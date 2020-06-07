@@ -1,0 +1,67 @@
+.card-action.top {
+    border-bottom: 1px solid rgba(160, 160, 160, 0.2);
+    padding: 5px 5px;
+
+    .collection {
+        border: none;
+        margin: 2px 0;
+        cursor: pointer;
+    }
+
+    .collection-item.avatar {
+        min-height: auto;
+    }
+}
+
+.card.conversas {
+    height: 97.5%;
+    margin-bottom: 0;
+    position: relative;
+    padding-bottom: 57px;
+
+    .card-action.bottom {
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        padding: 16px 10px;
+    }
+}
+
+.mensagem-wrapper {
+    display: flex;
+    flex-direction: row;
+
+    #mensagem {
+        border: 1px solid rgba(160, 160, 160, 0.2);
+        outline: none;
+        flex: 1 1 auto;
+    }
+
+    .enviar {
+        margin-right: 0 !important;
+        margin-left: 10px;
+        cursor: pointer;
+
+        i {
+            vertical-align: middle;
+        }
+    }
+
+}
+
+.enviado {
+    text-align: right;
+    max-width: 90%;
+    float: right;
+    margin-bottom: 5px !important;
+    background-color: #fafafa;
+}
+
+.recebido {
+    text-align: left;
+    max-width: 90%;
+    float: left;
+    margin-bottom: 5px !important;
+    background-color: #e1e1e1;
+}
