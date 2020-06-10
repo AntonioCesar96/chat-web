@@ -5,25 +5,36 @@
       <div class="card-stacked">
         <div class="card-content">
           <div class="row mb-0">
-            <form class="col s12">
+            <form class="col s12" [formGroup]="form" novalidate>
+              <div class="row mb-0" *ngIf="existeErros()">
+                <div class="input-field col s12">
+                  <div class="erros">
+                    <span *ngFor="let e of erro?.erros">{{ e }}</span>
+                  </div>
+                </div>
+              </div>
+
               <div class="row mb-0">
                 <div class="input-field col s12">
-                  <input id="nome" type="text" class="validate">
+                  <input id="nome" type="text" formControlName="nome">
                   <label for="nome">Nome</label>
                 </div>
               </div>
+
               <div class="row mb-0">
                 <div class="input-field col s12">
-                  <input id="email" type="email" class="validate">
+                  <input id="email" type="email" formControlName="email">
                   <label for="email">Email</label>
                 </div>
               </div>
+
               <div class="row mb-0">
                 <div class="input-field col s12">
-                  <input id="senha" type="password" class="validate">
+                  <input id="senha" type="password" maxlength="10" formControlName="senha">
                   <label for="senha">Senha</label>
                 </div>
               </div>
+
               <div class="row mb-0">
                 <div class="input-field col s12">
                   <a class="waves-effect waves-light btn" (click)="criarConta()">Criar Conta</a>

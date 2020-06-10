@@ -11,10 +11,24 @@ body {
     margin-bottom: 0 !important;
 }
 
-.clearfix::before, .clearfix::after {
+.clearfix::before, 
+.clearfix::after {
     content: ' ';
     display: table;
-  }
+}
+
 .clearfix::after {
     clear: both;
+}
+
+.erros {
+    color: #F44336;
+    background-color: #ffedeb;
+    border-radius: 5px;
+    border: 1px solid #fcd7d5;
+    padding: 2px 5px;
+    
+    span {
+        display: block;
+    }
 }

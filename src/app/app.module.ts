@@ -1,3 +1,4 @@
+import { UrlService } from './_common/services/url.service';
 import { HomeModule } from './home/home.module';
 import { AutenticacaoModule } from './autenticacao/autenticacao.module';
 import { ChatCommonModule } from './_common/common.module';
@@ -18,7 +19,7 @@ import { AppComponent } from './app.component';
   exports: [
     ChatCommonModule
   ],
-  providers: [],
+  providers: [UrlService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

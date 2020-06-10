@@ -1,5 +1,7 @@
+import { AutenticacaoService } from './../_common/services/autenticacao.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-home',
@@ -9,12 +11,17 @@ import { Router } from '@angular/router';
 export class HomeComponent implements OnInit {
 
   constructor(
-    private router: Router
+    private router: Router,
+    private location: Location,
+    private autenticacaoService: AutenticacaoService,
   ) { }
 
   ngOnInit() {
-    // setTimeout(() => {
-    //   this.router.navigate([`/entrar`]);
-    // }, 2000);
+    if (!this.autenticacaoService.estaLogado()) {
+      this.router.navigate([`/entrar`]);
+      return;
+    }
+
+    this.location.replaceState('/');
   }
 }
