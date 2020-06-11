@@ -1,24 +1,24 @@
 <div class="row height-100">
   <div class="col s12 height-100">
-    <div class="card conversas">
+    <div class="card conversa" *ngIf="!existeConversas()"></div>
+    <div class="card conversa" *ngIf="existeConversas()">
       <div class="card-action top">
         <ul class="collection">
           <li class="collection-item avatar">
-            <img src="https://materializecss.com/images/yuna.jpg" alt="" class="circle">
-            <span class="title">Title</span>
-            <p>First Line</p>
+            <img *ngIf="conversa.fotoUrl" [src]="conversa.fotoUrl" alt="" class="circle">
+            <i *ngIf="!conversa.fotoUrl" class="material-icons circle"></i>
+            <span class="title">{{ conversa.nome }}</span>
+            <p>On-line</p>
           </li>
         </ul>
       </div>
       <div class="card-content clearfix">
-        <p class="enviado">I am a very simple card. I am good at containing small bits of information.
-        I am convenient because I require little markup to use effectively.</p>
-        <p class="recebido">I am a very simple card. I am good at containing small bits of information.
-          I am convenient because I require little markup to use effectively.</p>
-      </div>
+        <div class="mensagem clearfix" *ngFor="let item of resultado?.lista">
+          <p [class]="definirClasse(item)">{{ item.mensagemEnviada }}</p>
+        </div>
       <div class="card-action bottom">
-        <div class="mensagem-wrapper">
-          <div id="mensagem" contenteditable="true"></div>
+        <div class="mensagem-enviar-wrapper">
+          <div id="mensagem-enviar" contenteditable="true"></div>
 
           <a class="enviar">
             <i class="material-icons">send</i>

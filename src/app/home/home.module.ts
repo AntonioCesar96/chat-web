@@ -1,3 +1,6 @@
+import { ConversaHandleService } from './services/conversa-handle.service';
+import { MensagemService } from './services/mensagem.service';
+import { ConversaService } from './services/conversa.service';
 import { HomeRouting } from './home.routing';
 import { ChatCommonModule } from './../_common/common.module';
 import { NgModule } from '@angular/core';
@@ -16,6 +19,10 @@ import { ConversaComponent } from './conversa/conversa.component';
     HomeRouting
   ],
   exports: [],
-  providers: []
+  providers: [
+    ConversaService,
+    MensagemService,
+    ConversaHandleService
+  ]
 })
 export class HomeModule { }

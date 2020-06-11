@@ -13,7 +13,7 @@
     }
 }
 
-.card.conversas {
+.card.conversa {
     height: 97.5%;
     margin-bottom: 0;
     position: relative;
@@ -28,11 +28,11 @@
     }
 }
 
-.mensagem-wrapper {
+.mensagem-enviar-wrapper {
     display: flex;
     flex-direction: row;
 
-    #mensagem {
+    #mensagem-enviar {
         border: 1px solid rgba(160, 160, 160, 0.2);
         outline: none;
         flex: 1 1 auto;
@@ -47,21 +47,27 @@
             vertical-align: middle;
         }
     }
-
 }
 
-.enviado {
-    text-align: right;
-    max-width: 90%;
-    float: right;
-    margin-bottom: 5px !important;
-    background-color: #fafafa;
-}
+.mensagem {
+    p {
+        padding: 5px 15px;
+        border-radius: 5px;
 
-.recebido {
-    text-align: left;
-    max-width: 90%;
-    float: left;
-    margin-bottom: 5px !important;
-    background-color: #e1e1e1;
+        &.enviado {
+            text-align: right;
+            max-width: 90%;
+            float: right;
+            margin-bottom: 5px !important;
+            background-color: #fafafa;
+        }
+        
+        &.recebido {
+            text-align: left;
+            max-width: 90%;
+            float: left;
+            margin-bottom: 5px !important;
+            background-color: #e1e1e1;
+        }
+    }
 }

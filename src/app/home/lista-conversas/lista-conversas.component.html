@@ -1,30 +1,14 @@
-<ul class="collection">
-  <li class="collection-item avatar">
-    <img src="https://materializecss.com/images/yuna.jpg" alt="" class="circle">
-    <span class="title">Title</span>
-    <p>First Line <br>
-       Second Line
-    </p>
+<ul class="collection" *ngIf="existeConversas()">
+  <li class="collection-item avatar" *ngFor="let item of resultado?.lista" (click)="selecionarConversa(item)">
+    <img *ngIf="item.fotoUrl" [src]="item.fotoUrl" alt="" class="circle">
+    <i *ngIf="!item.fotoUrl" class="material-icons circle"></i>
+    <span class="title">{{ item.nome }}</span>
+    <p>{{ item.ultimaMensagem }}</p>
   </li>
-  <li class="collection-item avatar">
-    <i class="material-icons circle">folder</i>
-    <span class="title">Title</span>
-    <p>First Line <br>
-       Second Line
-    </p>
-  </li>
-  <li class="collection-item avatar">
-    <i class="material-icons circle green">insert_chart</i>
-    <span class="title">Title</span>
-    <p>First Line <br>
-       Second Line
-    </p>
-  </li>
-  <li class="collection-item avatar">
-    <i class="material-icons circle red">play_arrow</i>
-    <span class="title">Title</span>
-    <p>First Line <br>
-       Second Line
-    </p>
+</ul>
+
+<ul class="collection" *ngIf="!existeConversas()">
+  <li class="collection-item">
+    <p>Nenhuma conversa encontrada.</p>
   </li>
 </ul>

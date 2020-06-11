@@ -63,7 +63,10 @@ export class CriarLoginComponent implements OnInit {
     }
 
     this.autenticacaoService.setContatoCriado(res as Contato);
+    this.alertarSucesso();
+  }
 
+  alertarSucesso() {
     this.alertaService.alertarSucessoComRetorno(
       StringResources.MSG_CONTA_CRIADA,
       '',

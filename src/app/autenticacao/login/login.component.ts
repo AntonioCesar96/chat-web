@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
     this.criarForm();
-    this.preencherCampos();
+    this.preencherCamposSeCriouContaAgora();
   }
 
   criarForm() {
@@ -38,16 +38,18 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  preencherCampos() {
+  preencherCamposSeCriouContaAgora() {
     const contato = this.autenticacaoService.getContatoCriado();
-    this.autenticacaoService.limparContatoCriado();
-
     if (!contato) { return; }
 
+    this.autenticacaoService.limparContatoCriado();
+    this.preencherCampos(contato);
+    this.criouContaAgora = true;
+  }
+
+  preencherCampos(contato: Contato) {
     this.form.get('email').setValue(contato.email);
     this.form.get('senha').setValue(contato.senha);
-
-    this.criouContaAgora = true;
   }
 
   entrar() {
