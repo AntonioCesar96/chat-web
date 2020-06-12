@@ -153,6 +153,8 @@ body {
     }
 
     .card-content {
+        display: flex;
+        flex-direction: column;
         height: 100%;
         overflow-y: scroll;
         background-color: #0b1419;
@@ -205,7 +207,18 @@ body {
         }
     }
     
+    .msg-y {
+        flex: 1 1 auto;
+        min-height: 12px;
+    }
+
+    .msg-loader {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
     .msg {
+        flex: 0 0 auto;
         .center {
             text-align: center;;
         }

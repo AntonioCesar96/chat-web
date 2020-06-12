@@ -13,6 +13,8 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   @Input() contato: Contato;
   ultimaConversa: UltimaConversa;
   conversaSubscription: Subscription;
+  contatoDigitandoSubscription: Subscription;
+  estaDigitando = false;
 
   constructor(
     private conversaHandleService: ConversaHandleService,
@@ -32,6 +34,12 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
       .conversaSelecionada()
       .subscribe((conversa) => {
         this.ultimaConversa = conversa;
+    });
+
+    this.contatoDigitandoSubscription = this.appSignalRService
+      .receberContatoDigitando()
+      .subscribe((estaDigitando) => {
+        this.estaDigitando = estaDigitando;
     });
   }
 }

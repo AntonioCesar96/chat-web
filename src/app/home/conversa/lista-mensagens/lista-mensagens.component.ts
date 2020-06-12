@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Input, Output } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';
 import { Mensagem } from 'src/app/_common/models/mensagem.model';
@@ -13,8 +13,10 @@ import { AppSignalRService } from 'src/app/_common/services/signalr-service.serv
   selector: 'app-lista-mensagens',
   templateUrl: './lista-mensagens.component.html'
 })
-export class ListaMensagensComponent implements OnInit, OnDestroy {
+export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() contato: Contato;
+  @ViewChild('mensagem') mensagem: ElementRef;
+  @ViewChildren('mensagemPorData') viewsMensagemData: QueryList<any>;
 
   filtro: MensagemFiltro;
   mensagensPorData: Map<string, Mensagem[]>;
@@ -22,6 +24,10 @@ export class ListaMensagensComponent implements OnInit, OnDestroy {
   ultimaConversa: UltimaConversa;
   conversaSubscription: Subscription;
   receberMensagemSubscription: Subscription;
+  manterScroll = false;
+  buscandoMensagens = false;
+  ultimaPagina = false;
+  scrollHeightOld = 0;
 
   constructor(
     private mensagemService: MensagemService,
@@ -30,6 +36,22 @@ export class ListaMensagensComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.inicializar();
+  }
+
+  ngAfterViewInit() {
+    this.viewsMensagemData.changes.subscribe(t => {
+      this.viewsMensagemRenderizadas();
+    })
+  }
+
+  viewsMensagemRenderizadas() {
+    const elemento = this.mensagem.nativeElement;
+    if(this.manterScroll) {
+      elemento.scrollTop = elemento.scrollTop + (elemento.scrollHeight - this.scrollHeightOld);
+      return;
+    }
+
+    elemento.scrollTop = elemento.scrollHeight - elemento.offsetHeight;
   }
 
   ngOnDestroy() {
@@ -45,19 +67,35 @@ export class ListaMensagensComponent implements OnInit, OnDestroy {
       .conversaSelecionada()
       .subscribe((conversa) => {
         this.ultimaConversa = conversa;
+        this.inicializarVariaveis()
         this.criarListaInicial();
-        this.obterMensagens(conversa.conversaId);
+        this.criarFiltro(conversa.conversaId);
+        this.obterMensagens();
     });
 
     this.receberMensagemSubscription = this.appSignalRService
-    .receberMensagem()
-    .subscribe((mensagem) => {
-      this.receberMensagem(mensagem);
+      .receberMensagem()
+      .subscribe((mensagem) => {
+        this.receberMensagem(mensagem);
     });
   }
 
-  existeConversas() {
-    return !!this.resultado && this.resultado.lista.length > 0;
+  inicializarVariaveis() {
+    this.manterScroll = false;
+    this.buscandoMensagens = false;
+    this.ultimaPagina = false;
+  }
+
+  receberMensagem(mensagem: Mensagem) {
+    if(!this.ultimaConversa ||
+        this.ultimaConversa.conversaId !== mensagem.conversaId) {
+      return;
+    }
+
+    this.resultado.lista.push(mensagem);
+    this.resultado.total++;
+    this.manterScroll = false;
+    this.ordenarMensagens()
   }
 
   ehIgualAoContatoLogado(item: Mensagem) {
@@ -77,11 +115,17 @@ export class ListaMensagensComponent implements OnInit, OnDestroy {
     this.ordenarMensagens();
   }
 
-  obterMensagens(conversaId: number) {
+  criarFiltro(conversaId: number) {
     this.filtro = new MensagemFiltro(conversaId);
+  }
+
+  obterMensagens() {
+    this.buscandoMensagens = true;
     this.mensagemService.obterMensagens(this.filtro)
       .subscribe(res => {
         this.resultado = res as Resultado<Mensagem>;
+        this.buscandoMensagens = false;
+        this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
         this.ordenarMensagens();
       });
   }
@@ -92,7 +136,6 @@ export class ListaMensagensComponent implements OnInit, OnDestroy {
       .filter((item, i, ar) => ar.indexOf(item) === i)
       .sort((d1,d2) => new Date(d1).getTime() - new Date(d2).getTime());
 
-
     this.mensagensPorData = new Map<string, Mensagem[]>();
     datas.forEach(data => {
       const mensagens = lista.filter(x => new Date(x.dataEnvio).toDateString() === data)
@@ -102,14 +145,30 @@ export class ListaMensagensComponent implements OnInit, OnDestroy {
     });
   }
 
-  receberMensagem(mensagem: Mensagem) {
-    if(!this.ultimaConversa ||
-        this.ultimaConversa.conversaId !== mensagem.conversaId) {
-      return;
-    }
+  onScroll(target) {
+    this.scrollHeightOld = target.scrollHeight;
+    if (!this.ultimaPagina && !this.buscandoMensagens) {
+      const comecoTela = target.scrollTop - 100;
 
-    this.resultado.lista.push(mensagem);
-    this.resultado.total++;
-    this.ordenarMensagens()
+      if (comecoTela <= 0) {
+        this.obterMensagensPaginado();
+      }
+    }
+  }
+
+  obterMensagensPaginado() {
+    this.filtro.pagina++;
+    this.manterScroll = true;
+    this.buscandoMensagens = true;
+    this.mensagemService.obterMensagens(this.filtro)
+      .subscribe(res => {
+        const resultado = res as Resultado<Mensagem>;
+
+        this.resultado.total = resultado.total;
+        this.resultado.lista.push(...resultado.lista);
+        this.ordenarMensagens();
+        this.buscandoMensagens = false;
+        this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
+      });
   }
 }

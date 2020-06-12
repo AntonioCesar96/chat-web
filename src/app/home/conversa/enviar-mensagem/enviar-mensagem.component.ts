@@ -14,7 +14,9 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   @ViewChild('mensagemEnviar') mensagem: ElementRef;
   @Input() contato: Contato;
   @Input() ultimaConversa: UltimaConversa;
-
+  estaDigitando = false;
+  tempo = 0;
+  ultimoTimer;
   conversaSubscription: Subscription;
 
   constructor(
@@ -39,7 +41,40 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     });
   }
 
-  onMensage2mChange(mensagem) { }
+  onMensagemChange(mensagem) {
+    this.tempo =  new Date().getTime();
+    this.enviarQueEstaDigitando();
+
+    clearTimeout(this.ultimoTimer);
+    this.validarTempo();
+  }
+
+  validarTempo() {
+    this.ultimoTimer = setTimeout(() => {
+      if((new Date().getTime() - this.tempo) <= 5000) {
+        this.validarTempo();
+        return;
+      }
+      this.enviarQueNaoEstaDigitando();
+    }, 1000);
+  }
+
+  enviarQueEstaDigitando() {
+    if(this.estaDigitando) { return; }
+
+    this.estaDigitando = true;
+
+    this.appSignalRService.run('EnviarContatoDigitando',
+      true, this.ultimaConversa.contatoAmigoId);
+  }
+
+  enviarQueNaoEstaDigitando() {
+    if(!this.estaDigitando) { return; }
+
+    this.estaDigitando = false;
+    this.appSignalRService.run('EnviarContatoDigitando',
+      false, this.ultimaConversa.contatoAmigoId);
+  }
 
   onEnviarMensagem(event: KeyboardEvent) {
     // tslint:disable-next-line: deprecation

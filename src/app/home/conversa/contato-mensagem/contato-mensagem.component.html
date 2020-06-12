@@ -4,7 +4,8 @@
         <img class="circle" *ngIf="ultimaConversa?.fotoUrl" [src]="ultimaConversa?.fotoUrl">
         <i class="material-icons circle" *ngIf="!ultimaConversa?.fotoUrl"></i>
         <span class="title">{{ ultimaConversa?.nome }}</span>
-        <p>On-line</p>
+        <p *ngIf="!estaDigitando">On-line</p>
+        <p *ngIf="estaDigitando">Esta digitando...</p>
       </li>
     </ul>
 </div>

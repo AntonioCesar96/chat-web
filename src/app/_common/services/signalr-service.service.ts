@@ -7,7 +7,8 @@ import { Subscription, Subject, Observable } from 'rxjs';
 @Injectable()
 export class AppSignalRService implements OnDestroy {
   public connectionEstablished = new EventEmitter<boolean>();
-  public receberMensagemSubject = new Subject<Mensagem>()
+  public receberMensagemSubject = new Subject<Mensagem>();
+  public contatoDigitandoSubject = new Subject<boolean>();
   public iniciarConexaoTimeoutDelay = 3000;
   public autoReconnect = true;
 
@@ -95,6 +96,10 @@ export class AppSignalRService implements OnDestroy {
     this.hubConnection.on('ReceberMensagem', (mensagem) => {
       this.enviarMensagem(mensagem);
     });
+
+    this.hubConnection.on('ReceberContatoDigitando', (mensagem) => {
+      this.enviarContatoDigitando(mensagem);
+    });
   }
 
   getConexaoEstaEstabelecida(): boolean {
@@ -103,6 +108,14 @@ export class AppSignalRService implements OnDestroy {
 
   getHubConnection(): HubConnection {
     return this.hubConnection;
+  }
+
+  public receberContatoDigitando(): Observable<boolean> {
+    return this.contatoDigitandoSubject.asObservable();
+  }
+
+  public enviarContatoDigitando(estaDigitando: boolean) {
+    this.contatoDigitandoSubject.next(estaDigitando);
   }
 
   public receberMensagem(): Observable<Mensagem> {

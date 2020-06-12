@@ -1,11 +1,25 @@
-<div class="card-content clearfix" *ngIf="ultimaConversa">
-    <div class="msg clearfix" *ngFor="let item of mensagensPorData | keyvalue">
+<div #mensagem (scroll)="onScroll($event.target)" class="card-content clearfix" *ngIf="ultimaConversa">
+  <div class="msg-y"></div>  
+  <div class="msg-loader" *ngIf="buscandoMensagens">
+    <div class="preloader-wrapper small active">
+      <div class="spinner-layer spinner-green-only">
+        <div class="circle-clipper left">
+          <div class="circle"></div>
+        </div><div class="gap-patch">
+          <div class="circle"></div>
+        </div><div class="circle-clipper right">
+          <div class="circle"></div>
+        </div>
+      </div>
+    </div>
+  </div>  
+  <div #mensagemPorData *ngFor="let item of mensagensPorData | keyvalue" class="msg clearfix">
       <div class="center">
         <div class="data">
           <span>{{ item.key }}</span>
         </div>          
       </div>
-      <div class="clearfix" *ngFor="let mensagem of item.value">
+      <div *ngFor="let mensagem of item.value" class="clearfix">
         <p [ngClass]="ehIgualAoContatoLogado(mensagem) ? 'enviado' : 'recebido'">
           {{ mensagem.mensagemEnviada }}
         </p>
