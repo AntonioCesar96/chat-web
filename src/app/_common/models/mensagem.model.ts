@@ -4,5 +4,5 @@ export class Mensagem {
   contatoRemetenteId: number;
   contatoDestinatarioId: number;
   mensagemEnviada: string;
-  dataEnvio: Date;
+  dataEnvio: string;
 }

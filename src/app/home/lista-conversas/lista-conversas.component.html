@@ -1,14 +1,16 @@
-<ul class="collection" *ngIf="existeConversas()">
-  <li class="collection-item avatar" *ngFor="let item of resultado?.lista" (click)="selecionarConversa(item)">
-    <img *ngIf="item.fotoUrl" [src]="item.fotoUrl" alt="" class="circle">
-    <i *ngIf="!item.fotoUrl" class="material-icons circle"></i>
-    <span class="title">{{ item.nome }}</span>
-    <p>{{ item.ultimaMensagem }}</p>
-  </li>
-</ul>
+<div class="lista-conversas">
+  <ul class="collection" *ngIf="existeConversas()">
+    <li class="collection-item avatar" *ngFor="let item of resultado?.lista" (click)="selecionarConversa(item)">
+      <img class="circle" [src]="item.fotoUrl" *ngIf="item.fotoUrl">
+      <i class="material-icons circle" *ngIf="!item.fotoUrl"></i>
+      <span class="title">{{ item.nome }}</span>
+      <p>{{ item.ultimaMensagem }}</p>
+    </li>
+  </ul>
 
-<ul class="collection" *ngIf="!existeConversas()">
-  <li class="collection-item">
-    <p>Nenhuma conversa encontrada.</p>
-  </li>
-</ul>
+  <ul class="collection" *ngIf="!existeConversas()">
+    <li class="collection-item">
+      <p>Nenhuma conversa encontrada.</p>
+    </li>
+  </ul>
+</div>

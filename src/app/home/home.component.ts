@@ -1,3 +1,4 @@
+import { AppSignalRService } from './../_common/services/signalr-service.service';
 import { AutenticacaoService } from './../_common/services/autenticacao.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
@@ -5,8 +6,7 @@ import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
 
@@ -14,6 +14,7 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private location: Location,
     private autenticacaoService: AutenticacaoService,
+    private appSignalRService: AppSignalRService,
   ) { }
 
   ngOnInit() {
@@ -23,5 +24,10 @@ export class HomeComponent implements OnInit {
     }
 
     this.location.replaceState('/');
+
+    const contato = this.autenticacaoService.getContatoLogado();
+    this.appSignalRService.criarConexao('/chatHub', contato.contatoId);
+    this.appSignalRService.iniciarConexao();
+    this.appSignalRService.configurarMetodoReceberMensagem();
   }
 }

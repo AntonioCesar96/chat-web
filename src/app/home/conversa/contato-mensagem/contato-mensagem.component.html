@@ -1,0 +1,10 @@
+<div class="card-action top" *ngIf="ultimaConversa">
+    <ul class="collection">
+      <li class="collection-item avatar">
+        <img class="circle" *ngIf="ultimaConversa?.fotoUrl" [src]="ultimaConversa?.fotoUrl">
+        <i class="material-icons circle" *ngIf="!ultimaConversa?.fotoUrl"></i>
+        <span class="title">{{ ultimaConversa?.nome }}</span>
+        <p>On-line</p>
+      </li>
+    </ul>
+</div>

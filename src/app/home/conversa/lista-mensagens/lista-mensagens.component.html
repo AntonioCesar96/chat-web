@@ -1,0 +1,14 @@
+<div class="card-content clearfix" *ngIf="ultimaConversa">
+    <div class="msg clearfix" *ngFor="let item of mensagensPorData | keyvalue">
+      <div class="center">
+        <div class="data">
+          <span>{{ item.key }}</span>
+        </div>          
+      </div>
+      <div class="clearfix" *ngFor="let mensagem of item.value">
+        <p [ngClass]="ehIgualAoContatoLogado(mensagem) ? 'enviado' : 'recebido'">
+          {{ mensagem.mensagemEnviada }}
+        </p>
+      </div>
+    </div>
+</div>

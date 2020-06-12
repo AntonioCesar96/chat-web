@@ -6,7 +6,7 @@ export class UrlService {
   URL_BASE = '';
 
   constructor() {
-    this.URL_BASE = StringResources.URL_API;
+    this.URL_BASE = `${StringResources.URL_SERVIDOR}/${StringResources.API}`;
   }
 
   denifirUrlBase(url: string) {

@@ -6,6 +6,6 @@ export class MensagemFiltro {
   constructor(conversaId: number) {
     this.conversaId = conversaId;
     this.pagina = 1;
-    this.totalPorPagina = 10;
+    this.totalPorPagina = 30;
   }
 }

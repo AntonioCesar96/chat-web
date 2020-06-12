@@ -1,30 +1,16 @@
-<div class="row height-100">
-  <div class="col s12 height-100">
-    <div class="card conversa" *ngIf="!existeConversas()"></div>
-    <div class="card conversa" *ngIf="existeConversas()">
-      <div class="card-action top">
-        <ul class="collection">
-          <li class="collection-item avatar">
-            <img *ngIf="conversa.fotoUrl" [src]="conversa.fotoUrl" alt="" class="circle">
-            <i *ngIf="!conversa.fotoUrl" class="material-icons circle"></i>
-            <span class="title">{{ conversa.nome }}</span>
-            <p>On-line</p>
-          </li>
-        </ul>
-      </div>
-      <div class="card-content clearfix">
-        <div class="mensagem clearfix" *ngFor="let item of resultado?.lista">
-          <p [class]="definirClasse(item)">{{ item.mensagemEnviada }}</p>
-        </div>
-      <div class="card-action bottom">
-        <div class="mensagem-enviar-wrapper">
-          <div id="mensagem-enviar" contenteditable="true"></div>
+<div class="conversa height-100">
+  <div class="card">
+    <app-contato-mensagem
+      [contato]="contato">
+    </app-contato-mensagem>
+    
+    <app-lista-mensagens
+      [contato]="contato" >
+    </app-lista-mensagens>
 
-          <a class="enviar">
-            <i class="material-icons">send</i>
-          </a>
-        </div>
-      </div>
-    </div>
+    <app-enviar-mensagem 
+      [contato]="contato" 
+      [ultimaConversa]="ultimaConversa">
+    </app-enviar-mensagem>
   </div>
 </div>

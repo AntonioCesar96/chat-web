@@ -10,8 +10,7 @@ import { StringResources } from 'src/app/string-resources';
 
 @Component({
   selector: 'app-criar-login',
-  templateUrl: './criar-login.component.html',
-  styleUrls: ['./criar-login.component.scss']
+  templateUrl: './criar-login.component.html'
 })
 export class CriarLoginComponent implements OnInit {
   form: FormGroup;

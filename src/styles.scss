@@ -1,5 +1,18 @@
+::-webkit-scrollbar {
+    width: 6px!important;
+    height: 6px!important
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: hsla(0,0%,100%,.16);
+}
+
+::-webkit-scrollbar-track {
+    background: hsla(0,0%,100%,.1);
+}
+
 body {
-    background-color: #eaeaea;
+    background-image: url(assets/images/default-bg-dark.jpg)
 }
 
 .mb-0 {
@@ -21,6 +34,12 @@ body {
     clear: both;
 }
 
+.main-container {
+    width: 100%;
+    margin: 0 auto;
+    max-width: 1380px;
+}
+
 .erros {
     color: #F44336;
     background-color: #ffedeb;
@@ -30,5 +49,204 @@ body {
     
     span {
         display: block;
+    }
+}
+
+.login {
+    .card.horizontal {
+        margin-top: 100px;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    .card-action {
+        text-align: center;
+    
+        a {
+            margin-right: 0 !important;
+        }
+    }
+}
+
+.criar-login {
+    .card.horizontal {
+        margin-top: 100px;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    .card-action {
+        text-align: center;
+    
+        a {
+            margin-right: 0 !important;
+        }
+    }
+}
+
+
+.home-box-wrapper {
+    display: flex;
+    align-items: stretch;
+}
+
+.home-box {
+    flex: 30%;
+
+    + .home-box {
+        flex: 70%;
+    }
+}
+
+.lista-conversas {
+    .collection-item.avatar {
+        cursor: pointer;
+    }
+    
+    .collection {
+        background-color: #101d24;
+        color: #f1f1f2de;
+        border: none;
+    
+        .collection-item {
+            border: none;
+        }
+    
+        .collection-item.avatar {
+            background-color: inherit;
+        }
+    }
+}
+
+.conversa .card {
+    height: 97.5%;
+    margin-bottom: 0;
+    position: relative;
+    padding-bottom: 69px;
+    padding-top: 81px;
+    background-color: #222e35;
+
+    .card-action.top {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border-bottom: 1px solid rgba(160, 160, 160, 0.2);
+        padding: 5px 5px;
+        background-color: #222e35;
+        color: #f1f1f2de;
+    
+        .collection {
+            border: none;
+            margin: 2px 0;
+            cursor: pointer;
+        }
+    
+        .collection-item.avatar {
+            min-height: auto;
+            background-color: inherit;
+        }
+    }
+
+    .card-content {
+        height: 100%;
+        overflow-y: scroll;
+        background-color: #0b1419;
+    }
+
+    .card-action.bottom {
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        padding: 16px 10px;
+        background-color: #222e35;
+        color: #f1f1f2de;
+    }
+
+    .msg-bottom {
+        display: flex;
+        flex-direction: row;
+    
+        .msg-input {
+            outline: none;
+            line-height: 18px;
+            min-height: 20px;
+        }
+
+        .msg-input-w {
+            align-items: center;
+            border: none;
+            outline: none;
+            flex: 1 1 auto;
+            background-color: #101d24;
+            border-radius: 21px;
+            line-height: 37px;
+            padding-left: 10px;
+            min-height: 37px;
+            padding: 8px 16px;
+        }
+    
+        .msg-btn-enviar {
+            align-items: center;
+            display: flex;
+            margin-right: 0 !important;
+            margin-left: 10px;
+            color: #80868b !important;
+            cursor: pointer;
+    
+            i {
+                vertical-align: middle;
+            }
+        }
+    }
+    
+    .msg {
+        .center {
+            text-align: center;;
+        }
+
+        .data {
+            box-sizing: border-box;
+            color: #f1f1f2de;
+            display: inline-block;
+            flex: none;
+            font-size: 12.5px;
+            line-height: 21px;
+            max-width: 100% !important;
+            background-color: #1e2a30;
+            border-radius: 7.5px;
+            box-shadow: 0 1px .5px rgba(var(--shadow-rgb),.13);
+            padding: 5px 12px 6px;
+            text-align: center;
+            text-shadow: none;
+        }
+
+        p {
+            padding: 5px 15px;
+            border-radius: 7px;
+    
+            &.enviado {
+                text-align: right;
+                max-width: 90%;
+                float: right;
+                margin-bottom: 5px !important;
+                background-color: #054740;
+                color: #f1f1f2de;
+            }
+            
+            &.recebido {
+                text-align: left;
+                max-width: 90%;
+                float: left;
+                margin-bottom: 5px !important;
+                background-color: #222e35;
+                color: #f1f1f2de;
+            }
+        }
     }
 }

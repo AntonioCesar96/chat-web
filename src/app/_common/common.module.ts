@@ -1,3 +1,4 @@
+import { AppSignalRService } from './services/signalr-service.service';
 import { CookieService } from './services/cookie.service';
 import { AutenticacaoService } from './services/autenticacao.service';
 import { AlertaService } from './services/alerta.service';
@@ -32,7 +33,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   providers: [
     AlertaService,
     AutenticacaoService,
-    CookieService
+    CookieService,
+    AppSignalRService
   ]
 })
 export class ChatCommonModule { }

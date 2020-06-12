@@ -1,18 +1,18 @@
-import { Conversa } from './../../_common/models/conversa.model';
+import { UltimaConversa } from './../../_common/models/ultima-conversa.model';
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class ConversaHandleService {
-  conversaSelecionadaSubject = new Subject<Conversa>();
+  conversaSelecionadaSubject = new Subject<UltimaConversa>();
 
   constructor() { }
 
-  public conversaSelecionada(): Observable<Conversa> {
+  public conversaSelecionada(): Observable<UltimaConversa> {
     return this.conversaSelecionadaSubject.asObservable();
   }
 
-  public selecionarConversa(conversa: Conversa) {
+  public selecionarConversa(conversa: UltimaConversa) {
     this.conversaSelecionadaSubject.next(conversa);
   }
 }
