@@ -20,9 +20,10 @@
         </div>          
       </div>
       <div *ngFor="let mensagem of item.value" class="clearfix">
-        <p [ngClass]="ehIgualAoContatoLogado(mensagem) ? 'enviado' : 'recebido'">
-          {{ mensagem.mensagemEnviada }}
-        </p>
+        <div [ngClass]="ehIgualAoContatoLogado(mensagem) ? 'enviado' : 'recebido'">
+          <div class="msg-d1"><span>{{ mensagem.mensagemEnviada }}</span></div>
+          <span class="msg-data">{{ mensagem.dataEnvio | date: 'HH:mm' }}</span>
+        </div>
       </div>
     </div>
 </div>

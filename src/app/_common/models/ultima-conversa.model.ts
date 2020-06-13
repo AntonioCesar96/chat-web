@@ -7,4 +7,7 @@ export class UltimaConversa {
   nome: string;
   fotoUrl: string;
   dataEnvio: string;
+
+  estaDigitando: boolean;
+  ultimoStatus: string;
 }

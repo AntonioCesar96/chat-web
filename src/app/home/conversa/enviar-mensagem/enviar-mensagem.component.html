@@ -1,11 +1,10 @@
 <div class="card-action bottom" *ngIf="ultimaConversa">
     <div class="msg-bottom">
-      {{ estaDigitando }}
       <div class="msg-input-w">
         <div class="msg-input" 
           #mensagemEnviar
           contenteditable="true" 
-          (input)="onMensagemChange($event.target.innerHTML)"
+          (input)="avisarContatoDigitando()"
           (keypress)="onEnviarMensagem($event)"></div>
       </div>
       <a class="msg-btn-enviar" (click)="enviarMensagem()">

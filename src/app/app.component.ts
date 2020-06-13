@@ -1,10 +1,9 @@
+import { Location } from '@angular/common';
 import { CookieService } from './_common/services/cookie.service';
 import { Contato } from './_common/models/contato.model';
 import { AutenticacaoService } from './_common/services/autenticacao.service';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { LoginService } from './autenticacao/login.service';
-import { StringResources } from './string-resources';
-import { UrlService } from './_common/services/url.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -16,12 +15,24 @@ export class AppComponent implements OnInit {
   constructor(
     private loginService: LoginService,
     private router: Router,
+    private location: Location,
     private autenticacaoService: AutenticacaoService,
     private cookieService: CookieService,
   ) { }
 
   async ngOnInit() {
+    this.addEventoReload();
     await this.autenticar();
+  }
+
+  addEventoReload() {
+    this.router.events.subscribe(event => {
+      if(event instanceof NavigationEnd) {
+        if(event.url === '/home' || event.url === '/') { return; }
+        this.location.replaceState('/');
+        location.reload();
+      }
+    });
   }
 
   private async autenticar() {

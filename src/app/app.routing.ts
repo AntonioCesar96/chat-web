@@ -1,10 +1,10 @@
 import { RouterModule } from '@angular/router';
-import { HomeComponent } from './home/home.component';
+import { LoginComponent } from './autenticacao/login/login.component';
 
 export const AppRouting = RouterModule.forRoot(
     [
-      { path: '', component: HomeComponent },
-      { path: '**', component: HomeComponent }
+      { path: '', component: LoginComponent },
+      { path: '**', component: LoginComponent }
     ],
     { useHash: true }
   );

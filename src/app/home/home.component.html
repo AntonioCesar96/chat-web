@@ -1,9 +1,12 @@
 
 <div class="home-box-wrapper height-100">
   <div class="home-box">
-    <app-lista-conversas></app-lista-conversas>
+    <app-lista-conversas (criarComponente)="criarComponente()"></app-lista-conversas>
   </div>
   <div class="home-box height-100">
-    <app-conversa></app-conversa>
+    <!-- <app-conversa></app-conversa> -->
+
+    <ng-template #dynamicComponent></ng-template>
+
   </div>
 </div>

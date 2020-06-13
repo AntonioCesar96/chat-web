@@ -7,7 +7,7 @@ import { Resultado } from './../../_common/models/resultado.model';
 import { AutenticacaoService } from './../../_common/services/autenticacao.service';
 import { ConversaFiltro } from './../../_common/models/conversa.filtro';
 import { ConversaService } from '../services/conversa.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -15,10 +15,12 @@ import { Subscription } from 'rxjs';
   templateUrl: './lista-conversas.component.html'
 })
 export class ListaConversasComponent implements OnInit, OnDestroy {
+  @Output() criarComponente = new EventEmitter();
   filtro: ConversaFiltro;
   contatoLogado: Contato;
   resultado: Resultado<UltimaConversa>;
   receberMensagemSubscription: Subscription;
+  contatoDigitandoSubscription: Subscription;
 
   constructor(
     private conversaService: ConversaService,
@@ -45,6 +47,18 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
     .subscribe((mensagem) => {
       this.receberMensagem(mensagem);
     });
+
+    this.contatoDigitandoSubscription = this.appSignalRService
+      .receberContatoDigitando()
+      .subscribe((res) => {
+        this.validarContatoQueEstaDigitando(res);
+    });
+  }
+
+  validarContatoQueEstaDigitando(res) {
+    const amigo = this.resultado.lista.find(x => x.contatoAmigoId === res.contatoQueEstaDigitandoId)
+    if(!amigo) { return; }
+    amigo.estaDigitando = res.estaDigitando
   }
 
   obterConversasDoContato(contatoId: number) {
@@ -64,6 +78,7 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   public selecionarConversa(conversa: UltimaConversa) {
+    this.criarComponente.emit();
     this.conversaHandleService.selecionarConversa(conversa);
   }
 

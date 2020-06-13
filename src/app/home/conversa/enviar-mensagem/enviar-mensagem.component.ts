@@ -41,7 +41,37 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     });
   }
 
-  onMensagemChange(mensagem) {
+  onEnviarMensagem(event: KeyboardEvent) {
+    // tslint:disable-next-line: deprecation
+    if (event.code === 'Enter' || event.code === 'NumpadEnter') {
+      this.enviarMensagem();
+      return false;
+    }
+  }
+
+  enviarMensagem() {
+    if(!this.mensagem.nativeElement.innerText ||
+      this.mensagem.nativeElement.innerText === '') {
+      return;
+    }
+
+    clearTimeout(this.ultimoTimer);
+    this.enviarQueNaoEstaDigitando();
+
+    this.appSignalRService.run('EnviarMensagem', this.criarMensagem());
+    this.mensagem.nativeElement.innerText = '';
+  }
+
+  criarMensagem() {
+    const mensagem = new Mensagem();
+    mensagem.conversaId = this.ultimaConversa.conversaId;
+    mensagem.contatoRemetenteId = this.contato.contatoId;
+    mensagem.contatoDestinatarioId = this.ultimaConversa.contatoAmigoId;
+    mensagem.mensagemEnviada = this.mensagem.nativeElement.innerText;
+    return mensagem;
+  }
+
+  avisarContatoDigitando() {
     this.tempo =  new Date().getTime();
     this.enviarQueEstaDigitando();
 
@@ -65,7 +95,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     this.estaDigitando = true;
 
     this.appSignalRService.run('EnviarContatoDigitando',
-      true, this.ultimaConversa.contatoAmigoId);
+      true, this.ultimaConversa.contatoAmigoId, this.contato.contatoId);
   }
 
   enviarQueNaoEstaDigitando() {
@@ -73,33 +103,6 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
 
     this.estaDigitando = false;
     this.appSignalRService.run('EnviarContatoDigitando',
-      false, this.ultimaConversa.contatoAmigoId);
-  }
-
-  onEnviarMensagem(event: KeyboardEvent) {
-    // tslint:disable-next-line: deprecation
-    if (event.code === 'Enter') {
-      this.enviarMensagem();
-      return false;
-    }
-  }
-
-  enviarMensagem() {
-    if(!this.mensagem.nativeElement.innerText ||
-      this.mensagem.nativeElement.innerText === '') {
-      return;
-    }
-
-    this.appSignalRService.run('EnviarMensagem', this.criarMensagem());
-    this.mensagem.nativeElement.innerText = '';
-  }
-
-  criarMensagem() {
-    const mensagem = new Mensagem();
-    mensagem.conversaId = this.ultimaConversa.conversaId;
-    mensagem.contatoRemetenteId = this.contato.contatoId;
-    mensagem.contatoDestinatarioId = this.ultimaConversa.contatoAmigoId;
-    mensagem.mensagemEnviada = this.mensagem.nativeElement.innerText;
-    return mensagem;
+      false, this.ultimaConversa.contatoAmigoId, this.contato.contatoId);
   }
 }

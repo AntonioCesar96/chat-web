@@ -14,7 +14,6 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   ultimaConversa: UltimaConversa;
   conversaSubscription: Subscription;
   contatoDigitandoSubscription: Subscription;
-  estaDigitando = false;
 
   constructor(
     private conversaHandleService: ConversaHandleService,
@@ -37,9 +36,11 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
     });
 
     this.contatoDigitandoSubscription = this.appSignalRService
-      .receberContatoDigitando()
-      .subscribe((estaDigitando) => {
-        this.estaDigitando = estaDigitando;
+      .receberStatusContato()
+      .subscribe((res) => {
+        if (this.ultimaConversa && this.ultimaConversa.contatoAmigoId === res.contatoId) {
+          this.ultimaConversa.ultimoStatus = res.ultimoStatus;
+        }
     });
   }
 }

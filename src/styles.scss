@@ -95,10 +95,14 @@ body {
 }
 
 .home-box {
-    flex: 30%;
+    float: left;
+    
+    &:first-child {
+        width: 30%;
+    }
 
     + .home-box {
-        flex: 70%;
+        width: 70%;
     }
 }
 
@@ -120,6 +124,13 @@ body {
             background-color: inherit;
         }
     }
+    .ultima-mensagem {
+        p {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
 }
 
 .conversa .card {
@@ -127,7 +138,7 @@ body {
     margin-bottom: 0;
     position: relative;
     padding-bottom: 69px;
-    padding-top: 81px;
+    padding-top: 59px;
     background-color: #222e35;
 
     .card-action.top {
@@ -139,16 +150,34 @@ body {
         padding: 5px 5px;
         background-color: #222e35;
         color: #f1f1f2de;
+        height: 59px;
+        box-sizing: border-box;
+        padding: 8px 16px;
     
         .collection {
             border: none;
             margin: 2px 0;
             cursor: pointer;
+            margin: 0;
         }
     
         .collection-item.avatar {
             min-height: auto;
             background-color: inherit;
+            padding: 0;
+            padding-left: 55px;
+            height: 40px;
+        }
+        .material-icons.circle {
+            width: 40px;
+            height: 40px;
+            left: 0;
+        }
+        .status {
+            color: #f1f1f299;
+            font-size: 13px;
+            line-height: 14px;
+            min-height: 20px;
         }
     }
 
@@ -158,6 +187,7 @@ body {
         height: 100%;
         overflow-y: scroll;
         background-color: #0b1419;
+        padding: 15px 80px;
     }
 
     .card-action.bottom {
@@ -239,27 +269,42 @@ body {
             text-shadow: none;
         }
 
-        p {
-            padding: 5px 15px;
+        .msg-d1 {
+            margin-right: 60px;
+        }
+
+        .enviado,
+        .recebido {
+            padding: 4px 7px 6px 9px;
             border-radius: 7px;
-    
-            &.enviado {
-                text-align: right;
-                max-width: 90%;
-                float: right;
-                margin-bottom: 5px !important;
-                background-color: #054740;
-                color: #f1f1f2de;
-            }
-            
-            &.recebido {
-                text-align: left;
-                max-width: 90%;
-                float: left;
-                margin-bottom: 5px !important;
-                background-color: #222e35;
-                color: #f1f1f2de;
-            }
+        }
+
+        .enviado {
+            text-align: right;
+            max-width: 90%;
+            float: right;
+            margin-bottom: 5px !important;
+            background-color: #054740;
+            color: #f1f1f2de;
+        }
+        
+        .recebido {
+            text-align: left;
+            max-width: 90%;
+            float: left;
+            margin-bottom: 5px !important;
+            background-color: #222e35;
+            color: #f1f1f2de;
+        }
+
+        .msg-data {
+            font-size: 11px;
+            height: 15px;
+            line-height: 15px;
+            white-space: nowrap;
+            color: #f1f1f299;
+            float: right;
+            margin: -10px 0 -5px 4px;
         }
     }
 }

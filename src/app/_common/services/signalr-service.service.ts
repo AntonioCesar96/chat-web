@@ -8,7 +8,8 @@ import { Subscription, Subject, Observable } from 'rxjs';
 export class AppSignalRService implements OnDestroy {
   public connectionEstablished = new EventEmitter<boolean>();
   public receberMensagemSubject = new Subject<Mensagem>();
-  public contatoDigitandoSubject = new Subject<boolean>();
+  public contatoDigitandoSubject = new Subject<any>();
+  public statusContatoSubject = new Subject<any>();
   public iniciarConexaoTimeoutDelay = 3000;
   public autoReconnect = true;
 
@@ -97,8 +98,12 @@ export class AppSignalRService implements OnDestroy {
       this.enviarMensagem(mensagem);
     });
 
-    this.hubConnection.on('ReceberContatoDigitando', (mensagem) => {
-      this.enviarContatoDigitando(mensagem);
+    this.hubConnection.on('ReceberContatoDigitando', (estaDigitando, contatoQueEstaDigitandoId) => {
+      this.enviarContatoDigitando(estaDigitando, contatoQueEstaDigitandoId);
+    });
+
+    this.hubConnection.on('ReceberStatusContato', (ultimoStatus, contatoId) => {
+      this.enviarStatusContato(ultimoStatus, contatoId);
     });
   }
 
@@ -110,20 +115,28 @@ export class AppSignalRService implements OnDestroy {
     return this.hubConnection;
   }
 
-  public receberContatoDigitando(): Observable<boolean> {
-    return this.contatoDigitandoSubject.asObservable();
-  }
-
-  public enviarContatoDigitando(estaDigitando: boolean) {
-    this.contatoDigitandoSubject.next(estaDigitando);
-  }
-
   public receberMensagem(): Observable<Mensagem> {
     return this.receberMensagemSubject.asObservable();
   }
 
   public enviarMensagem(mensagem: Mensagem) {
     this.receberMensagemSubject.next(mensagem);
+  }
+
+  public receberContatoDigitando(): Observable<any> {
+    return this.contatoDigitandoSubject.asObservable();
+  }
+
+  public enviarContatoDigitando(estaDigitando: boolean, contatoQueEstaDigitandoId: number) {
+    this.contatoDigitandoSubject.next({ estaDigitando, contatoQueEstaDigitandoId });
+  }
+
+  public receberStatusContato(): Observable<any> {
+    return this.statusContatoSubject.asObservable();
+  }
+
+  public enviarStatusContato(ultimoStatus: string, contatoId: number) {
+    this.statusContatoSubject.next({ ultimoStatus, contatoId });
   }
 
   ngOnDestroy() {
