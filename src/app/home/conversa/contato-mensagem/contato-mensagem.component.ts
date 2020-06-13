@@ -4,6 +4,7 @@ import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
 import { Subscription } from 'rxjs';
 import { ConversaHandleService } from '../../services/conversa-handle.service';
 import { AppSignalRService } from 'src/app/_common/services/signalr-service.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-contato-mensagem',
@@ -34,13 +35,17 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
       .subscribe((conversa) => {
         this.ultimaConversa = conversa;
     });
+  }
 
-    this.contatoDigitandoSubscription = this.appSignalRService
-      .receberStatusContato()
-      .subscribe((res) => {
-        if (this.ultimaConversa && this.ultimaConversa.contatoAmigoId === res.contatoId) {
-          this.ultimaConversa.ultimoStatus = res.ultimoStatus;
-        }
-    });
+  ultimoStatus() {
+    if(this.ultimaConversa.online) {
+      return 'On-line';
+    }
+
+    if(this.ultimaConversa.dataRegistroOnline) {
+      return moment(this.ultimaConversa.dataRegistroOnline).calendar();
+    }
+
+    return '';
   }
 }

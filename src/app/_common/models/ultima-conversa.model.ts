@@ -10,5 +10,6 @@ export class UltimaConversa {
   dataEnvio: string;
 
   estaDigitando: boolean;
-  ultimoStatus: string;
+  online: boolean;
+  dataRegistroOnline: string;
 }

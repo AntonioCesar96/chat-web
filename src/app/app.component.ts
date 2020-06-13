@@ -1,16 +1,21 @@
+import { Subscription } from 'rxjs';
+import { AppSignalRService } from 'src/app/_common/services/signalr-service.service';
 import { Location } from '@angular/common';
 import { CookieService } from './_common/services/cookie.service';
 import { Contato } from './_common/models/contato.model';
 import { AutenticacaoService } from './_common/services/autenticacao.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { LoginService } from './autenticacao/login.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+  deslogarSubscription: Subscription;
+  usuarioLogouEmOutroLugar = false;
 
   constructor(
     private loginService: LoginService,
@@ -18,21 +23,37 @@ export class AppComponent implements OnInit {
     private location: Location,
     private autenticacaoService: AutenticacaoService,
     private cookieService: CookieService,
+    private appSignalRService: AppSignalRService
   ) { }
 
   async ngOnInit() {
-    this.addEventoReload();
+    this.inicializar();
     await this.autenticar();
+  }
+
+  inicializar() {
+    moment.locale('pt-br');
+    this.addEventoReload();
+
+    this.deslogarSubscription = this.appSignalRService
+      .receberDeslogar()
+      .subscribe(() => {
+        this.usuarioLogouEmOutroLugar = true;
+    });
   }
 
   addEventoReload() {
     this.router.events.subscribe(event => {
       if(event instanceof NavigationEnd) {
         if(event.url === '/home' || event.url === '/') { return; }
-        this.location.replaceState('/');
-        location.reload();
+        this.recarregar();
       }
     });
+  }
+
+  recarregar() {
+    this.location.replaceState('/');
+    location.reload();
   }
 
   private async autenticar() {
@@ -53,5 +74,10 @@ export class AppComponent implements OnInit {
   validarCookies() {
     return !this.cookieService.checkCookie('email')
       && !this.cookieService.checkCookie('senha');
+  }
+
+  ngOnDestroy() {
+    if (!this.deslogarSubscription) { return; }
+    this.deslogarSubscription.unsubscribe();
   }
 }

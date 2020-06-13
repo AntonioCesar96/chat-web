@@ -81,7 +81,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
 
   validarTempo() {
     this.ultimoTimer = setTimeout(() => {
-      if((new Date().getTime() - this.tempo) <= 5000) {
+      if((new Date().getTime() - this.tempo) <= 3000) {
         this.validarTempo();
         return;
       }

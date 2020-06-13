@@ -1,3 +1,4 @@
+import { ContatoStatus } from './../../../_common/models/contato-status.model';
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';
@@ -24,6 +25,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   ultimaConversa: UltimaConversa;
   conversaSubscription: Subscription;
   receberMensagemSubscription: Subscription;
+  receberStatusContatoSubscription: Subscription;
   manterScroll = false;
   buscandoMensagens = false;
   ultimaPagina = false;
@@ -60,6 +62,9 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
 
     if (!this.receberMensagemSubscription) { return; }
     this.receberMensagemSubscription.unsubscribe();
+
+    if (!this.receberStatusContatoSubscription) { return; }
+    this.receberStatusContatoSubscription.unsubscribe();
   }
 
   inicializar() {
@@ -78,6 +83,15 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
       .subscribe((mensagem) => {
         this.receberMensagem(mensagem);
     });
+
+    this.receberStatusContatoSubscription = this.appSignalRService
+      .receberStatusContato()
+      .subscribe((contatoStatus: ContatoStatus) => {
+        if (this.ultimaConversa && this.ultimaConversa.contatoAmigoId === contatoStatus.contatoId) {
+          this.ultimaConversa.online = contatoStatus.online;
+          this.ultimaConversa.dataRegistroOnline = contatoStatus.data;
+        }
+    });
   }
 
   inicializarVariaveis() {
@@ -93,9 +107,9 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     this.resultado.lista.push(mensagem);
+    this.filtro.qtdMensagensPular++;
     this.resultado.total++;
     this.manterScroll = false;
-    this.filtro.qtdMensagensPular++;
     this.ordenarMensagens()
   }
 

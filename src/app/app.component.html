@@ -1,3 +1,14 @@
-<main class="main-container height-100">
+<main class="main-container height-100" *ngIf="!usuarioLogouEmOutroLugar">
   <router-outlet></router-outlet>
 </main>
+
+<div class="relogar" *ngIf="usuarioLogouEmOutroLugar">
+  <div class="relogar-w" >
+     <div>
+        <div class="relogar-t">O WhatsApp está aberto em outra janela. Clique em “Usar aqui” para usar o WhatsApp nesta janela.</div>
+        <div class="relogar-b">
+          <a class="waves-effect waves-light btn" (click)="recarregar()">Usar aqui</a>
+        </div>
+     </div>
+  </div>
+</div>

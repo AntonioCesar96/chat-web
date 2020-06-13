@@ -1,3 +1,4 @@
+import { ContatoStatus } from './../models/contato-status.model';
 import { Mensagem } from './../models/mensagem.model';
 import { StringResources } from 'src/app/string-resources';
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
@@ -10,6 +11,7 @@ export class AppSignalRService implements OnDestroy {
   public receberMensagemSubject = new Subject<Mensagem>();
   public contatoDigitandoSubject = new Subject<any>();
   public statusContatoSubject = new Subject<any>();
+  public deslogarSubject = new Subject<any>();
   public iniciarConexaoTimeoutDelay = 3000;
   public autoReconnect = true;
 
@@ -30,7 +32,7 @@ export class AppSignalRService implements OnDestroy {
       this.hubConnection = new HubConnectionBuilder()
         .withUrl(StringResources.URL_SERVIDOR + hubUrl)
         .configureLogging(LogLevel.Information)
-        .withAutomaticReconnect()
+        .withAutomaticReconnect([0, 1000, 10000])
         .build();
 
       this.hubConnection.onclose((msg) => {
@@ -102,8 +104,12 @@ export class AppSignalRService implements OnDestroy {
       this.enviarContatoDigitando(estaDigitando, contatoQueEstaDigitandoId);
     });
 
-    this.hubConnection.on('ReceberStatusContato', (ultimoStatus, contatoId) => {
-      this.enviarStatusContato(ultimoStatus, contatoId);
+    this.hubConnection.on('ReceberStatusContato', (contatoStatus: ContatoStatus) => {
+      this.enviarStatusContato(contatoStatus);
+    });
+
+    this.hubConnection.on('Deslogar', (res) => {
+      this.enviarDeslogar();
     });
   }
 
@@ -131,12 +137,20 @@ export class AppSignalRService implements OnDestroy {
     this.contatoDigitandoSubject.next({ estaDigitando, contatoQueEstaDigitandoId });
   }
 
-  public receberStatusContato(): Observable<any> {
+  public receberStatusContato(): Observable<ContatoStatus> {
     return this.statusContatoSubject.asObservable();
   }
 
-  public enviarStatusContato(ultimoStatus: string, contatoId: number) {
-    this.statusContatoSubject.next({ ultimoStatus, contatoId });
+  public enviarStatusContato(contatoStatus: ContatoStatus) {
+    this.statusContatoSubject.next(contatoStatus);
+  }
+
+  public receberDeslogar(): Observable<any> {
+    return this.deslogarSubject.asObservable();
+  }
+
+  public enviarDeslogar() {
+    this.deslogarSubject.next();
   }
 
   ngOnDestroy() {
