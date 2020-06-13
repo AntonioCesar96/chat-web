@@ -95,6 +95,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
     this.resultado.lista.push(mensagem);
     this.resultado.total++;
     this.manterScroll = false;
+    this.filtro.qtdMensagensPular++;
     this.ordenarMensagens()
   }
 
@@ -106,6 +107,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
     const mensagem = new Mensagem();
     mensagem.conversaId = this.ultimaConversa.conversaId;
     mensagem.contatoRemetenteId =  this.ultimaConversa.contatoRemetenteId;
+    mensagem.contatoDestinatarioId =  this.ultimaConversa.contatoDestinatarioId;
     mensagem.dataEnvio =  this.ultimaConversa.dataEnvio;
     mensagem.mensagemEnviada =  this.ultimaConversa.ultimaMensagem;
 

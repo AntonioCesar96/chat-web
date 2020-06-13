@@ -3,6 +3,7 @@ export class UltimaConversa {
   contatoAmigoId: number;
   ultimaMensagem: string;
   contatoRemetenteId: number;
+  contatoDestinatarioId: number;
   email: string;
   nome: string;
   fotoUrl: string;
