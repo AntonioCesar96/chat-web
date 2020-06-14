@@ -31,7 +31,7 @@ export class HomeComponent implements OnInit {
     const contato = this.autenticacaoService.getContatoLogado();
     this.appSignalRService.criarConexao('/chatHub', contato.contatoId);
     this.appSignalRService.iniciarConexao();
-    this.appSignalRService.configurarMetodoReceberMensagem();
+    this.appSignalRService.configurarMetodos();
   }
 
   criarComponente() {

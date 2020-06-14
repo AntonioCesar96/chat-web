@@ -10,12 +10,11 @@ export class AppSignalRService implements OnDestroy {
   public connectionEstablished = new EventEmitter<boolean>();
   public receberMensagemSubject = new Subject<Mensagem>();
   public contatoDigitandoSubject = new Subject<any>();
-  public statusContatoSubject = new Subject<any>();
+  public statusContatoOnlineSubject = new Subject<number>();
+  public statusContatoOfflineSubject = new Subject<ContatoStatus>();
   public deslogarSubject = new Subject<any>();
   public iniciarConexaoTimeoutDelay = 3000;
   public autoReconnect = true;
-
-  private connectionId: string;
   private contatoId = 0;
   private conexaoEstaEstabelecida = false;
   private hubConnection: HubConnection;
@@ -40,8 +39,7 @@ export class AppSignalRService implements OnDestroy {
       });
 
       this.hubConnection.onreconnected((connectionId: string) => {
-        this.hubConnection.invoke('RegistrarConexao', this.contatoId, this.connectionId)
-        this.connectionId = connectionId;
+        this.hubConnection.invoke('RegistrarConexao', this.contatoId);
       });
     }
   }
@@ -56,8 +54,7 @@ export class AppSignalRService implements OnDestroy {
           this.conexaoEstaEstabelecida = true;
           this.connectionEstablished.emit(true);
 
-          this.hubConnection.invoke('RegistrarConexao', this.contatoId, this.connectionId);
-          this.connectionId = this.hubConnection.connectionId;
+          this.hubConnection.invoke('RegistrarConexao', this.contatoId);
         })
         .catch(err => {
           this.conexaoEstaEstabelecida = false;
@@ -87,15 +84,14 @@ export class AppSignalRService implements OnDestroy {
           .then(() => {
             this.hubConnection.invoke(method, args)
 
-            this.hubConnection.invoke('RegistrarConexao', this.contatoId, this.connectionId);
-            this.connectionId = this.hubConnection.connectionId;
+            this.hubConnection.invoke('RegistrarConexao', this.contatoId);
           })
           .catch(err => console.error(err.toString()));
         break;
     }
   }
 
-  configurarMetodoReceberMensagem() {
+  configurarMetodos() {
     this.hubConnection.on('ReceberMensagem', (mensagem) => {
       this.enviarMensagem(mensagem);
     });
@@ -104,8 +100,12 @@ export class AppSignalRService implements OnDestroy {
       this.enviarContatoDigitando(estaDigitando, contatoQueEstaDigitandoId);
     });
 
-    this.hubConnection.on('ReceberStatusContato', (contatoStatus: ContatoStatus) => {
-      this.enviarStatusContato(contatoStatus);
+    this.hubConnection.on('ReceberStatusContatoOnline', (contatoId: number) => {
+      this.enviarStatusContatoOnline(contatoId);
+    });
+
+    this.hubConnection.on('ReceberStatusContatoOffline', (contatoStatus: ContatoStatus) => {
+      this.enviarStatusContatoOffline(contatoStatus);
     });
 
     this.hubConnection.on('Deslogar', (res) => {
@@ -137,12 +137,20 @@ export class AppSignalRService implements OnDestroy {
     this.contatoDigitandoSubject.next({ estaDigitando, contatoQueEstaDigitandoId });
   }
 
-  public receberStatusContato(): Observable<ContatoStatus> {
-    return this.statusContatoSubject.asObservable();
+  public receberStatusContatoOffline(): Observable<ContatoStatus> {
+    return this.statusContatoOfflineSubject.asObservable();
   }
 
-  public enviarStatusContato(contatoStatus: ContatoStatus) {
-    this.statusContatoSubject.next(contatoStatus);
+  public enviarStatusContatoOffline(contatoStatus: ContatoStatus) {
+    this.statusContatoOfflineSubject.next(contatoStatus);
+  }
+
+  public receberStatusContatoOnline(): Observable<number> {
+    return this.statusContatoOnlineSubject.asObservable();
+  }
+
+  public enviarStatusContatoOnline(contatoId: number) {
+    this.statusContatoOnlineSubject.next(contatoId);
   }
 
   public receberDeslogar(): Observable<any> {

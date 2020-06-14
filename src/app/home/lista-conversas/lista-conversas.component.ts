@@ -1,3 +1,4 @@
+import { ContatoStatus } from './../../_common/models/contato-status.model';
 import { UltimaConversa } from './../../_common/models/ultima-conversa.model';
 import { Mensagem } from './../../_common/models/mensagem.model';
 import { AppSignalRService } from './../../_common/services/signalr-service.service';
@@ -21,6 +22,8 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   resultado: Resultado<UltimaConversa>;
   receberMensagemSubscription: Subscription;
   contatoDigitandoSubscription: Subscription;
+  receberStatusContatoOnlineSubscription: Subscription;
+  receberStatusContatoOfflineSubscription: Subscription;
 
   constructor(
     private conversaService: ConversaService,
@@ -36,11 +39,6 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
     this.inicializar();
   }
 
-  ngOnDestroy() {
-    if (!this.receberMensagemSubscription) { return; }
-    this.receberMensagemSubscription.unsubscribe();
-  }
-
   inicializar() {
     this.receberMensagemSubscription = this.appSignalRService
     .receberMensagem()
@@ -52,6 +50,23 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
       .receberContatoDigitando()
       .subscribe((res) => {
         this.validarContatoQueEstaDigitando(res);
+    });
+
+    this.receberStatusContatoOnlineSubscription = this.appSignalRService
+      .receberStatusContatoOnline()
+      .subscribe((contatoId: number) => {
+        const amigo = this.resultado.lista.find(x => x.contatoAmigoId === contatoId);
+        if(!amigo) { return; }
+        amigo.online = true;
+    });
+
+    this.receberStatusContatoOfflineSubscription = this.appSignalRService
+      .receberStatusContatoOffline()
+      .subscribe((contatoStatus: ContatoStatus) => {
+        const amigo = this.resultado.lista.find(x => x.contatoAmigoId === contatoStatus.contatoId);
+        if(!amigo) { return; }
+        amigo.online = contatoStatus.online;
+        amigo.dataRegistroOnline = contatoStatus.data;
     });
   }
 
@@ -106,5 +121,19 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
     this.resultado.total++;
     this.resultado.lista.sort((n1,n2) =>
       new Date(n2.dataEnvio).getTime() - new Date(n1.dataEnvio).getTime());
+  }
+
+  ngOnDestroy() {
+    if (!this.receberMensagemSubscription) { return; }
+    this.receberMensagemSubscription.unsubscribe();
+
+    if (!this.contatoDigitandoSubscription) { return; }
+    this.contatoDigitandoSubscription.unsubscribe();
+
+    if (!this.receberStatusContatoOnlineSubscription) { return; }
+    this.receberStatusContatoOnlineSubscription.unsubscribe();
+
+    if (!this.receberStatusContatoOfflineSubscription) { return; }
+    this.receberStatusContatoOfflineSubscription.unsubscribe();
   }
 }

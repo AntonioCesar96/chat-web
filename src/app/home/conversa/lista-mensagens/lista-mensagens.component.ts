@@ -25,7 +25,6 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   ultimaConversa: UltimaConversa;
   conversaSubscription: Subscription;
   receberMensagemSubscription: Subscription;
-  receberStatusContatoSubscription: Subscription;
   manterScroll = false;
   buscandoMensagens = false;
   ultimaPagina = false;
@@ -62,9 +61,6 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
 
     if (!this.receberMensagemSubscription) { return; }
     this.receberMensagemSubscription.unsubscribe();
-
-    if (!this.receberStatusContatoSubscription) { return; }
-    this.receberStatusContatoSubscription.unsubscribe();
   }
 
   inicializar() {
@@ -82,15 +78,6 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
       .receberMensagem()
       .subscribe((mensagem) => {
         this.receberMensagem(mensagem);
-    });
-
-    this.receberStatusContatoSubscription = this.appSignalRService
-      .receberStatusContato()
-      .subscribe((contatoStatus: ContatoStatus) => {
-        if (this.ultimaConversa && this.ultimaConversa.contatoAmigoId === contatoStatus.contatoId) {
-          this.ultimaConversa.online = contatoStatus.online;
-          this.ultimaConversa.dataRegistroOnline = contatoStatus.data;
-        }
     });
   }
 
