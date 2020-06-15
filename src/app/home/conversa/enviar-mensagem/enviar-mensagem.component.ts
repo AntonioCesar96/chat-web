@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs';
 })
 export class EnviarMensagemComponent implements OnInit, OnDestroy {
   @ViewChild('mensagemEnviar') mensagem: ElementRef;
-  @Input() contato: Contato;
+  @Input() contatoLogado: Contato;
   @Input() ultimaConversa: UltimaConversa;
   estaDigitando = false;
   tempo = 0;
@@ -65,7 +65,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   criarMensagem() {
     const mensagem = new Mensagem();
     mensagem.conversaId = this.ultimaConversa.conversaId;
-    mensagem.contatoRemetenteId = this.contato.contatoId;
+    mensagem.contatoRemetenteId = this.contatoLogado.contatoId;
     mensagem.contatoDestinatarioId = this.ultimaConversa.contatoAmigoId;
     mensagem.mensagemEnviada = this.mensagem.nativeElement.innerText;
     return mensagem;
@@ -95,7 +95,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     this.estaDigitando = true;
 
     this.appSignalRService.run('EnviarContatoDigitando',
-      true, this.ultimaConversa.contatoAmigoId, this.contato.contatoId);
+      true, this.ultimaConversa.contatoAmigoId, this.contatoLogado.contatoId);
   }
 
   enviarQueNaoEstaDigitando() {
@@ -103,6 +103,6 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
 
     this.estaDigitando = false;
     this.appSignalRService.run('EnviarContatoDigitando',
-      false, this.ultimaConversa.contatoAmigoId, this.contato.contatoId);
+      false, this.ultimaConversa.contatoAmigoId, this.contatoLogado.contatoId);
   }
 }

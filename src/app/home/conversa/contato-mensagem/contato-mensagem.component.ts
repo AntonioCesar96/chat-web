@@ -11,7 +11,7 @@ import * as moment from 'moment';
   templateUrl: './contato-mensagem.component.html'
 })
 export class ContatoMensagemComponent implements OnInit, OnDestroy {
-  @Input() contato: Contato;
+  @Input() contatoLogado: Contato;
   ultimaConversa: UltimaConversa;
   conversaSubscription: Subscription;
   contatoDigitandoSubscription: Subscription;

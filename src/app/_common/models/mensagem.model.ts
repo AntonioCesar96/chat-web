@@ -1,3 +1,4 @@
+import { StatusMensagem } from './status-mensagem.enum';
 export class Mensagem {
   mensagemId: number;
   conversaId: number;
@@ -5,4 +6,7 @@ export class Mensagem {
   contatoDestinatarioId: number;
   mensagemEnviada: string;
   dataEnvio: string;
+  statusMensagem: StatusMensagem;
+
+  qtdMensagensNovas: number;
 }

@@ -151,8 +151,93 @@ body {
 }
 
 .lista-conversas {
-    .collection-item.avatar {
-        cursor: pointer;
+    .collection-item {
+        &.avatar {
+            cursor: pointer;
+            padding: 8px 16px 8px 72px;
+            min-height: auto;
+            height: 72px;
+            background-color: #101d24;
+            color: #f1f1f2de;
+        }
+
+        .title-w {
+            align-items: center;
+            line-height: normal;
+            display: flex;
+        }
+
+        .title-n {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+            
+            .title {
+                font-weight: 600;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+        }
+
+        .title-data {
+            color: #f1f1f273;
+            flex: none;
+            font-size: 12px;
+            margin-top: 3px;
+            margin-left: 6px;
+        }
+
+        .ultima-mensagem {
+            font-size: 14px;
+            line-height: 20px;
+            color: #f1f1f299;
+            align-items: center;
+            line-height: normal;
+            display: flex;
+            margin-top: 2px;
+        }
+        .status {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .status-text {
+            overflow: hidden;
+            span {
+                display: block;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+        }
+
+        .qtd-msgs-novas {
+            span {
+                color: #101d24;
+                display: inline-block;
+                font-size: 12px;
+                font-weight: 600;
+                line-height: 1em;
+                height: 20px;
+                min-width: 20px;
+                vertical-align: top;
+                background-color: #00af9c;
+                border-radius: 1.1em;
+                padding: .3em .4em .4em;
+                text-align: center;
+            }
+        }
+
+        &.nova {
+            .status-text {
+                font-weight: 600;
+            }
+            .title-data {
+                color: #00af9c;
+            }
+        }
     }
     
     .collection {
@@ -166,13 +251,6 @@ body {
     
         .collection-item.avatar {
             background-color: inherit;
-        }
-    }
-    .ultima-mensagem {
-        p {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
     }
 }
@@ -212,7 +290,7 @@ body {
             padding-left: 55px;
             height: 40px;
         }
-        .material-icons.circle {
+        .circle {
             width: 40px;
             height: 40px;
             left: 0;
@@ -311,34 +389,42 @@ body {
             padding: 5px 12px 6px;
             text-align: center;
             text-shadow: none;
+            margin-bottom: 5px;
+            margin-top: 2px;
         }
 
         .msg-d1 {
-            margin-right: 60px;
+            margin-right: 30px;
+            display: flex;
+            flex-grow: 1;
+        }
+
+        .msg-d2 {
+            margin-bottom: -10px;
         }
 
         .enviado,
         .recebido {
             padding: 4px 7px 6px 9px;
             border-radius: 7px;
+            align-items: center;
+            line-height: normal;
+            display: flex;
+            max-width: 90%;
+            margin-bottom: 3px !important;
+            color: #f1f1f2de;
         }
 
         .enviado {
             text-align: right;
-            max-width: 90%;
             float: right;
-            margin-bottom: 5px !important;
             background-color: #054740;
-            color: #f1f1f2de;
         }
         
         .recebido {
             text-align: left;
-            max-width: 90%;
             float: left;
-            margin-bottom: 5px !important;
             background-color: #222e35;
-            color: #f1f1f2de;
         }
 
         .msg-data {
@@ -347,8 +433,25 @@ body {
             line-height: 15px;
             white-space: nowrap;
             color: #f1f1f299;
-            float: right;
-            margin: -10px 0 -5px 4px;
+            display: inline-block;
+            vertical-align: middle;
         }
     }
+}
+
+.msg-checked {
+    color: #f1f1f299;
+    &.lida {
+        color: #34b7f1;
+    }
+}
+
+.conversa .msg-checked {
+    display: inline-block;
+    vertical-align: sub;
+    margin-left: 3px;
+}
+
+.lista-conversas .msg-checked {
+    margin-right: 3px;
 }

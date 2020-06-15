@@ -13,6 +13,7 @@ export class AppSignalRService implements OnDestroy {
   public statusContatoOnlineSubject = new Subject<number>();
   public statusContatoOfflineSubject = new Subject<ContatoStatus>();
   public deslogarSubject = new Subject<any>();
+  public mensagemLidaSubject = new Subject<Mensagem>();
   public iniciarConexaoTimeoutDelay = 3000;
   public autoReconnect = true;
   private contatoId = 0;
@@ -111,6 +112,10 @@ export class AppSignalRService implements OnDestroy {
     this.hubConnection.on('Deslogar', (res) => {
       this.enviarDeslogar();
     });
+
+    this.hubConnection.on('ReceberMensagemLida', (mensagemId: number, conversaId: number) => {
+      this.enviarMensagemLida(mensagemId, conversaId);
+    });
   }
 
   getConexaoEstaEstabelecida(): boolean {
@@ -159,6 +164,17 @@ export class AppSignalRService implements OnDestroy {
 
   public enviarDeslogar() {
     this.deslogarSubject.next();
+  }
+
+  public receberMensagemLida(): Observable<Mensagem> {
+    return this.mensagemLidaSubject.asObservable();
+  }
+
+  public enviarMensagemLida(mensagemId: number, conversaId: number) {
+    const mensagem = new Mensagem();
+    mensagem.mensagemId = mensagemId;
+    mensagem.conversaId = conversaId;
+    this.mensagemLidaSubject.next(mensagem);
   }
 
   ngOnDestroy() {

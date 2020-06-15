@@ -1,3 +1,4 @@
+import { StatusMensagem } from './../../_common/models/status-mensagem.enum';
 import { ContatoStatus } from './../../_common/models/contato-status.model';
 import { UltimaConversa } from './../../_common/models/ultima-conversa.model';
 import { Mensagem } from './../../_common/models/mensagem.model';
@@ -24,6 +25,7 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   contatoDigitandoSubscription: Subscription;
   receberStatusContatoOnlineSubscription: Subscription;
   receberStatusContatoOfflineSubscription: Subscription;
+  receberMensagensLidasSubscription: Subscription;
 
   constructor(
     private conversaService: ConversaService,
@@ -63,17 +65,33 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
     this.receberStatusContatoOfflineSubscription = this.appSignalRService
       .receberStatusContatoOffline()
       .subscribe((contatoStatus: ContatoStatus) => {
+        // TODO:
         const amigo = this.resultado.lista.find(x => x.contatoAmigoId === contatoStatus.contatoId);
         if(!amigo) { return; }
         amigo.online = contatoStatus.online;
         amigo.dataRegistroOnline = contatoStatus.data;
+        amigo.estaDigitando = false;
     });
+
+    this.receberMensagemSubscription = this.appSignalRService
+      .receberMensagemLida()
+      .subscribe((mensagem: Mensagem) => {
+        this.marcarMensagemComoLida(mensagem);
+    });
+  }
+
+  marcarMensagemComoLida(mensagem: Mensagem) {
+    const amigo = this.resultado.lista.find(x => x.conversaId === mensagem.conversaId)
+    if(!amigo) { return; }
+
+    amigo.statusUltimaMensagem = StatusMensagem.Lida;
   }
 
   validarContatoQueEstaDigitando(res) {
     const amigo = this.resultado.lista.find(x => x.contatoAmigoId === res.contatoQueEstaDigitandoId)
     if(!amigo) { return; }
-    amigo.estaDigitando = res.estaDigitando
+
+    amigo.estaDigitando = res.estaDigitando;
   }
 
   obterConversasDoContato(contatoId: number) {
@@ -81,7 +99,12 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
     this.conversaService.obterConversasDoContato(this.filtro)
       .subscribe(res => {
         this.resultado = res as Resultado<UltimaConversa>;
+        this.inicializarConversas();
       });
+  }
+
+  inicializarConversas() {
+    this.resultado.lista.forEach(conversa => conversa.conversaAberta = false);
   }
 
   obterContatoLogado() {
@@ -93,6 +116,7 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   public selecionarConversa(conversa: UltimaConversa) {
+    this.resultado.lista.forEach(x => x.conversaAberta = false);
     this.criarComponente.emit();
     this.conversaHandleService.selecionarConversa(conversa);
   }
@@ -101,13 +125,30 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
     const conversa = this.resultado.lista.find(x => x.conversaId === mensagem.conversaId);
     if(!conversa) { return; }
 
+    this.atualizarUltimaConversa(conversa, mensagem);
+    this.ordenarConversas();
+  }
+
+  atualizarUltimaConversa(conversa: UltimaConversa, mensagem: Mensagem) {
     conversa.ultimaMensagem = mensagem.mensagemEnviada;
     conversa.dataEnvio = mensagem.dataEnvio;
+    conversa.statusUltimaMensagem = mensagem.statusMensagem;
+    conversa.contatoRemetenteId = mensagem.contatoRemetenteId;
+    conversa.contatoDestinatarioId = mensagem.contatoDestinatarioId;
+    if(!conversa.conversaAberta) {
+      conversa.qtdMensagensNovas++;
+      conversa.mostrarMensagensNovas = mensagem.contatoDestinatarioId === this.contatoLogado.contatoId;
+    }
+  }
 
+  ordenarConversas() {
     this.resultado.lista.sort((n1,n2) =>
       new Date(n2.dataEnvio).getTime() - new Date(n1.dataEnvio).getTime());
   }
 
+  /*
+    TODO:
+  */
   receberPrimeiraMensagem(mensagem: Mensagem) {
     const conversa = new UltimaConversa();
     conversa.contatoAmigoId = this.contatoLogado.contatoId === mensagem.contatoRemetenteId
@@ -135,5 +176,8 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
 
     if (!this.receberStatusContatoOfflineSubscription) { return; }
     this.receberStatusContatoOfflineSubscription.unsubscribe();
+
+    if (!this.receberMensagensLidasSubscription) { return; }
+    this.receberMensagensLidasSubscription.unsubscribe();
   }
 }
