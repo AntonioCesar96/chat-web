@@ -2,8 +2,7 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
 import { Subscription } from 'rxjs';
-import { ConversaHandleService } from '../../services/conversa-handle.service';
-import { AppSignalRService } from 'src/app/_common/services/signalr-service.service';
+import { ConversaService } from '../../services/conversa.service';
 import * as moment from 'moment';
 
 @Component({
@@ -17,8 +16,7 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   contatoDigitandoSubscription: Subscription;
 
   constructor(
-    private conversaHandleService: ConversaHandleService,
-    private appSignalRService: AppSignalRService) { }
+    private conversaService: ConversaService) { }
 
   ngOnInit() {
     this.inicializar();
@@ -30,7 +28,7 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
-    this.conversaSubscription = this.conversaHandleService
+    this.conversaSubscription = this.conversaService
       .conversaSelecionada()
       .subscribe((conversa) => {
         this.ultimaConversa = conversa;

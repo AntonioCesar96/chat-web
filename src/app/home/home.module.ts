@@ -1,5 +1,3 @@
-import { ConversaHandleService } from './services/conversa-handle.service';
-import { MensagemService } from './services/mensagem.service';
 import { ConversaService } from './services/conversa.service';
 import { HomeRouting } from './home.routing';
 import { ChatCommonModule } from './../_common/common.module';
@@ -26,9 +24,7 @@ import { ContatoMensagemComponent } from './conversa/contato-mensagem/contato-me
   ],
   exports: [],
   providers: [
-    ConversaService,
-    MensagemService,
-    ConversaHandleService
+    ConversaService
   ]
 })
 export class HomeModule { }

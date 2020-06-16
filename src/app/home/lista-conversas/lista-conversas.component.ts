@@ -1,14 +1,14 @@
+import { AppSignalRService } from './../../_common/services/signalr.service';
+import { SignalREventsService } from './../../_common/services/signalr-events.service';
 import { StatusMensagem } from './../../_common/models/status-mensagem.enum';
 import { ContatoStatus } from './../../_common/models/contato-status.model';
 import { UltimaConversa } from './../../_common/models/ultima-conversa.model';
 import { Mensagem } from './../../_common/models/mensagem.model';
-import { AppSignalRService } from './../../_common/services/signalr-service.service';
 import { Contato } from './../../_common/models/contato.model';
-import { ConversaHandleService } from './../services/conversa-handle.service';
+import { ConversaService } from '../services/conversa.service';
 import { Resultado } from './../../_common/models/resultado.model';
 import { AutenticacaoService } from './../../_common/services/autenticacao.service';
 import { ConversaFiltro } from './../../_common/models/conversa.filtro';
-import { ConversaService } from '../services/conversa.service';
 import { Component, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 
@@ -26,12 +26,13 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   receberStatusContatoOnlineSubscription: Subscription;
   receberStatusContatoOfflineSubscription: Subscription;
   receberMensagensLidasSubscription: Subscription;
+  conversasDoContatoSubscription: Subscription;
 
   constructor(
     private conversaService: ConversaService,
-    private conversaHandleService: ConversaHandleService,
     private autenticacaoService: AutenticacaoService,
-    private appSignalRService: AppSignalRService) { }
+    private appSignalRService: AppSignalRService,
+    private signalREventsService: SignalREventsService) { }
 
   ngOnInit() {
     if (!this.autenticacaoService.estaLogado()) { return; }
@@ -42,19 +43,19 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
-    this.receberMensagemSubscription = this.appSignalRService
+    this.receberMensagemSubscription = this.signalREventsService
     .receberMensagem()
     .subscribe((mensagem) => {
       this.receberMensagem(mensagem);
     });
 
-    this.contatoDigitandoSubscription = this.appSignalRService
+    this.contatoDigitandoSubscription = this.signalREventsService
       .receberContatoDigitando()
       .subscribe((res) => {
         this.validarContatoQueEstaDigitando(res);
     });
 
-    this.receberStatusContatoOnlineSubscription = this.appSignalRService
+    this.receberStatusContatoOnlineSubscription = this.signalREventsService
       .receberStatusContatoOnline()
       .subscribe((contatoId: number) => {
         const amigo = this.resultado.lista.find(x => x.contatoAmigoId === contatoId);
@@ -62,10 +63,10 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
         amigo.online = true;
     });
 
-    this.receberStatusContatoOfflineSubscription = this.appSignalRService
+    this.receberStatusContatoOfflineSubscription = this.signalREventsService
       .receberStatusContatoOffline()
       .subscribe((contatoStatus: ContatoStatus) => {
-        // TODO:
+        // TODO: extrair metodo
         const amigo = this.resultado.lista.find(x => x.contatoAmigoId === contatoStatus.contatoId);
         if(!amigo) { return; }
         amigo.online = contatoStatus.online;
@@ -73,10 +74,17 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
         amigo.estaDigitando = false;
     });
 
-    this.receberMensagemSubscription = this.appSignalRService
+    this.receberMensagemSubscription = this.signalREventsService
       .receberMensagemLida()
       .subscribe((mensagem: Mensagem) => {
         this.marcarMensagemComoLida(mensagem);
+    });
+
+    this.conversasDoContatoSubscription = this.signalREventsService
+      .receberConversasDoContato()
+      .subscribe((res: Resultado<UltimaConversa>) => {
+        this.resultado = res;
+        this.inicializarConversas();
     });
   }
 
@@ -96,11 +104,7 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
 
   obterConversasDoContato(contatoId: number) {
     this.filtro = new ConversaFiltro(contatoId);
-    this.conversaService.obterConversasDoContato(this.filtro)
-      .subscribe(res => {
-        this.resultado = res as Resultado<UltimaConversa>;
-        this.inicializarConversas();
-      });
+    this.appSignalRService.run('ObterConversasDoContato', this.filtro);
   }
 
   inicializarConversas() {
@@ -118,7 +122,7 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   public selecionarConversa(conversa: UltimaConversa) {
     this.resultado.lista.forEach(x => x.conversaAberta = false);
     this.criarComponente.emit();
-    this.conversaHandleService.selecionarConversa(conversa);
+    this.conversaService.selecionarConversa(conversa);
   }
 
   receberMensagem(mensagem: Mensagem) {
@@ -179,5 +183,8 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
 
     if (!this.receberMensagensLidasSubscription) { return; }
     this.receberMensagensLidasSubscription.unsubscribe();
+
+    if (!this.conversasDoContatoSubscription) { return; }
+    this.conversasDoContatoSubscription.unsubscribe();
   }
 }

@@ -1,5 +1,5 @@
 import { ConversaComponent } from './conversa/conversa.component';
-import { AppSignalRService } from './../_common/services/signalr-service.service';
+import { AppSignalRService } from '../_common/services/signalr.service';
 import { AutenticacaoService } from './../_common/services/autenticacao.service';
 import { Component, OnInit, ViewContainerRef, ViewChild, ComponentFactoryResolver } from '@angular/core';
 import { Router } from '@angular/router';

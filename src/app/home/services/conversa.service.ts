@@ -1,21 +1,18 @@
-import { UrlService } from '../../_common/services/url.service';
+import { UltimaConversa } from '../../_common/models/ultima-conversa.model';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { HttpBaseService } from 'src/app/_common/services/base.service';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable()
-export class ConversaService extends HttpBaseService {
-  API = 'conversa';
+export class ConversaService {
+  conversaSelecionadaSubject = new Subject<UltimaConversa>();
 
-  constructor(
-    private http: HttpClient,
-    urlService: UrlService
-  ) {
-    super(urlService);
+  constructor() { }
+
+  public conversaSelecionada(): Observable<UltimaConversa> {
+    return this.conversaSelecionadaSubject.asObservable();
   }
 
-  obterConversasDoContato(filtro: any): Observable<any> {
-    return this.http.get<any>(`${this.URL_BASE}/${this.API}/${this.prepararParametros(filtro)}`);
+  public selecionarConversa(conversa: UltimaConversa) {
+    this.conversaSelecionadaSubject.next(conversa);
   }
 }

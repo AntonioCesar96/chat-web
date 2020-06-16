@@ -1,7 +1,7 @@
-import { ConversaHandleService } from './../../services/conversa-handle.service';
+import { ConversaService } from '../../services/conversa.service';
 import { UltimaConversa } from './../../../_common/models/ultima-conversa.model';
 import { Contato } from 'src/app/_common/models/contato.model';
-import { AppSignalRService } from './../../../_common/services/signalr-service.service';
+import { AppSignalRService } from '../../../_common/services/signalr.service';
 import { Mensagem } from './../../../_common/models/mensagem.model';
 import { Component, OnInit, ViewChild, ElementRef, Input, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
@@ -14,13 +14,13 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   @ViewChild('mensagemEnviar') mensagem: ElementRef;
   @Input() contatoLogado: Contato;
   @Input() ultimaConversa: UltimaConversa;
+  ultimoTimer: any;
   estaDigitando = false;
   tempo = 0;
-  ultimoTimer;
   conversaSubscription: Subscription;
 
   constructor(
-    private conversaHandleService: ConversaHandleService,
+    private conversaService: ConversaService,
     private appSignalRService: AppSignalRService)
   { }
 
@@ -34,7 +34,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
-    this.conversaSubscription = this.conversaHandleService
+    this.conversaSubscription = this.conversaService
       .conversaSelecionada()
       .subscribe((conversa) => {
         this.ultimaConversa = conversa;
@@ -91,7 +91,6 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
 
   enviarQueEstaDigitando() {
     if(this.estaDigitando) { return; }
-
     this.estaDigitando = true;
 
     this.appSignalRService.run('EnviarContatoDigitando',

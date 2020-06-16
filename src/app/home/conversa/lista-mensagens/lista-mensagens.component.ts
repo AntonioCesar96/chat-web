@@ -1,3 +1,4 @@
+import { SignalREventsService } from './../../../_common/services/signalr-events.service';
 import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';
@@ -5,9 +6,8 @@ import { Mensagem } from 'src/app/_common/models/mensagem.model';
 import { Resultado } from 'src/app/_common/models/resultado.model';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
-import { MensagemService } from '../../services/mensagem.service';
-import { ConversaHandleService } from '../../services/conversa-handle.service';
-import { AppSignalRService } from 'src/app/_common/services/signalr-service.service';
+import { ConversaService } from '../../services/conversa.service';
+import { AppSignalRService } from 'src/app/_common/services/signalr.service';
 import * as moment from 'moment';
 import { StatusMensagem } from 'src/app/_common/models/status-mensagem.enum';
 
@@ -28,15 +28,16 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   conversaSubscription: Subscription;
   receberMensagemSubscription: Subscription;
   receberMensagemLidaSubscription: Subscription;
+  mensagensSubscription: Subscription;
   manterScrollTop = false;
   buscandoMensagens = false;
   ultimaPagina = false;
   scrollHeightOld = 0;
 
   constructor(
-    private mensagemService: MensagemService,
-    private conversaHandleService: ConversaHandleService,
-    private appSignalRService: AppSignalRService) { }
+    private conversaService: ConversaService,
+    private appSignalRService: AppSignalRService,
+    private signalREventsService: SignalREventsService) { }
 
   ngOnInit() {
     this.inicializar();
@@ -68,7 +69,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   inicializar() {
-    this.conversaSubscription = this.conversaHandleService
+    this.conversaSubscription = this.conversaService
       .conversaSelecionada()
       .subscribe((conversa) => {
         this.ultimaConversa = conversa;
@@ -78,16 +79,36 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
         this.obterMensagens();
     });
 
-    this.receberMensagemSubscription = this.appSignalRService
+    this.receberMensagemSubscription = this.signalREventsService
       .receberMensagem()
       .subscribe((mensagem) => {
         this.receberMensagem(mensagem);
     });
 
-    this.receberMensagemLidaSubscription = this.appSignalRService
+    this.receberMensagemLidaSubscription = this.signalREventsService
       .receberMensagemLida()
       .subscribe((mensagem: Mensagem) => {
         this.marcarMensagemComoLida(mensagem);
+    });
+
+    this.mensagensSubscription = this.signalREventsService
+      .receberMensagens()
+      .subscribe((res: Resultado<Mensagem>) => {
+        if(this.manterScrollTop) {
+          this.resultado.total = res.total;
+          this.resultado.lista.push(...res.lista);
+          this.ordenarMensagens();
+          this.buscandoMensagens = false;
+          this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
+          return;
+        }
+
+        this.resultado = res;
+        this.buscandoMensagens = false;
+        this.filtro.primeiraBusca = false;
+        this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
+        this.marcarMensagemNova();
+        this.ordenarMensagens();
     });
   }
 
@@ -152,15 +173,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
 
   obterMensagens() {
     this.buscandoMensagens = true;
-    this.mensagemService.obterMensagens(this.filtro)
-      .subscribe(res => {
-        this.resultado = res as Resultado<Mensagem>;
-        this.buscandoMensagens = false;
-        this.filtro.primeiraBusca = false;
-        this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
-        this.marcarMensagemNova();
-        this.ordenarMensagens();
-      });
+    this.appSignalRService.run('ObterMensagens', this.filtro);
   }
 
   marcarMensagemNova() {
@@ -235,16 +248,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
     this.filtro.pagina++;
     this.manterScrollTop = true;
     this.buscandoMensagens = true;
-    this.mensagemService.obterMensagens(this.filtro)
-      .subscribe(res => {
-        const resultado = res as Resultado<Mensagem>;
-
-        this.resultado.total = resultado.total;
-        this.resultado.lista.push(...resultado.lista);
-        this.ordenarMensagens();
-        this.buscandoMensagens = false;
-        this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
-      });
+    this.appSignalRService.run('ObterMensagens', this.filtro);
   }
 
   ngOnDestroy() {
@@ -256,5 +260,8 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
 
     if (!this.receberMensagemLidaSubscription) { return; }
     this.receberMensagemLidaSubscription.unsubscribe();
+
+    if (!this.mensagensSubscription) { return; }
+    this.mensagensSubscription.unsubscribe();
   }
 }

@@ -1,9 +1,8 @@
-import { AppSignalRService } from './services/signalr-service.service';
 import { CookieService } from './services/cookie.service';
 import { AutenticacaoService } from './services/autenticacao.service';
 import { AlertaService } from './services/alerta.service';
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, ErrorHandler } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -33,8 +32,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   providers: [
     AlertaService,
     AutenticacaoService,
-    CookieService,
-    AppSignalRService
+    CookieService
   ]
 })
 export class ChatCommonModule { }
