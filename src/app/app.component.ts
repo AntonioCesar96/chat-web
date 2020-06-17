@@ -1,6 +1,5 @@
-import { SignalREventsService } from './_common/services/signalr-events.service';
-import { Subscription, Subject } from 'rxjs';
-import { AppSignalRService } from 'src/app/_common/services/signalr.service';
+import { SignalRService } from './_common/services/signalr-events.service';
+import { Subject } from 'rxjs';
 import { Location } from '@angular/common';
 import { CookieService } from './_common/services/cookie.service';
 import { Contato } from './_common/models/contato.model';
@@ -17,7 +16,6 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class AppComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
-
   usuarioLogouEmOutroLugar = false;
 
   constructor(
@@ -26,7 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private location: Location,
     private autenticacaoService: AutenticacaoService,
     private cookieService: CookieService,
-    private signalREventsService: SignalREventsService
+    private signalRService: SignalRService
   ) { }
 
   async ngOnInit() {
@@ -38,7 +36,7 @@ export class AppComponent implements OnInit, OnDestroy {
     moment.locale('pt-br');
     this.addEventoReload();
 
-    this.signalREventsService
+    this.signalRService
       .receberDeslogar()
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.usuarioLogouEmOutroLugar = true);

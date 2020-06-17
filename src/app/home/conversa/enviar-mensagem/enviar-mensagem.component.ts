@@ -1,7 +1,7 @@
+import { SignalRService } from './../../../_common/services/signalr-events.service';
 import { ConversaService } from '../../services/conversa.service';
 import { UltimaConversa } from './../../../_common/models/ultima-conversa.model';
 import { Contato } from 'src/app/_common/models/contato.model';
-import { AppSignalRService } from '../../../_common/services/signalr.service';
 import { Mensagem } from './../../../_common/models/mensagem.model';
 import { Component, OnInit, ViewChild, ElementRef, Input, OnDestroy } from '@angular/core';
 import { takeUntil } from 'rxjs/operators';
@@ -23,7 +23,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
 
   constructor(
     private conversaService: ConversaService,
-    private appSignalRService: AppSignalRService)
+    private signalRService: SignalRService)
   { }
 
   ngOnInit() {
@@ -38,7 +38,6 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   }
 
   onEnviarMensagem(event: KeyboardEvent) {
-    // tslint:disable-next-line: deprecation
     if (event.code === 'Enter' || event.code === 'NumpadEnter') {
       this.enviarMensagem();
       return false;
@@ -54,7 +53,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     clearTimeout(this.ultimoTimer);
     this.enviarQueNaoEstaDigitando();
 
-    this.appSignalRService.run('EnviarMensagem', this.criarMensagem());
+    this.signalRService.enviarMensagem(this.criarMensagem());
     this.mensagem.nativeElement.innerText = '';
   }
 
@@ -89,16 +88,16 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     if(this.estaDigitando) { return; }
     this.estaDigitando = true;
 
-    this.appSignalRService.run('EnviarContatoDigitando',
-      true, this.ultimaConversa.contatoAmigoId, this.contatoLogado.contatoId);
+    this.signalRService.enviarContatoDigitando(true,
+      this.ultimaConversa.contatoAmigoId, this.contatoLogado.contatoId);
   }
 
   enviarQueNaoEstaDigitando() {
     if(!this.estaDigitando) { return; }
 
     this.estaDigitando = false;
-    this.appSignalRService.run('EnviarContatoDigitando',
-      false, this.ultimaConversa.contatoAmigoId, this.contatoLogado.contatoId);
+    this.signalRService.enviarContatoDigitando(false,
+      this.ultimaConversa.contatoAmigoId, this.contatoLogado.contatoId);
   }
 
   ngOnDestroy() {

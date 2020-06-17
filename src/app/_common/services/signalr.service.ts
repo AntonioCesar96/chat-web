@@ -2,7 +2,6 @@ import { StringResources } from 'src/app/string-resources';
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subscription } from 'rxjs';
-import { SignalREventsService } from './signalr-events.service';
 
 @Injectable({ providedIn: 'root' })
 export class AppSignalRService implements OnDestroy {
@@ -12,7 +11,11 @@ export class AppSignalRService implements OnDestroy {
   private _hubConnection: HubConnection;
   private _connectedSubscription: Subscription;
 
-  constructor(private signalREventsService: SignalREventsService) { }
+  constructor() { }
+
+  get hubConnection() {
+    return this._hubConnection;
+  }
 
   criarConexao(hubUrl: string, contatoId: number) {
     this._contatoId = contatoId;
@@ -33,10 +36,6 @@ export class AppSignalRService implements OnDestroy {
         this._hubConnection.invoke('RegistrarConexao', this._contatoId);
       });
     }
-  }
-
-  configurarMetodos() {
-    this.signalREventsService.configurarMetodos(this._hubConnection);
   }
 
   iniciarConexao() {
@@ -71,9 +70,8 @@ export class AppSignalRService implements OnDestroy {
       default:
         this._hubConnection.start()
           .then(() => {
-            this._hubConnection.invoke(method, args)
-
             this._hubConnection.invoke('RegistrarConexao', this._contatoId);
+            this._hubConnection.invoke(method, args);
           })
           .catch(err => console.error(err.toString()));
         break;

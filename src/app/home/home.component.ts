@@ -1,5 +1,5 @@
+import { SignalRService } from './../_common/services/signalr-events.service';
 import { ConversaComponent } from './conversa/conversa.component';
-import { AppSignalRService } from '../_common/services/signalr.service';
 import { AutenticacaoService } from './../_common/services/autenticacao.service';
 import { Component, OnInit, ViewContainerRef, ViewChild, ComponentFactoryResolver } from '@angular/core';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private location: Location,
     private autenticacaoService: AutenticacaoService,
-    private appSignalRService: AppSignalRService,
+    private signalRService: SignalRService,
     private componentFactoryResolver: ComponentFactoryResolver
   ) { }
 
@@ -29,9 +29,7 @@ export class HomeComponent implements OnInit {
     this.location.replaceState('/');
 
     const contato = this.autenticacaoService.getContatoLogado();
-    this.appSignalRService.criarConexao('/chatHub', contato.contatoId);
-    this.appSignalRService.iniciarConexao();
-    this.appSignalRService.configurarMetodos();
+    this.signalRService.inicializar(contato.contatoId);
   }
 
   criarComponente() {

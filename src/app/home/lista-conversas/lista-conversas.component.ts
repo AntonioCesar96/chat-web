@@ -1,5 +1,4 @@
-import { AppSignalRService } from './../../_common/services/signalr.service';
-import { SignalREventsService } from './../../_common/services/signalr-events.service';
+import { SignalRService } from './../../_common/services/signalr-events.service';
 import { StatusMensagem } from './../../_common/models/status-mensagem.enum';
 import { ContatoStatus } from './../../_common/models/contato-status.model';
 import { UltimaConversa } from './../../_common/models/ultima-conversa.model';
@@ -19,7 +18,6 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class ListaConversasComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
-
   @Output() criarComponente = new EventEmitter();
   filtro: ConversaFiltro;
   contatoLogado: Contato;
@@ -28,8 +26,7 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   constructor(
     private conversaService: ConversaService,
     private autenticacaoService: AutenticacaoService,
-    private appSignalRService: AppSignalRService,
-    private signalREventsService: SignalREventsService) { }
+    private signalRService: SignalRService) { }
 
   ngOnInit() {
     if (!this.autenticacaoService.estaLogado()) { return; }
@@ -40,32 +37,32 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
-    this.signalREventsService
+    this.signalRService
       .receberMensagem()
       .pipe(takeUntil(this.destroy$))
       .subscribe((mensagem) => this.receberMensagem(mensagem));
 
-    this.signalREventsService
+    this.signalRService
       .receberContatoDigitando()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => this.validarContatoQueEstaDigitando(res));
 
-    this.signalREventsService
+    this.signalRService
       .receberStatusContatoOnline()
       .pipe(takeUntil(this.destroy$))
       .subscribe((contatoId) => this.marcarStatusContatoOnline(contatoId));
 
-    this.signalREventsService
+    this.signalRService
       .receberStatusContatoOffline()
       .pipe(takeUntil(this.destroy$))
       .subscribe((status) => this.marcarStatusContatoOffline(status));
 
-    this.signalREventsService
+    this.signalRService
       .receberMensagemLida()
       .pipe(takeUntil(this.destroy$))
       .subscribe((mensagem) => this.marcarMensagemComoLida(mensagem));
 
-    this.signalREventsService
+    this.signalRService
       .receberConversasDoContato()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => this.receberConversasDoContato(res));
@@ -106,7 +103,7 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
 
   obterConversasDoContato(contatoId: number) {
     this.filtro = new ConversaFiltro(contatoId);
-    this.appSignalRService.run('ObterConversasDoContato', this.filtro);
+    this.signalRService.obterConversasDoContato(this.filtro);
   }
 
   existeConversas() {

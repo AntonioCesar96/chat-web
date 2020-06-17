@@ -1,13 +1,15 @@
+import { ConversaFiltro } from './../models/conversa.filtro';
+import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';
 import { ContatoStatus } from '../models/contato-status.model';
 import { Mensagem } from '../models/mensagem.model';
 import { Injectable } from '@angular/core';
-import { HubConnection } from '@microsoft/signalr';
 import { Subject, Observable } from 'rxjs';
 import { Resultado } from '../models/resultado.model';
 import { UltimaConversa } from '../models/ultima-conversa.model';
+import { AppSignalRService } from './signalr.service';
 
 @Injectable({ providedIn: 'root' })
-export class SignalREventsService {
+export class SignalRService {
   private _receberMensagemSubject = new Subject<Mensagem>();
   private _contatoDigitandoSubject = new Subject<any>();
   private _statusContatoOnlineSubject = new Subject<number>();
@@ -17,9 +19,16 @@ export class SignalREventsService {
   private _conversasDoContatoSubject = new Subject<Resultado<UltimaConversa>>();
   private _mensagensSubject = new Subject<Resultado<Mensagem>>();
 
-  constructor() { }
+  constructor(private appSignalRService: AppSignalRService) { }
 
-  configurarMetodos(hubConnection: HubConnection) {
+  inicializar(contatoId: number) {
+    this.appSignalRService.criarConexao('/chatHub', contatoId);
+    this.appSignalRService.iniciarConexao();
+    this.configurarMetodos();
+  }
+
+  configurarMetodos() {
+    const hubConnection = this.appSignalRService.hubConnection;
     hubConnection.on('ReceberMensagem', (mensagem) => {
       this._receberMensagemSubject.next(mensagem);
     });
@@ -56,35 +65,55 @@ export class SignalREventsService {
     });
   }
 
-  public receberMensagem(): Observable<Mensagem> {
+  receberMensagem(): Observable<Mensagem> {
     return this._receberMensagemSubject.asObservable();
   }
 
-  public receberContatoDigitando(): Observable<any> {
+  receberContatoDigitando(): Observable<any> {
     return this._contatoDigitandoSubject.asObservable();
   }
 
-  public receberStatusContatoOffline(): Observable<ContatoStatus> {
+  receberStatusContatoOffline(): Observable<ContatoStatus> {
     return this._statusContatoOfflineSubject.asObservable();
   }
 
-  public receberStatusContatoOnline(): Observable<number> {
+  receberStatusContatoOnline(): Observable<number> {
     return this._statusContatoOnlineSubject.asObservable();
   }
 
-  public receberDeslogar(): Observable<any> {
+  receberDeslogar(): Observable<any> {
     return this._deslogarSubject.asObservable();
   }
 
-  public receberMensagemLida(): Observable<Mensagem> {
+  receberMensagemLida(): Observable<Mensagem> {
     return this._mensagemLidaSubject.asObservable();
   }
 
-  public receberConversasDoContato(): Observable<Resultado<UltimaConversa>> {
+  receberConversasDoContato(): Observable<Resultado<UltimaConversa>> {
     return this._conversasDoContatoSubject.asObservable();
   }
 
-  public receberMensagens(): Observable<Resultado<Mensagem>> {
+  receberMensagens(): Observable<Resultado<Mensagem>> {
     return this._mensagensSubject.asObservable();
+  }
+
+  marcarMensagemComoLida(mensagemId: number, conversaId: number, contatoRemetenteId: number) {
+    this.appSignalRService.run('MarcarMensagemComoLida', mensagemId, conversaId, contatoRemetenteId);
+  }
+
+  enviarContatoDigitando(estaDigitando: boolean, contatoAmigoId: number, contatoLogadoId: number) {
+    this.appSignalRService.run('EnviarContatoDigitando', estaDigitando, contatoAmigoId, contatoLogadoId);
+  }
+
+  enviarMensagem(mensagem: Mensagem) {
+    this.appSignalRService.run('EnviarMensagem', mensagem);
+  }
+
+  obterMensagens(filtro: MensagemFiltro) {
+    this.appSignalRService.run('ObterMensagens', filtro);
+  }
+
+  obterConversasDoContato(filtro: ConversaFiltro) {
+    this.appSignalRService.run('ObterConversasDoContato', filtro);
   }
 }
