@@ -9,4 +9,5 @@ export class Mensagem {
   statusMensagem: StatusMensagem;
 
   qtdMensagensNovas: number;
+  dataDescricao: string;
 }

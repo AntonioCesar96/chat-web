@@ -9,7 +9,7 @@ import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
 import { ConversaService } from '../../services/conversa.service';
 import * as moment from 'moment';
 import { StatusMensagem } from 'src/app/_common/models/status-mensagem.enum';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -18,14 +18,17 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit {
   destroy$: Subject<boolean> = new Subject<boolean>();
+  receberMensagemSub: Subscription;
+  receberMensagensSub: Subscription;
+  receberMensagemLidaSub: Subscription;
+  conversaSelecionadaSub: Subscription;
 
   @Input() contatoLogado: Contato;
   @ViewChild('mensagem') mensagem: ElementRef;
   @ViewChildren('mensagemNova') mensagemNova: QueryList<any>;
-  @ViewChildren('mensagemPorData') viewsMensagemData: QueryList<any>;
+  @ViewChildren('mensagemLista') viewsMensagemLista: QueryList<any>;
 
   filtro: MensagemFiltro;
-  mensagensPorData: Map<any, Mensagem[]>;
   resultado: Resultado<Mensagem>;
   ultimaConversa: UltimaConversa;
   manterScrollTop = false;
@@ -42,29 +45,29 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngAfterViewInit() {
-    this.viewsMensagemData.changes.subscribe(t => this.viewsMensagemRenderizadas());
+    this.viewsMensagemLista.changes.subscribe(t => this.viewsMensagemRenderizadas());
     this.mensagemNova.changes.subscribe(t => this.mensagemNovaRenderizada());
   }
 
   inicializar() {
-    this.conversaService
+    this.conversaSelecionadaSub =  this.conversaService
       .conversaSelecionada()
-      .pipe(takeUntil(this.destroy$))
+      // .pipe(takeUntil(this.destroy$))
       .subscribe((conversa) => this.selecionarConversa(conversa));
 
-    this.signalRService
+    this.receberMensagemSub = this.signalRService
       .receberMensagem()
-      .pipe(takeUntil(this.destroy$))
+      // .pipe(takeUntil(this.destroy$))
       .subscribe((mensagem) => this.receberMensagem(mensagem));
 
-    this.signalRService
+    this.receberMensagemLidaSub = this.signalRService
       .receberMensagemLida()
-      .pipe(takeUntil(this.destroy$))
+      // .pipe(takeUntil(this.destroy$))
       .subscribe((mensagem) => this.marcarMensagemComoLida(mensagem));
 
-    this.signalRService
+    this.receberMensagensSub = this.signalRService
       .receberMensagens()
-      .pipe(takeUntil(this.destroy$))
+      // .pipe(takeUntil(this.destroy$))
       .subscribe((res) => this.receberMensagens(res));
   }
 
@@ -202,18 +205,16 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ordenarMensagens() {
-    const lista = this.resultado.lista;
-    const datas = lista.map(x => new Date(x.dataEnvio).toDateString())
-    .filter((item, i, ar) => ar.indexOf(item) === i)
-    .sort((d1,d2) => new Date(d1).getTime() - new Date(d2).getTime());
+    this.resultado.lista.sort((m1,m2) =>
+      new Date(m1.dataEnvio).getTime() - new Date(m2.dataEnvio).getTime());
 
-    this.mensagensPorData = new Map<string, Mensagem[]>();
-    datas.forEach(data => {
-      const mensagens = lista.filter(x => new Date(x.dataEnvio).toDateString() === data)
-        .sort((m1,m2) => new Date(m1.dataEnvio).getTime() - new Date(m2.dataEnvio).getTime());
-
-      const dataKey = this.obterDataKey(new Date(data));
-      this.mensagensPorData.set(dataKey, mensagens);
+    this.resultado.lista.map(x => new Date(x.dataEnvio).toDateString())
+      .filter((item, i, ar) => ar.indexOf(item) === i)
+      .sort((d1,d2) => new Date(d1).getTime() - new Date(d2).getTime())
+      .forEach(data => {
+        const mensagens = this.resultado.lista.filter(x => new Date(x.dataEnvio).toDateString() === data);
+        mensagens.forEach(x => delete x.dataDescricao);
+        mensagens[0].dataDescricao = this.obterDataKey(new Date(data));
     });
   }
 
@@ -230,7 +231,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
       dataDescricao = moment(data).format('dddd');
     }
 
-    return { dataDescricao, data: moment(data).format('L') };
+    return dataDescricao;
   }
 
   onScroll(target) {
@@ -252,7 +253,12 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngOnDestroy() {
-    this.destroy$.next(true);
-    this.destroy$.unsubscribe();
+    // this.destroy$.next(true);
+    // this.destroy$.unsubscribe();
+
+    if(this.conversaSelecionadaSub) { this.conversaSelecionadaSub.unsubscribe() }
+    if(this.receberMensagemSub) { this.receberMensagemSub.unsubscribe() }
+    if(this.receberMensagensSub) { this.receberMensagensSub.unsubscribe() }
+    if(this.receberMensagemLidaSub) { this.receberMensagemLidaSub.unsubscribe() }
   }
 }

@@ -1,14 +1,15 @@
-<div class="card-action bottom" *ngIf="ultimaConversa">
-    <div class="msg-bottom">
-      <div class="msg-input-w">
-        <div class="msg-input" 
-          #mensagemEnviar
-          contenteditable="true" 
-          (input)="avisarContatoDigitando()"
-          (keypress)="onEnviarMensagem($event)"></div>
-      </div>
-      <a class="msg-btn-enviar" (click)="enviarMensagem()">
-        <i class="material-icons">send</i>
-      </a>
-    </div>
+<div class="enviar-mensagem-wrapper" *ngIf="ultimaConversa">
+  <div class="enviar-mensagem-input-wrapper">
+    <div #mensagemEnviar
+      contenteditable="true" 
+      (input)="avisarContatoDigitando()"
+      (keypress)="onEnviarMensagem($event)"></div>
+  </div>
+
+  <div class="enviar-mensagem-botao-wrapper">
+    <a class="enviar-mensagem-botao" (click)="enviarMensagem()">
+      <i class="material-icons">send</i>
+    </a>
+  </div>
+
 </div>

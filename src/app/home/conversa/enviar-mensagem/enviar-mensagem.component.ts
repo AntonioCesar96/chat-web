@@ -5,7 +5,7 @@ import { Contato } from 'src/app/_common/models/contato.model';
 import { Mensagem } from './../../../_common/models/mensagem.model';
 import { Component, OnInit, ViewChild, ElementRef, Input, OnDestroy } from '@angular/core';
 import { takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-enviar-mensagem',
@@ -13,6 +13,7 @@ import { Subject } from 'rxjs';
 })
 export class EnviarMensagemComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
+  conversaSelecionadaSub: Subscription;
 
   @ViewChild('mensagemEnviar') mensagem: ElementRef;
   @Input() contatoLogado: Contato;
@@ -31,9 +32,9 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
-    this.conversaService
+    this.conversaSelecionadaSub = this.conversaService
       .conversaSelecionada()
-      .pipe(takeUntil(this.destroy$))
+      // .pipe(takeUntil(this.destroy$))
       .subscribe((conversa) => this.ultimaConversa = conversa);
   }
 
@@ -101,7 +102,9 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy$.next(true);
-    this.destroy$.unsubscribe();
+    // this.destroy$.next(true);
+    // this.destroy$.unsubscribe();
+
+    if(this.conversaSelecionadaSub) { this.conversaSelecionadaSub.unsubscribe() }
   }
 }

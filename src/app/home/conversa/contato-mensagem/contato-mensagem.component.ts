@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
 import { ConversaService } from '../../services/conversa.service';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import * as moment from 'moment';
 
@@ -12,6 +12,7 @@ import * as moment from 'moment';
 })
 export class ContatoMensagemComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
+  conversaSelecionadaSub: Subscription;
 
   @Input() contatoLogado: Contato;
   ultimaConversa: UltimaConversa;
@@ -24,9 +25,9 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
-    this.conversaService
+    this.conversaSelecionadaSub = this.conversaService
       .conversaSelecionada()
-      .pipe(takeUntil(this.destroy$))
+      // .pipe(takeUntil(this.destroy$))
       .subscribe((conversa) => this.ultimaConversa = conversa);
   }
 
@@ -42,7 +43,9 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy$.next(true);
-    this.destroy$.unsubscribe();
+    // this.destroy$.next(true);
+    // this.destroy$.unsubscribe();
+
+    if(this.conversaSelecionadaSub) { this.conversaSelecionadaSub.unsubscribe() }
   }
 }

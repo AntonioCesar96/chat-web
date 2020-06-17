@@ -1,16 +1,16 @@
-<div class="conversa height-100">
-  <div class="card">
-    <app-contato-mensagem
-      [contatoLogado]="contato">
-    </app-contato-mensagem>
-    
-    <app-lista-mensagens
-      [contatoLogado]="contato" >
-    </app-lista-mensagens>
+<div class="conversa">
+  <app-contato-mensagem
+    [contatoLogado]="contato">
+  </app-contato-mensagem>
 
-    <app-enviar-mensagem 
-      [contatoLogado]="contato" 
-      [ultimaConversa]="ultimaConversa">
-    </app-enviar-mensagem>
-  </div>
+  <app-lista-mensagens
+    class="app-lista-mensagens"
+    [contatoLogado]="contato" >
+  </app-lista-mensagens>
+
+  <app-enviar-mensagem 
+    class="app-enviar-mensagem"
+    [contatoLogado]="contato" 
+    [ultimaConversa]="ultimaConversa">
+  </app-enviar-mensagem>
 </div>

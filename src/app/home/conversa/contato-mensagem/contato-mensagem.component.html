@@ -1,11 +1,23 @@
-<div class="card-action top" *ngIf="ultimaConversa">
-    <ul class="collection">
-      <li class="collection-item avatar">
-        <img class="circle" *ngIf="ultimaConversa?.fotoUrl" [src]="ultimaConversa?.fotoUrl">
-        <i class="material-icons circle" *ngIf="!ultimaConversa?.fotoUrl"></i>
-        <span class="title">{{ ultimaConversa?.nome }}</span>
-        <p class="status" *ngIf="!ultimaConversa?.estaDigitando">{{ ultimoStatus() }}</p>
-        <p class="status" *ngIf="ultimaConversa?.estaDigitando">Está digitando...</p>
-      </li>
-    </ul>
+<div class="contato" *ngIf="ultimaConversa">
+  <div class="img-wrapper">
+    <div class="crop">
+      <img [src]="ultimaConversa?.fotoUrl" *ngIf="ultimaConversa?.fotoUrl">
+      <i class="material-icons circle" *ngIf="!ultimaConversa?.fotoUrl"></i>
+    </div>
+  </div>
+
+  <div class="titulo">
+    <div class="nome-wrapper">
+      <div class="nome"><span>{{ ultimaConversa?.nome }}</span></div>
+    </div>
+    
+    <div class="ultima-mensagem-wrapper">
+      <div class="ultima-mensagem">
+        <div class="ultima-mensagem-texto">
+          <span *ngIf="!ultimaConversa?.estaDigitando">{{ ultimoStatus() }}</span>
+          <span *ngIf="ultimaConversa?.estaDigitando">Está digitando...</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
