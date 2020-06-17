@@ -1,10 +1,10 @@
-import { SignalRService } from './../../_common/services/signalr-events.service';
+import { ConversaService } from './../services/conversa.service';
+import { SignalRService } from '../../_common/services/signalr.service';
 import { StatusMensagem } from './../../_common/models/status-mensagem.enum';
 import { ContatoStatus } from './../../_common/models/contato-status.model';
 import { UltimaConversa } from './../../_common/models/ultima-conversa.model';
 import { Mensagem } from './../../_common/models/mensagem.model';
 import { Contato } from './../../_common/models/contato.model';
-import { ConversaService } from '../services/conversa.service';
 import { Resultado } from './../../_common/models/resultado.model';
 import { AutenticacaoService } from './../../_common/services/autenticacao.service';
 import { ConversaFiltro } from './../../_common/models/conversa.filtro';
@@ -18,14 +18,14 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class ListaConversasComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
-  @Output() criarComponente = new EventEmitter();
+  @Output() criarComponente = new EventEmitter<UltimaConversa>();
   filtro: ConversaFiltro;
   contatoLogado: Contato;
   resultado: Resultado<UltimaConversa>;
 
   constructor(
-    private conversaService: ConversaService,
     private autenticacaoService: AutenticacaoService,
+    private conversaService: ConversaService,
     private signalRService: SignalRService) { }
 
   ngOnInit() {
@@ -112,7 +112,6 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
 
   public selecionarConversa(conversa: UltimaConversa) {
     this.resultado.lista.forEach(x => x.conversaAberta = false);
-    this.criarComponente.emit();
     this.conversaService.selecionarConversa(conversa);
   }
 

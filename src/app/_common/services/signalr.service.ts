@@ -1,85 +1,119 @@
-import { StringResources } from 'src/app/string-resources';
-import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
-import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
-import { Subscription } from 'rxjs';
+import { ConversaFiltro } from '../models/conversa.filtro';
+import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';
+import { ContatoStatus } from '../models/contato-status.model';
+import { Mensagem } from '../models/mensagem.model';
+import { Injectable } from '@angular/core';
+import { Subject, Observable } from 'rxjs';
+import { Resultado } from '../models/resultado.model';
+import { UltimaConversa } from '../models/ultima-conversa.model';
+import { AppSignalRService } from './app-signalr.service';
 
 @Injectable({ providedIn: 'root' })
-export class AppSignalRService implements OnDestroy {
-  private _connectionEstablished = new EventEmitter<boolean>();
-  private _iniciarConexaoTimeoutDelay = 3000;
-  private _contatoId = 0;
-  private _hubConnection: HubConnection;
-  private _connectedSubscription: Subscription;
+export class SignalRService {
+  private _receberMensagemSubject = new Subject<Mensagem>();
+  private _contatoDigitandoSubject = new Subject<any>();
+  private _statusContatoOnlineSubject = new Subject<number>();
+  private _statusContatoOfflineSubject = new Subject<ContatoStatus>();
+  private _mensagemLidaSubject = new Subject<Mensagem>();
+  private _deslogarSubject = new Subject<any>();
+  private _conversasDoContatoSubject = new Subject<Resultado<UltimaConversa>>();
+  private _mensagensSubject = new Subject<Resultado<Mensagem>>();
 
-  constructor() { }
+  constructor(private appSignalRService: AppSignalRService) { }
 
-  get hubConnection() {
-    return this._hubConnection;
+  inicializar(contatoId: number) {
+    this.appSignalRService.criarConexao('/chatHub', contatoId);
+    this.appSignalRService.iniciarConexao();
+    this.configurarMetodos();
   }
 
-  criarConexao(hubUrl: string, contatoId: number) {
-    this._contatoId = contatoId;
+  configurarMetodos() {
+    const hubConnection = this.appSignalRService.hubConnection;
+    hubConnection.on('ReceberMensagem', (mensagem) => {
+      this._receberMensagemSubject.next(mensagem);
+    });
 
-    if (!this._hubConnection && this._contatoId > 0)
-    {
-      this._hubConnection = new HubConnectionBuilder()
-        .withUrl(StringResources.URL_SERVIDOR + hubUrl)
-        .configureLogging(LogLevel.Information)
-        // .withAutomaticReconnect([0, 1000, 10000])
-        .build();
+    hubConnection.on('ReceberContatoDigitando', (estaDigitando, contatoQueEstaDigitandoId) => {
+      this._contatoDigitandoSubject.next({ estaDigitando, contatoQueEstaDigitandoId });
+    });
 
-      this._hubConnection.onclose((msg) => {
-        this.iniciarConexao();
-      });
+    hubConnection.on('ReceberStatusContatoOnline', (contatoId: number) => {
+      this._statusContatoOnlineSubject.next(contatoId);
+    });
 
-      this._hubConnection.onreconnected((connectionId: string) => {
-        this._hubConnection.invoke('RegistrarConexao', this._contatoId);
-      });
-    }
+    hubConnection.on('ReceberStatusContatoOffline', (contatoStatus: ContatoStatus) => {
+      this._statusContatoOfflineSubject.next(contatoStatus);
+    });
+
+    hubConnection.on('Deslogar', () => {
+      this._deslogarSubject.next();
+    });
+
+    hubConnection.on('ReceberMensagemLida', (mensagemId: number, conversaId: number) => {
+      const mensagem = new Mensagem();
+      mensagem.mensagemId = mensagemId;
+      mensagem.conversaId = conversaId;
+      this._mensagemLidaSubject.next(mensagem);
+    });
+
+    hubConnection.on('ReceberConversasDoContato', (res: Resultado<UltimaConversa>) => {
+      this._conversasDoContatoSubject.next(res);
+    });
+
+    hubConnection.on('ReceberMensagens', (res: Resultado<Mensagem>) => {
+      this._mensagensSubject.next(res);
+    });
   }
 
-  iniciarConexao() {
-    if (this._hubConnection.state === HubConnectionState.Disconnected) {
-      this._hubConnection
-        .start()
-        .then(() => {
-          console.log('Conectado ao Hub');
-          this._hubConnection.invoke('RegistrarConexao', this._contatoId);
-          this._connectionEstablished.emit();
-        })
-        .catch(err => {
-          console.log('Erro ao tentar conectar, tentando novamente...');
-          setTimeout(() => {
-            this.iniciarConexao();
-          }, this._iniciarConexaoTimeoutDelay);
-        });
-    }
+  receberMensagem(): Observable<Mensagem> {
+    return this._receberMensagemSubject.asObservable();
   }
 
-  run(method: string, ...args: any[]) {
-    switch (this._hubConnection.state) {
-      case HubConnectionState.Connected: ;
-        this._hubConnection.invoke(method, ...args);
-        break;
-      case HubConnectionState.Connecting:
-        this._connectedSubscription = this._connectionEstablished.subscribe((data: any) => {
-          this._hubConnection.invoke(method, ...args);
-          this._connectedSubscription.unsubscribe();
-        });
-        break;
-      default:
-        this._hubConnection.start()
-          .then(() => {
-            this._hubConnection.invoke('RegistrarConexao', this._contatoId);
-            this._hubConnection.invoke(method, args);
-          })
-          .catch(err => console.error(err.toString()));
-        break;
-    }
+  receberContatoDigitando(): Observable<any> {
+    return this._contatoDigitandoSubject.asObservable();
   }
 
-  ngOnDestroy() {
-    if (!this._connectedSubscription) { return; }
-    this._connectedSubscription.unsubscribe();
+  receberStatusContatoOffline(): Observable<ContatoStatus> {
+    return this._statusContatoOfflineSubject.asObservable();
+  }
+
+  receberStatusContatoOnline(): Observable<number> {
+    return this._statusContatoOnlineSubject.asObservable();
+  }
+
+  receberDeslogar(): Observable<any> {
+    return this._deslogarSubject.asObservable();
+  }
+
+  receberMensagemLida(): Observable<Mensagem> {
+    return this._mensagemLidaSubject.asObservable();
+  }
+
+  receberConversasDoContato(): Observable<Resultado<UltimaConversa>> {
+    return this._conversasDoContatoSubject.asObservable();
+  }
+
+  receberMensagens(): Observable<Resultado<Mensagem>> {
+    return this._mensagensSubject.asObservable();
+  }
+
+  marcarMensagemComoLida(mensagemId: number, conversaId: number, contatoRemetenteId: number) {
+    this.appSignalRService.run('MarcarMensagemComoLida', mensagemId, conversaId, contatoRemetenteId);
+  }
+
+  enviarContatoDigitando(estaDigitando: boolean, contatoAmigoId: number, contatoLogadoId: number) {
+    this.appSignalRService.run('EnviarContatoDigitando', estaDigitando, contatoAmigoId, contatoLogadoId);
+  }
+
+  enviarMensagem(mensagem: Mensagem) {
+    this.appSignalRService.run('EnviarMensagem', mensagem);
+  }
+
+  obterMensagens(filtro: MensagemFiltro) {
+    this.appSignalRService.run('ObterMensagens', filtro);
+  }
+
+  obterConversasDoContato(filtro: ConversaFiltro) {
+    this.appSignalRService.run('ObterConversasDoContato', filtro);
   }
 }

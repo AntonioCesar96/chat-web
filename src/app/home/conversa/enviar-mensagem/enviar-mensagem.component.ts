@@ -1,11 +1,11 @@
-import { SignalRService } from './../../../_common/services/signalr-events.service';
+import { SignalRService } from './../../../_common/services/signalr.service';
 import { ConversaService } from '../../services/conversa.service';
 import { UltimaConversa } from './../../../_common/models/ultima-conversa.model';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { Mensagem } from './../../../_common/models/mensagem.model';
 import { Component, OnInit, ViewChild, ElementRef, Input, OnDestroy } from '@angular/core';
 import { takeUntil } from 'rxjs/operators';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-enviar-mensagem',
@@ -13,7 +13,6 @@ import { Subject, Subscription } from 'rxjs';
 })
 export class EnviarMensagemComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
-  conversaSelecionadaSub: Subscription;
 
   @ViewChild('mensagemEnviar') mensagem: ElementRef;
   @Input() contatoLogado: Contato;
@@ -32,9 +31,9 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
-    this.conversaSelecionadaSub = this.conversaService
+    this.conversaService
       .conversaSelecionada()
-      // .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((conversa) => this.ultimaConversa = conversa);
   }
 
@@ -102,9 +101,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // this.destroy$.next(true);
-    // this.destroy$.unsubscribe();
-
-    if(this.conversaSelecionadaSub) { this.conversaSelecionadaSub.unsubscribe() }
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
   }
 }

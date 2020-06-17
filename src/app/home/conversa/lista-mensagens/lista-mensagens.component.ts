@@ -1,4 +1,4 @@
-import { SignalRService } from './../../../_common/services/signalr-events.service';
+import { SignalRService } from './../../../_common/services/signalr.service';
 import { Component, OnInit, OnDestroy, Input, ViewChild,
   ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
 import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';
@@ -9,7 +9,7 @@ import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
 import { ConversaService } from '../../services/conversa.service';
 import * as moment from 'moment';
 import { StatusMensagem } from 'src/app/_common/models/status-mensagem.enum';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -18,11 +18,6 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit {
   destroy$: Subject<boolean> = new Subject<boolean>();
-  receberMensagemSub: Subscription;
-  receberMensagensSub: Subscription;
-  receberMensagemLidaSub: Subscription;
-  conversaSelecionadaSub: Subscription;
-
   @Input() contatoLogado: Contato;
   @ViewChild('mensagem') mensagem: ElementRef;
   @ViewChildren('mensagemNova') mensagemNova: QueryList<any>;
@@ -50,24 +45,24 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   inicializar() {
-    this.conversaSelecionadaSub =  this.conversaService
+    this.conversaService
       .conversaSelecionada()
-      // .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((conversa) => this.selecionarConversa(conversa));
 
-    this.receberMensagemSub = this.signalRService
+    this.signalRService
       .receberMensagem()
-      // .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((mensagem) => this.receberMensagem(mensagem));
 
-    this.receberMensagemLidaSub = this.signalRService
+    this.signalRService
       .receberMensagemLida()
-      // .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((mensagem) => this.marcarMensagemComoLida(mensagem));
 
-    this.receberMensagensSub = this.signalRService
+    this.signalRService
       .receberMensagens()
-      // .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((res) => this.receberMensagens(res));
   }
 
@@ -98,6 +93,11 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   receberMensagens(res: Resultado<Mensagem>) {
+    if(!this.ultimaConversa || res.lista.length === 0
+        || this.ultimaConversa.conversaId !== res.lista[0].conversaId) {
+      return;
+    }
+
     this.buscandoMensagens = false;
     this.resultado.total = res.total;
     this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
@@ -253,12 +253,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngOnDestroy() {
-    // this.destroy$.next(true);
-    // this.destroy$.unsubscribe();
-
-    if(this.conversaSelecionadaSub) { this.conversaSelecionadaSub.unsubscribe() }
-    if(this.receberMensagemSub) { this.receberMensagemSub.unsubscribe() }
-    if(this.receberMensagensSub) { this.receberMensagensSub.unsubscribe() }
-    if(this.receberMensagemLidaSub) { this.receberMensagemLidaSub.unsubscribe() }
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
   }
 }

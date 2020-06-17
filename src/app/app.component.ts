@@ -1,4 +1,4 @@
-import { SignalRService } from './_common/services/signalr-events.service';
+import { SignalRService } from './_common/services/signalr.service';
 import { Subject } from 'rxjs';
 import { Location } from '@angular/common';
 import { CookieService } from './_common/services/cookie.service';

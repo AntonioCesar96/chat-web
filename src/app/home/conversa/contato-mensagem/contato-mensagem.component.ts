@@ -27,7 +27,7 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   inicializar() {
     this.conversaSelecionadaSub = this.conversaService
       .conversaSelecionada()
-      // .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this.destroy$))
       .subscribe((conversa) => this.ultimaConversa = conversa);
   }
 
@@ -43,9 +43,7 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // this.destroy$.next(true);
-    // this.destroy$.unsubscribe();
-
-    if(this.conversaSelecionadaSub) { this.conversaSelecionadaSub.unsubscribe() }
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
   }
 }

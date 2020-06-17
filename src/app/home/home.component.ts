@@ -1,7 +1,6 @@
-import { SignalRService } from './../_common/services/signalr-events.service';
-import { ConversaComponent } from './conversa/conversa.component';
+import { SignalRService } from '../_common/services/signalr.service';
 import { AutenticacaoService } from './../_common/services/autenticacao.service';
-import { Component, OnInit, ViewContainerRef, ViewChild, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit, ViewContainerRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -16,8 +15,7 @@ export class HomeComponent implements OnInit {
     private router: Router,
     private location: Location,
     private autenticacaoService: AutenticacaoService,
-    private signalRService: SignalRService,
-    private componentFactoryResolver: ComponentFactoryResolver
+    private signalRService: SignalRService
   ) { }
 
   ngOnInit() {
@@ -30,12 +28,5 @@ export class HomeComponent implements OnInit {
 
     const contato = this.autenticacaoService.getContatoLogado();
     this.signalRService.inicializar(contato.contatoId);
-  }
-
-  criarComponente() {
-    this.myRef.clear();
-    const factory = this.componentFactoryResolver.resolveComponentFactory(ConversaComponent);
-    const ref = this.myRef.createComponent(factory);
-    ref.changeDetectorRef.detectChanges();
   }
 }

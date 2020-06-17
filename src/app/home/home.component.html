@@ -1,9 +1,10 @@
 
 <div class="home-box-wrapper">
   <div class="home-box">
-    <app-lista-conversas (criarComponente)="criarComponente()"></app-lista-conversas>
+    <app-lista-conversas (criarComponente)="criarComponente($event)"></app-lista-conversas>
   </div>
   <div class="home-box">
+    <app-conversa></app-conversa>
     <ng-template #dynamicComponent></ng-template>
   </div>
 </div>
