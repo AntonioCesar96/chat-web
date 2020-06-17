@@ -1,5 +1,5 @@
 import { SignalREventsService } from './_common/services/signalr-events.service';
-import { Subscription } from 'rxjs';
+import { Subscription, Subject } from 'rxjs';
 import { AppSignalRService } from 'src/app/_common/services/signalr.service';
 import { Location } from '@angular/common';
 import { CookieService } from './_common/services/cookie.service';
@@ -9,13 +9,15 @@ import { Router, NavigationEnd } from '@angular/router';
 import { LoginService } from './autenticacao/login.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as moment from 'moment';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit, OnDestroy {
-  deslogarSubscription: Subscription;
+  destroy$: Subject<boolean> = new Subject<boolean>();
+
   usuarioLogouEmOutroLugar = false;
 
   constructor(
@@ -36,11 +38,10 @@ export class AppComponent implements OnInit, OnDestroy {
     moment.locale('pt-br');
     this.addEventoReload();
 
-    this.deslogarSubscription = this.signalREventsService
+    this.signalREventsService
       .receberDeslogar()
-      .subscribe(() => {
-        this.usuarioLogouEmOutroLugar = true;
-    });
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.usuarioLogouEmOutroLugar = true);
   }
 
   addEventoReload() {
@@ -78,7 +79,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (!this.deslogarSubscription) { return; }
-    this.deslogarSubscription.unsubscribe();
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
   }
 }

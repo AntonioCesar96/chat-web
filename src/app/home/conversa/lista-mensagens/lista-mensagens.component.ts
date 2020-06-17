@@ -1,6 +1,6 @@
 import { SignalREventsService } from './../../../_common/services/signalr-events.service';
-import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, OnDestroy, Input, ViewChild,
+  ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
 import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';
 import { Mensagem } from 'src/app/_common/models/mensagem.model';
 import { Resultado } from 'src/app/_common/models/resultado.model';
@@ -10,12 +10,16 @@ import { ConversaService } from '../../services/conversa.service';
 import { AppSignalRService } from 'src/app/_common/services/signalr.service';
 import * as moment from 'moment';
 import { StatusMensagem } from 'src/app/_common/models/status-mensagem.enum';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-lista-mensagens',
   templateUrl: './lista-mensagens.component.html'
 })
 export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit {
+  destroy$: Subject<boolean> = new Subject<boolean>();
+
   @Input() contatoLogado: Contato;
   @ViewChild('mensagem') mensagem: ElementRef;
   @ViewChildren('mensagemNova') mensagemNova: QueryList<any>;
@@ -25,10 +29,6 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   mensagensPorData: Map<any, Mensagem[]>;
   resultado: Resultado<Mensagem>;
   ultimaConversa: UltimaConversa;
-  conversaSubscription: Subscription;
-  receberMensagemSubscription: Subscription;
-  receberMensagemLidaSubscription: Subscription;
-  mensagensSubscription: Subscription;
   manterScrollTop = false;
   buscandoMensagens = false;
   ultimaPagina = false;
@@ -44,17 +44,30 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngAfterViewInit() {
-    this.viewsMensagemData.changes.subscribe(t => {
-      this.viewsMensagemRenderizadas();
-    });
+    this.viewsMensagemData.changes.subscribe(t => this.viewsMensagemRenderizadas());
+    this.mensagemNova.changes.subscribe(t => this.mensagemNovaRenderizada());
+  }
 
-    this.mensagemNova.changes.subscribe(t => {
-      // TODO:
-      if(!this.manterScrollTop && this.obterMensagemNova() && this.mensagemNova.first) {
-        const elemento = this.mensagemNova.first;
-        this.mensagem.nativeElement.scrollTop = elemento.nativeElement.offsetTop - 130; // TODO:
-      }
-    });
+  inicializar() {
+    this.conversaService
+      .conversaSelecionada()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((conversa) => this.selecionarConversa(conversa));
+
+    this.signalREventsService
+      .receberMensagem()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((mensagem) => this.receberMensagem(mensagem));
+
+    this.signalREventsService
+      .receberMensagemLida()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((mensagem) => this.marcarMensagemComoLida(mensagem));
+
+    this.signalREventsService
+      .receberMensagens()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res) => this.receberMensagens(res));
   }
 
   viewsMensagemRenderizadas() {
@@ -68,54 +81,37 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
     elemento.scrollTop = elemento.scrollHeight - elemento.offsetHeight;
   }
 
-  inicializar() {
-    this.conversaSubscription = this.conversaService
-      .conversaSelecionada()
-      .subscribe((conversa) => {
-        this.ultimaConversa = conversa;
-        this.inicializarVariaveis()
-        this.criarListaInicial();
-        this.criarFiltro(conversa.conversaId);
-        this.obterMensagens();
-    });
-
-    this.receberMensagemSubscription = this.signalREventsService
-      .receberMensagem()
-      .subscribe((mensagem) => {
-        this.receberMensagem(mensagem);
-    });
-
-    this.receberMensagemLidaSubscription = this.signalREventsService
-      .receberMensagemLida()
-      .subscribe((mensagem: Mensagem) => {
-        this.marcarMensagemComoLida(mensagem);
-    });
-
-    this.mensagensSubscription = this.signalREventsService
-      .receberMensagens()
-      .subscribe((res: Resultado<Mensagem>) => {
-        if(this.manterScrollTop) {
-          this.resultado.total = res.total;
-          this.resultado.lista.push(...res.lista);
-          this.ordenarMensagens();
-          this.buscandoMensagens = false;
-          this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
-          return;
-        }
-
-        this.resultado = res;
-        this.buscandoMensagens = false;
-        this.filtro.primeiraBusca = false;
-        this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
-        this.marcarMensagemNova();
-        this.ordenarMensagens();
-    });
+  mensagemNovaRenderizada() {
+    if(!this.manterScrollTop && this.obterMensagemNova() && this.mensagemNova.first) {
+      const elemento = this.mensagemNova.first;
+      this.mensagem.nativeElement.scrollTop = elemento.nativeElement.offsetTop - 130; // TODO:
+    }
   }
 
-  inicializarVariaveis() {
-    this.manterScrollTop = false;
+  selecionarConversa(conversa: UltimaConversa) {
+    this.ultimaConversa = conversa;
+    this.inicializarVariaveis()
+    this.criarListaInicial();
+    this.criarFiltro(conversa.conversaId);
+    this.obterMensagens();
+  }
+
+  receberMensagens(res: Resultado<Mensagem>) {
+    if(this.manterScrollTop) {
+      this.resultado.total = res.total;
+      this.resultado.lista.push(...res.lista);
+      this.ordenarMensagens();
+      this.buscandoMensagens = false;
+      this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
+      return;
+    }
+
+    this.resultado = res;
     this.buscandoMensagens = false;
-    this.ultimaPagina = false;
+    this.filtro.primeiraBusca = false;
+    this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
+    this.marcarMensagemNova();
+    this.ordenarMensagens();
   }
 
   marcarMensagemComoLida(mensagem: Mensagem) {
@@ -146,6 +142,12 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
       this.appSignalRService.run('MarcarMensagemComoLida',
         mensagem.mensagemId, mensagem.conversaId, mensagem.contatoRemetenteId);
     }
+  }
+
+  inicializarVariaveis() {
+    this.manterScrollTop = false;
+    this.buscandoMensagens = false;
+    this.ultimaPagina = false;
   }
 
   ehIgualAoContatoLogado(item: Mensagem) {
@@ -252,16 +254,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngOnDestroy() {
-    if (!this.conversaSubscription) { return; }
-    this.conversaSubscription.unsubscribe();
-
-    if (!this.receberMensagemSubscription) { return; }
-    this.receberMensagemSubscription.unsubscribe();
-
-    if (!this.receberMensagemLidaSubscription) { return; }
-    this.receberMensagemLidaSubscription.unsubscribe();
-
-    if (!this.mensagensSubscription) { return; }
-    this.mensagensSubscription.unsubscribe();
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
   }
 }

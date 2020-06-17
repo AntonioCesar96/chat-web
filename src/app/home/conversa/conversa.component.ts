@@ -14,10 +14,6 @@ export class ConversaComponent implements OnInit {
 
   ngOnInit() {
     if (!this.autenticacaoService.estaLogado()) { return; }
-    this.obterContatoLogado();
-  }
-
-  obterContatoLogado() {
     this.contato = this.autenticacaoService.getContatoLogado();
   }
 }

@@ -4,20 +4,22 @@ import { Contato } from 'src/app/_common/models/contato.model';
 import { AppSignalRService } from '../../../_common/services/signalr.service';
 import { Mensagem } from './../../../_common/models/mensagem.model';
 import { Component, OnInit, ViewChild, ElementRef, Input, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-enviar-mensagem',
   templateUrl: './enviar-mensagem.component.html'
 })
 export class EnviarMensagemComponent implements OnInit, OnDestroy {
+  destroy$: Subject<boolean> = new Subject<boolean>();
+
   @ViewChild('mensagemEnviar') mensagem: ElementRef;
   @Input() contatoLogado: Contato;
   @Input() ultimaConversa: UltimaConversa;
   ultimoTimer: any;
   estaDigitando = false;
   tempo = 0;
-  conversaSubscription: Subscription;
 
   constructor(
     private conversaService: ConversaService,
@@ -28,17 +30,11 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     this.inicializar();
   }
 
-  ngOnDestroy() {
-    if (!this.conversaSubscription) { return; }
-    this.conversaSubscription.unsubscribe();
-  }
-
   inicializar() {
-    this.conversaSubscription = this.conversaService
+    this.conversaService
       .conversaSelecionada()
-      .subscribe((conversa) => {
-        this.ultimaConversa = conversa;
-    });
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((conversa) => this.ultimaConversa = conversa);
   }
 
   onEnviarMensagem(event: KeyboardEvent) {
@@ -103,5 +99,10 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     this.estaDigitando = false;
     this.appSignalRService.run('EnviarContatoDigitando',
       false, this.ultimaConversa.contatoAmigoId, this.contatoLogado.contatoId);
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next(true);
+    this.destroy$.unsubscribe();
   }
 }
