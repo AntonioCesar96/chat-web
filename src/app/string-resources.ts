@@ -6,4 +6,6 @@ export const StringResources = {
   MSG_SENHA_DEVE_SER_INFORMADO: 'A senha deve ser informada.',
   MSG_CONTA_CRIADA: 'Conta criado com sucesso!',
   MSG_ENTRAR: 'Entrar',
+  QTD_MSG_NOVA_SINGULAR: '1 MENSAGEM NÃO LIDA',
+  QTD_MSG_NOVA_PLURAL: 'MENSAGENS NÃO LIDAS',
 };

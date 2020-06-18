@@ -1,0 +1,19 @@
+<div class="pesquisa">
+  <div class="pesquisa-wrapper">
+    <div class="pesquisa-input-wrapper">
+      <div #pesquisa contenteditable="true" (input)="pesquisar()"></div>
+    </div>
+  </div>
+
+  <div class="resultados" [hidden]="!textoPesquisa">
+
+    <app-pesquisa-conversas
+      [contatoLogado]="contatoLogado">
+    </app-pesquisa-conversas>
+
+    <app-pesquisa-contatos
+      [contatoLogado]="contatoLogado">
+    </app-pesquisa-contatos>
+    
+  </div>
+</div>

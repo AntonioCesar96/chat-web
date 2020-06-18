@@ -17,4 +17,5 @@ export class UltimaConversa {
   qtdMensagensNovas: number;
   mostrarMensagensNovas: boolean;
   conversaAberta: boolean;
+  conversaNova: boolean;
 }

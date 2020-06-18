@@ -1,3 +1,4 @@
+import { StringResources } from 'src/app/string-resources';
 import { SignalRService } from './../../../_common/services/signalr.service';
 import { Component, OnInit, OnDestroy, Input, ViewChild,
   ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
@@ -21,10 +22,11 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   @Input() contatoLogado: Contato;
   @ViewChild('mensagem') mensagem: ElementRef;
   @ViewChildren('mensagemNova') mensagemNova: QueryList<any>;
-  @ViewChildren('mensagemLista') viewsMensagemLista: QueryList<any>;
+  @ViewChildren('mensagemPorData') viewsMensagemData: QueryList<any>;
 
   filtro: MensagemFiltro;
   resultado: Resultado<Mensagem>;
+  mensagensPorData: Map<any, Mensagem[]>;
   ultimaConversa: UltimaConversa;
   manterScrollTop = false;
   buscandoMensagens = false;
@@ -40,7 +42,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngAfterViewInit() {
-    this.viewsMensagemLista.changes.subscribe(t => this.viewsMensagemRenderizadas());
+    this.viewsMensagemData.changes.subscribe(t => this.viewsMensagemRenderizadas());
     this.mensagemNova.changes.subscribe(t => this.mensagemNovaRenderizada());
   }
 
@@ -66,6 +68,32 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
       .subscribe((res) => this.receberMensagens(res));
   }
 
+  selecionarConversa(conversa: UltimaConversa) {
+    if(conversa.conversaNova) {
+      if(!this.ultimaConversa || this.ultimaConversa.conversaId > 0
+        || (this.ultimaConversa.conversaId === 0
+        && conversa.contatoAmigoId !== this.ultimaConversa.contatoAmigoId) ){
+        return;
+      }
+    }
+
+    this.ultimaConversa = conversa;
+    this.inicializarVariaveis();
+
+    if(conversa.conversaId === 0) { return; }
+
+    this.criarFiltro(conversa.conversaId);
+    this.criarListaInicial();
+
+    if(!conversa.conversaNova) {
+      this.obterMensagens();
+      return;
+    }
+
+    this.signalRService.marcarMensagemComoLida(0, this.ultimaConversa.conversaId,
+      this.ultimaConversa.contatoAmigoId);
+  }
+
   viewsMensagemRenderizadas() {
     const elemento = this.mensagem.nativeElement;
     if(this.manterScrollTop) {
@@ -82,14 +110,6 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
       const elemento = this.mensagemNova.first;
       this.mensagem.nativeElement.scrollTop = elemento.nativeElement.offsetTop - 130;
     }
-  }
-
-  selecionarConversa(conversa: UltimaConversa) {
-    this.ultimaConversa = conversa;
-    this.inicializarVariaveis()
-    this.criarListaInicial();
-    this.criarFiltro(conversa.conversaId);
-    this.obterMensagens();
   }
 
   receberMensagens(res: Resultado<Mensagem>) {
@@ -149,6 +169,8 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
     this.manterScrollTop = false;
     this.buscandoMensagens = false;
     this.ultimaPagina = false;
+    this.resultado = null;
+    this.mensagensPorData = null;
   }
 
   ehIgualAoContatoLogado(item: Mensagem) {
@@ -181,10 +203,16 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
 
   marcarMensagemNova() {
     this.ultimaConversa.conversaAberta = true;
-    if(this.ultimaConversa.qtdMensagensNovas === 0) { return; }
+    if(this.ultimaConversa.contatoRemetenteId === this.contatoLogado.contatoId
+        || this.ultimaConversa.qtdMensagensNovas === 0) {
+      return;
+    }
 
     const naoLidas = this.resultado.lista.filter(x => x.statusMensagem !== StatusMensagem.Lida);
     naoLidas[0].qtdMensagensNovas = this.ultimaConversa.qtdMensagensNovas;
+    naoLidas[0].qtdMensagensNovasDescricao = this.ultimaConversa.qtdMensagensNovas === 1
+      ? StringResources.QTD_MSG_NOVA_SINGULAR
+      : `${this.ultimaConversa.qtdMensagensNovas} ${StringResources.QTD_MSG_NOVA_PLURAL}`;
 
     this.ultimaConversa.qtdMensagensNovas = 0;
     this.ultimaConversa.mostrarMensagensNovas = false;
@@ -201,20 +229,23 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   obterMensagemNova() {
-    return this.resultado.lista.find(x => x.qtdMensagensNovas > 0);
+    return this.resultado && this.resultado.lista
+      && this.resultado.lista.find(x => x.qtdMensagensNovas > 0);
   }
 
   ordenarMensagens() {
-    this.resultado.lista.sort((m1,m2) =>
-      new Date(m1.dataEnvio).getTime() - new Date(m2.dataEnvio).getTime());
+    const lista = this.resultado.lista;
+    const datas = lista.map(x => new Date(x.dataEnvio).toDateString())
+    .filter((item, i, ar) => ar.indexOf(item) === i)
+    .sort((d1,d2) => new Date(d1).getTime() - new Date(d2).getTime());
 
-    this.resultado.lista.map(x => new Date(x.dataEnvio).toDateString())
-      .filter((item, i, ar) => ar.indexOf(item) === i)
-      .sort((d1,d2) => new Date(d1).getTime() - new Date(d2).getTime())
-      .forEach(data => {
-        const mensagens = this.resultado.lista.filter(x => new Date(x.dataEnvio).toDateString() === data);
-        mensagens.forEach(x => delete x.dataDescricao);
-        mensagens[0].dataDescricao = this.obterDataKey(new Date(data));
+    this.mensagensPorData = new Map<string, Mensagem[]>();
+    datas.forEach(data => {
+      const mensagens = lista.filter(x => new Date(x.dataEnvio).toDateString() === data)
+        .sort((m1,m2) => new Date(m1.dataEnvio).getTime() - new Date(m2.dataEnvio).getTime());
+
+      const dataKey = this.obterDataKey(new Date(data));
+      this.mensagensPorData.set(dataKey, mensagens);
     });
   }
 
@@ -231,15 +262,15 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
       dataDescricao = moment(data).format('dddd');
     }
 
-    return dataDescricao;
+    return { dataDescricao, data: moment(data).format('L') };
   }
 
   onScroll(target) {
     this.scrollHeightOld = target.scrollHeight;
-    if (!this.ultimaPagina && !this.buscandoMensagens) {
-      const comecoTela = target.scrollTop - 100;
+    if (this.ultimaConversa && !this.ultimaConversa.conversaNova
+        && !this.ultimaPagina && !this.buscandoMensagens) {
 
-      if (comecoTela <= 0) {
+      if ((target.scrollTop - 100) <= 0) {
         this.obterMensagensPaginado();
       }
     }

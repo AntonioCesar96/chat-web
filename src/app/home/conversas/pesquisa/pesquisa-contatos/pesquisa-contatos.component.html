@@ -1,0 +1,25 @@
+<div *ngIf="existeContatos()">
+  <div class="titulo-contexo">
+    <div>Contatos</div>
+  </div>
+
+  <div>
+    <div class="contato"       
+      *ngFor="let item of resultado?.lista" 
+      (click)="selecionarContato(item)">
+
+      <div class="img-wrapper">
+        <div class="crop">
+          <img [src]="item.fotoUrl" *ngIf="item.fotoUrl">
+          <i class="material-icons circle" *ngIf="!item.fotoUrl"></i>
+        </div>
+      </div>
+
+      <div class="titulo">
+        <div class="nome-wrapper">
+          <div class="nome"><span>{{ item.nomeAmigo }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

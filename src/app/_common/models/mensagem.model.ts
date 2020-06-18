@@ -8,6 +8,16 @@ export class Mensagem {
   dataEnvio: string;
   statusMensagem: StatusMensagem;
 
+  emailRemetente: string;
+  nomeRemetente: string;
+  descricaoRemetente: string;
+  fotoUrlRemetente: string;
+  emailDestinatario: string;
+  nomeDestinatario: string;
+  descricaoDestinatario: string;
+  fotoUrlDestinatario: string;
+
   qtdMensagensNovas: number;
+  qtdMensagensNovasDescricao: string;
   dataDescricao: string;
 }

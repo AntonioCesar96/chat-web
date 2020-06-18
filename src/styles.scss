@@ -58,10 +58,6 @@ table {
   background-color: hsla(0,0%,100%,.16);
 }
 
-::-webkit-scrollbar-track {
-  background: hsla(0,0%,100%,.1);
-}
-
 html,
 body {
   height: 100%;
@@ -72,12 +68,26 @@ body {
 .theme-black {
   background-image: url(assets/images/default-bg-dark.jpg);
 
-  .contato {
+  .conversas {
     background-color: #101d24;
-    color: #f1f1f2de;
-    &:hover {
-      background-color: #17232a;
+    .contato {
+      background-color: #101d24;
+      &:hover {
+        background-color: #17232a;
+      }
     }
+  }
+
+  .conversa {
+    background-color: #0b1419;
+    .contato {
+      background-color: #222e35;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  .contato {
+    color: #f1f1f2de;
 
     &.nova {
       .titulo .nome-wrapper .data {
@@ -116,15 +126,55 @@ body {
       background-color: #00af9c;
     }
   }
-}
 
-.mensagem-checked {
-  color: #f1f1f299;
-  &.lida {
-      color: #34b7f1;
+  .conversa {
+    .mensagem-wrapper {
+        &.enviado {
+          .mensagem {
+            background-color: #054740;
+          } 
+        }
+      }
+  
+      .mensagem {
+        color: #f1f1f2de;
+        background-color: #222e35;
+      }
+  
+      .mensagem-data-wrapper {
+        color: #f1f1f299;
+      }
+  
+    .aviso {
+      background-color: #1e2a30;
+      color: #f1f1f2de;
+    }
+    
+    .enviar-mensagem-wrapper {
+      background-color: #1c282f;
+
+      .enviar-mensagem-input-wrapper {
+        background-color: #101d24;
+        border: 1px solid #101d24;
+    
+        div {
+          color: #a5aaad;
+        }
+      }
+    }
+    
+    .enviar-mensagem-botao-wrapper {
+      color: #80868b;
+    }
+    
+    .mensagem-checked {
+      color: #f1f1f299;
+      &.lida {
+          color: #34b7f1;
+      }
+    }
   }
 }
-
 
 .home-box-wrapper {
   display: flex;
@@ -138,6 +188,8 @@ body {
 
 .home-box {
   overflow: hidden;
+  position: relative;
+  z-index: 2;
     
   &:first-child {
     flex: 30%;
@@ -174,7 +226,6 @@ body {
     i {
       width: 49px;
       height: 49px;
-      background-color: #f1f1f273;
     }
   }
 
@@ -262,12 +313,21 @@ body {
   }
 }
 
+.conversas {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
 .conversa {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100%;  
 
-  background-color: #0b1419;
+  .contato {
+    position: relative;
+    z-index: 2;
+  }
 
   .app-lista-mensagens {
     flex: 1 1 0;
@@ -291,6 +351,7 @@ body {
     position: absolute;
     top: 0;
     width: 100%;
+    padding: 20px 0;
 
     .msg-vazio {
       flex: 1 1 auto;
@@ -307,10 +368,6 @@ body {
 
     &.enviado {
       align-items: flex-end;
-
-      .mensagem {
-        background-color: #054740;
-      } 
     }
 
     &.recebido {
@@ -326,9 +383,6 @@ body {
       padding: 6px 7px 8px 9px;
       display: flex;
       align-items: flex-end;
-
-      color: #f1f1f2de;
-      background-color: #222e35;
     }
 
     .mensagem-texto-wrapper {
@@ -348,8 +402,6 @@ body {
       line-height: 15px;
       white-space: nowrap;
       margin-bottom: -5px;
-
-      color: #f1f1f299;
 
       .mensagem-checked,
       span {
@@ -374,12 +426,9 @@ body {
   .aviso {
     font-size: 12.5px;
     line-height: 21px;
-    background-color: #1e2a30;
     border-radius: 7.5px;
     padding: 5px 12px 6px;
     margin: 7px auto 10px;
-
-    color: #f1f1f2de;
   }
 
   .loader {
@@ -393,8 +442,6 @@ body {
     max-width: 100%;
     min-height: 62px;
     padding: 5px 10px;
-
-    background-color: #1c282f;
 
     .enviar-mensagem-input-wrapper {
       box-sizing: border-box;
@@ -410,9 +457,6 @@ body {
       border-radius: 21px;
       padding: 9px 12px 11px;
       margin: 5px 10px;
-
-      background-color: #101d24;
-      border: 1px solid #101d24;
   
       div {
         font-size: 15px;
@@ -425,8 +469,6 @@ body {
         position: relative;
         white-space: pre-wrap;
         word-wrap: break-word;
-
-        color: #a5aaad;
       }
     }
   }
@@ -436,8 +478,6 @@ body {
     min-height: 52px;
     display: flex;
     align-items: center;
-    
-    color: #80868b;
 
     .enviar-mensagem-botao {
       cursor: pointer;
@@ -445,10 +485,73 @@ body {
   }
 }
 
+.pesquisa {
+  background-color: #222e35;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 
+  .resultados {
+    background-color: #101d24;
+    position: absolute;
+    left: 0;
+    top: 54px;
+    width: 100%;
+    z-index: 3;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    height: 100%;
+    height: calc(100% - 54px);
+  }
 
+  .pesquisa-wrapper {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: row;
+    max-width: 100%;
+    padding: 5px 10px;
 
+    .pesquisa-input-wrapper {
+      box-sizing: border-box;
+      flex: 1 1 auto;
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 20px;
+      min-height: 20px;
+      outline: none;
+      width: inherit;
+      will-change: width;
+      border-radius: 21px;
+      padding: 7px 12px;
+      margin: 5px 10px;
 
+      background-color: #101d24;
+      color: #a5aaad;
+  
+      div {
+        font-size: 15px;
+        font-weight: 400;
+        max-height: 100px;
+        min-height: 20px;
+        outline: none;
+        overflow-x: hidden;
+        overflow-y: auto;
+        position: relative;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    }
+  }
+}
+
+.titulo-contexo {
+  padding: 30px 0 15px 32px;
+
+  div {
+    height: 30px;
+    font-size: 16px;
+    color: #009688;
+    text-transform: uppercase;
+  }
+}
 
 /* Loader */
 .preloader-wrapper {

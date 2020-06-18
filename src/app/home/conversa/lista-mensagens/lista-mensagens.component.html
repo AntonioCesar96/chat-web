@@ -21,35 +21,34 @@
     </div>
   </div>  
 
-  <div #mensagemLista *ngFor="let mensagem of resultado?.lista">
-    <div class="aviso-wrapper" *ngIf="mensagem.dataDescricao">
+  <div #mensagemPorData *ngFor="let item of mensagensPorData | keyvalue">
+    <div class="aviso-wrapper">
       <div class="aviso">
-        <span>{{ mensagem.dataDescricao | uppercase }}</span>
+        <span>{{ item.key.dataDescricao | uppercase }}</span>
       </div>          
     </div>
 
-    <div #mensagemNova class="aviso-wrapper" *ngIf="mensagem.qtdMensagensNovas > 0">
-      <div class="aviso">
-        <span>{{ mensagem.qtdMensagensNovas === 1 
-          ? '1 MENSAGEM NÃO LIDA' :  mensagem.qtdMensagensNovas + ' MENSAGENS NÃO LIDAS'}}
-        </span>
-      </div>          
-    </div>
-
-    <div class="mensagem-wrapper" [ngClass]="ehIgualAoContatoLogado(mensagem) ? 'enviado' : 'recebido'">
-      <div class="mensagem">
-        <div class="mensagem-texto-wrapper">
-          <div class="mensagem-texto">
-            <span>{{ mensagem.mensagemEnviada }}</span>
+    <div *ngFor="let mensagem of item.value">
+      <div #mensagemNova class="aviso-wrapper" *ngIf="mensagem.qtdMensagensNovas > 0">
+        <div class="aviso">
+          <span>{{ mensagem.qtdMensagensNovasDescricao }}</span>
+        </div>          
+      </div>
+      <div class="mensagem-wrapper" [ngClass]="ehIgualAoContatoLogado(mensagem) ? 'enviado' : 'recebido'">
+        <div class="mensagem">
+          <div class="mensagem-texto-wrapper">
+            <div class="mensagem-texto">
+              <span>{{ mensagem.mensagemEnviada }}</span>
+            </div>
           </div>
-        </div>
-
-        <div class="mensagem-data-wrapper">
-          <span>{{ mensagem.dataEnvio | date: 'HH:mm' }}</span>
-          <div class="mensagem-checked lida" 
-            [class.lida]="mensagem.statusMensagem === 3"
-            *ngIf="mensagem.contatoRemetenteId === contatoLogado.contatoId">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"><path fill="currentColor" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"></path></svg>
+  
+          <div class="mensagem-data-wrapper">
+            <span>{{ mensagem.dataEnvio | date: 'HH:mm' }}</span>
+            <div class="mensagem-checked lida" 
+              [class.lida]="mensagem.statusMensagem === 3"
+              *ngIf="mensagem.contatoRemetenteId === contatoLogado.contatoId">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 15" width="16" height="15"><path fill="currentColor" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"></path></svg>
+            </div>
           </div>
         </div>
       </div>
