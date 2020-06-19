@@ -1,5 +1,5 @@
 <div class="conversas" *ngIf="existeConversas()">
-    <div class="contato nova"       
+    <div class="contato"       
       *ngFor="let item of resultado?.lista" 
       (click)="selecionarConversa(item)"
       [class.nova]="item.mostrarMensagensNovas">

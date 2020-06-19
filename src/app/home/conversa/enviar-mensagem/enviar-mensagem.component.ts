@@ -1,6 +1,6 @@
 import { SignalRService } from './../../../_common/services/signalr.service';
 import { ConversaService } from '../../services/conversa.service';
-import { UltimaConversa } from './../../../_common/models/ultima-conversa.model';
+import { UltimaConversa, OrigemConversa } from './../../../_common/models/ultima-conversa.model';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { Mensagem } from './../../../_common/models/mensagem.model';
 import { Component, OnInit, ViewChild, ElementRef, Input, OnDestroy } from '@angular/core';
@@ -34,7 +34,19 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     this.conversaService
       .conversaSelecionada()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((conversa) => this.ultimaConversa = conversa);
+      .subscribe((conversa) => {
+        if(conversa.origemConversa === OrigemConversa.ReceberPrimeiraMensagem) {
+          if(this.ultimaConversa && this.ultimaConversa.conversaId === 0
+            && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId) {
+
+              this.ultimaConversa = conversa
+            return;
+          }
+          return;
+        }
+
+        this.ultimaConversa = conversa
+      });
   }
 
   onEnviarMensagem(event: KeyboardEvent) {
@@ -55,6 +67,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
 
     this.signalRService.enviarMensagem(this.criarMensagem());
     this.mensagem.nativeElement.innerText = '';
+    this.conversaService.esconderResultados(true);
   }
 
   criarMensagem() {

@@ -1,4 +1,4 @@
-import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
+import { UltimaConversa, OrigemConversa } from './../../../../_common/models/ultima-conversa.model';
 import { ConversaService } from '../../../services/conversa.service';
 import { SignalRService } from '../../../../_common/services/signalr.service';
 import { Resultado } from 'src/app/_common/models/resultado.model';
@@ -70,8 +70,9 @@ export class PesquisaContatosComponent implements OnInit, OnDestroy {
     conversa.nome = contato.nomeAmigo;
     conversa.email = contato.emailAmigo;
     conversa.fotoUrl = contato.fotoUrl;
-
-    this.resultado.lista.forEach(x => x.conversaAberta = false);
+    conversa.origemConversa = OrigemConversa.SelecionarContato;
+    conversa.conversaAberta = true;
+    this.conversaService.atualizarContatosParaFechados();
     this.conversaService.selecionarConversa(conversa);
   }
 

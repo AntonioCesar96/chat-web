@@ -1,3 +1,4 @@
+import { OrigemConversa } from './../../../../_common/models/ultima-conversa.model';
 import { ConversaService } from './../../../services/conversa.service';
 import { SignalRService } from './../../../../_common/services/signalr.service';
 import { Resultado } from 'src/app/_common/models/resultado.model';
@@ -17,6 +18,7 @@ export class PesquisaConversasComponent implements OnInit, OnDestroy {
   @Input() contatoLogado: Contato;
   filtro: ConversaFiltro;
   resultado: Resultado<UltimaConversa>;
+  resultadoPesquisa: UltimaConversa[];
 
   constructor(
     private signalRService: SignalRService,
@@ -27,25 +29,24 @@ export class PesquisaConversasComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
-    this.signalRService
-      .receberConversasDoContatoPesquisa()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((res) => this.receberConversasDoContato(res));
-
     this.conversaService
       .receberPesquisaConversas()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => this.receberPesquisa(res));
+
+    this.conversaService
+      .receberAtualizarListaConversas()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res) => {
+        this.resultado = res;
+      });
   }
 
   receberPesquisa(res) {
     this.filtro = new ConversaFiltro(res.contatoLogadoId, res.textoPesquisa);
-    this.signalRService.obterConversasDoContatoPesquisa(this.filtro);
-  }
 
-  receberConversasDoContato(res: Resultado<UltimaConversa>) {
-    this.resultado = res;
-    this.resultado.lista.forEach(conversa => conversa.conversaAberta = false);
+    this.resultadoPesquisa = this.resultado.lista.filter(x =>
+      x.nome.toLocaleLowerCase().includes(res.textoPesquisa))
 
     this.conversaService.pesquisarContatos(this.obterFiltroDaPesquisa());
   }
@@ -59,7 +60,7 @@ export class PesquisaConversasComponent implements OnInit, OnDestroy {
   }
 
   existeConversas() {
-    return !!this.resultado && this.resultado.lista.length > 0;
+    return !!this.resultadoPesquisa && this.resultadoPesquisa.length > 0;
   }
 
   ordenarConversas() {
@@ -68,7 +69,12 @@ export class PesquisaConversasComponent implements OnInit, OnDestroy {
   }
 
   public selecionarConversa(conversa: UltimaConversa) {
-    this.resultado.lista.forEach(x => x.conversaAberta = false);
+    this.resultado.lista.forEach(x => {
+      x.conversaAberta = false;
+      delete x.origemConversa;
+    });
+
+    conversa.conversaAberta = true;
     this.conversaService.selecionarConversa(conversa);
   }
 

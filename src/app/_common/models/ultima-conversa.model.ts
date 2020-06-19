@@ -17,5 +17,11 @@ export class UltimaConversa {
   qtdMensagensNovas: number;
   mostrarMensagensNovas: boolean;
   conversaAberta: boolean;
-  conversaNova: boolean;
+  origemConversa: OrigemConversa;
+}
+
+export enum OrigemConversa {
+  ListaConversas,
+  SelecionarContato,
+  ReceberPrimeiraMensagem
 }

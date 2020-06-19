@@ -167,11 +167,11 @@ body {
       color: #80868b;
     }
     
-    .mensagem-checked {
-      color: #f1f1f299;
-      &.lida {
-          color: #34b7f1;
-      }
+  }
+  .mensagem-checked {
+    color: #f1f1f299;
+    &.lida {
+        color: #34b7f1;
     }
   }
 }

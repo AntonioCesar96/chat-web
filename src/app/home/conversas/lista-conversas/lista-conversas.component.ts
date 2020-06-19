@@ -4,7 +4,7 @@ import { StatusMensagem } from 'src/app/_common/models/status-mensagem.enum';
 import { Resultado } from 'src/app/_common/models/resultado.model';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { ConversaFiltro } from './../../../_common/models/conversa.filtro';
-import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
+import { UltimaConversa, OrigemConversa } from 'src/app/_common/models/ultima-conversa.model';
 import { SignalRService } from './../../../_common/services/signalr.service';
 import { ConversaService } from './../../services/conversa.service';
 import { AutenticacaoService } from './../../../_common/services/autenticacao.service';
@@ -20,7 +20,6 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
   @Input() contatoLogado: Contato;
   @Output() criarComponente = new EventEmitter<UltimaConversa>();
-  ultimaConversaAberta: UltimaConversa;
   filtro: ConversaFiltro;
   resultado: Resultado<UltimaConversa>;
 
@@ -34,6 +33,10 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
+    this.resultado = new Resultado<UltimaConversa>();
+    this.resultado.lista = [];
+    this.resultado.total = 0;
+
     this.signalRService
       .receberMensagem()
       .pipe(takeUntil(this.destroy$))
@@ -68,6 +71,11 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
       .receberConversasDoContato()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => this.receberConversasDoContato(res));
+
+    this.conversaService
+      .receberAtualizarContatosParaFechados()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.resultado.lista.forEach(conversa => conversa.conversaAberta = false));
   }
 
   marcarStatusContatoOnline(contatoId: number) {
@@ -85,7 +93,7 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   marcarMensagemComoLida(mensagem: Mensagem) {
-    const amigo = this.resultado.lista.find(x => x.conversaId === mensagem.conversaId)
+    const amigo = this.resultado.lista.find(x => x.conversaId === mensagem.conversaId);
     if(!amigo) { return; }
 
     amigo.statusUltimaMensagem = StatusMensagem.Lida;
@@ -101,6 +109,7 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   receberConversasDoContato(res: Resultado<UltimaConversa>) {
+    this.conversaService.atualizarListaConversas(res);
     this.resultado = res;
     this.resultado.lista.forEach(conversa => conversa.conversaAberta = false);
   }
@@ -115,40 +124,46 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   public selecionarConversa(conversa: UltimaConversa) {
-    this.ultimaConversaAberta = conversa;
-    this.resultado.lista.forEach(x => x.conversaAberta = false);
+    this.resultado.lista.forEach(x => {
+      x.conversaAberta = false;
+      delete x.origemConversa;
+    });
+
+    conversa.origemConversa = OrigemConversa.ListaConversas;
+    conversa.conversaAberta = true;
     this.conversaService.selecionarConversa(conversa);
   }
 
   receberPrimeiraMensagem(mensagem: Mensagem) {
-    const souOContatoAmigo = this.contatoLogado.contatoId === mensagem.contatoRemetenteId;
+    const souORemetente = this.contatoLogado.contatoId === mensagem.contatoRemetenteId;
 
     const conversaNova = new UltimaConversa();
-    conversaNova.contatoAmigoId = souOContatoAmigo
+    conversaNova.contatoAmigoId = souORemetente
       ? mensagem.contatoDestinatarioId : mensagem.contatoRemetenteId;
     conversaNova.conversaId = mensagem.conversaId;
     conversaNova.contatoRemetenteId = mensagem.contatoRemetenteId;
     conversaNova.contatoDestinatarioId = mensagem.contatoDestinatarioId;
-    conversaNova.nome = souOContatoAmigo ? mensagem.nomeDestinatario : mensagem.nomeRemetente;
-    conversaNova.email = souOContatoAmigo ? mensagem.emailDestinatario : mensagem.emailRemetente;
-    conversaNova.fotoUrl = souOContatoAmigo ? mensagem.fotoUrlDestinatario : mensagem.fotoUrlRemetente;
+    conversaNova.nome = souORemetente ? mensagem.nomeDestinatario : mensagem.nomeRemetente;
+    conversaNova.email = souORemetente ? mensagem.emailDestinatario : mensagem.emailRemetente;
+    conversaNova.fotoUrl = souORemetente ? mensagem.fotoUrlDestinatario : mensagem.fotoUrlRemetente;
     conversaNova.ultimaMensagem = mensagem.mensagemEnviada;
     conversaNova.dataEnvio = mensagem.dataEnvio;
     conversaNova.statusUltimaMensagem = mensagem.statusMensagem;
-    conversaNova.conversaNova = true;
+    conversaNova.origemConversa = OrigemConversa.ReceberPrimeiraMensagem;
 
-    if(!souOContatoAmigo) {
+    if(!souORemetente) {
       conversaNova.qtdMensagensNovas = 1;
       conversaNova.mostrarMensagensNovas = true;
     }
 
     this.resultado.lista.push(conversaNova);
     this.resultado.total++;
-    this.resultado.lista.sort((n1,n2) =>
-      new Date(n2.dataEnvio).getTime() - new Date(n1.dataEnvio).getTime());
-
     this.ordenarConversas();
     this.conversaService.selecionarConversa(conversaNova);
+
+    if(this.contatoLogado.contatoId !== mensagem.contatoRemetenteId) {
+      this.conversaService.atualizarResultados();
+    }
   }
 
   receberMensagem(mensagem: Mensagem) {
@@ -157,6 +172,10 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
 
     this.atualizarUltimaConversa(conversa, mensagem);
     this.ordenarConversas();
+
+    if(this.contatoLogado.contatoId !== mensagem.contatoRemetenteId) {
+      this.conversaService.atualizarResultados();
+    }
   }
 
   atualizarUltimaConversa(conversa: UltimaConversa, mensagem: Mensagem) {

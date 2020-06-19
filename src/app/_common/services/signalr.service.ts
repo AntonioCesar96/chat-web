@@ -15,6 +15,7 @@ export class SignalRService {
   private _contatoDigitandoSubject = new Subject<any>();
   private _statusContatoOnlineSubject = new Subject<number>();
   private _statusContatoOfflineSubject = new Subject<ContatoStatus>();
+  private _statusContatoSubject = new Subject<ContatoStatus>();
   private _mensagemLidaSubject = new Subject<Mensagem>();
   private _deslogarSubject = new Subject<any>();
   private _conversasDoContatoSubject = new Subject<Resultado<UltimaConversa>>();
@@ -50,6 +51,10 @@ export class SignalRService {
 
     hubConnection.on('ReceberStatusContatoOffline', (contatoStatus: ContatoStatus) => {
       this._statusContatoOfflineSubject.next(contatoStatus);
+    });
+
+    hubConnection.on('ReceberStatusDoContato', (contatoStatus: ContatoStatus) => {
+      this._statusContatoSubject.next(contatoStatus);
     });
 
     hubConnection.on('Deslogar', () => {
@@ -94,6 +99,10 @@ export class SignalRService {
 
   receberStatusContatoOffline(): Observable<ContatoStatus> {
     return this._statusContatoOfflineSubject.asObservable();
+  }
+
+  receberStatusContato(): Observable<ContatoStatus> {
+    return this._statusContatoSubject.asObservable();
   }
 
   receberStatusContatoOnline(): Observable<number> {
@@ -150,5 +159,9 @@ export class SignalRService {
 
   obterContatosAmigosPesquisa(filtro: any) {
     this.appSignalRService.run('ObterContatosAmigosPesquisa', filtro);
+  }
+
+  obterStatusDoContato(contatoId: number) {
+    this.appSignalRService.run('ObterStatusDoContato', contatoId);
   }
 }
