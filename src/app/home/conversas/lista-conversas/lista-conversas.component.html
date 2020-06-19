@@ -1,6 +1,6 @@
 <div class="conversas" *ngIf="existeConversas()">
     <div class="contato"       
-      *ngFor="let item of resultado?.lista" 
+      *ngFor="let item of conversaService.obterUltimasConversas()?.lista" 
       (click)="selecionarConversa(item)"
       [class.nova]="item.mostrarMensagensNovas">
   

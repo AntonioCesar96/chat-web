@@ -13,9 +13,7 @@ export class SignalRService {
   private _receberMensagemSubject = new Subject<Mensagem>();
   private _receberPrimeiraMensagemSubject = new Subject<Mensagem>();
   private _contatoDigitandoSubject = new Subject<any>();
-  private _statusContatoOnlineSubject = new Subject<number>();
-  private _statusContatoOfflineSubject = new Subject<ContatoStatus>();
-  private _statusContatoSubject = new Subject<ContatoStatus>();
+  private _statusDoContatoSubject = new Subject<ContatoStatus>();
   private _mensagemLidaSubject = new Subject<Mensagem>();
   private _deslogarSubject = new Subject<any>();
   private _conversasDoContatoSubject = new Subject<Resultado<UltimaConversa>>();
@@ -45,16 +43,8 @@ export class SignalRService {
       this._contatoDigitandoSubject.next({ estaDigitando, contatoQueEstaDigitandoId });
     });
 
-    hubConnection.on('ReceberStatusContatoOnline', (contatoId: number) => {
-      this._statusContatoOnlineSubject.next(contatoId);
-    });
-
-    hubConnection.on('ReceberStatusContatoOffline', (contatoStatus: ContatoStatus) => {
-      this._statusContatoOfflineSubject.next(contatoStatus);
-    });
-
     hubConnection.on('ReceberStatusDoContato', (contatoStatus: ContatoStatus) => {
-      this._statusContatoSubject.next(contatoStatus);
+      this._statusDoContatoSubject.next(contatoStatus);
     });
 
     hubConnection.on('Deslogar', () => {
@@ -97,16 +87,8 @@ export class SignalRService {
     return this._contatoDigitandoSubject.asObservable();
   }
 
-  receberStatusContatoOffline(): Observable<ContatoStatus> {
-    return this._statusContatoOfflineSubject.asObservable();
-  }
-
-  receberStatusContato(): Observable<ContatoStatus> {
-    return this._statusContatoSubject.asObservable();
-  }
-
-  receberStatusContatoOnline(): Observable<number> {
-    return this._statusContatoOnlineSubject.asObservable();
+  receberStatusDoContato(): Observable<ContatoStatus> {
+    return this._statusDoContatoSubject.asObservable();
   }
 
   receberDeslogar(): Observable<any> {

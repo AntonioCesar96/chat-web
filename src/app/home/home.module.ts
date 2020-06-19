@@ -1,5 +1,5 @@
 import { PesquisaContatosComponent } from './conversas/pesquisa/pesquisa-contatos/pesquisa-contatos.component';
-import { ConversaService } from './services/conversa.service';
+import { ConversaSubjectsService } from './services/conversa-subjects.service';
 import { HomeRouting } from './home.routing';
 import { ChatCommonModule } from './../_common/common.module';
 import { NgModule } from '@angular/core';
@@ -32,7 +32,7 @@ import { PesquisaConversasComponent } from './conversas/pesquisa/pesquisa-conver
   ],
   exports: [],
   providers: [
-    ConversaService
+    ConversaSubjectsService
   ]
 })
 export class HomeModule { }

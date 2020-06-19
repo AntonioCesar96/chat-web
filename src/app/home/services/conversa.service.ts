@@ -1,73 +1,104 @@
+import { StatusMensagem } from 'src/app/_common/models/status-mensagem.enum';
+import { Mensagem } from 'src/app/_common/models/mensagem.model';
 import { Resultado } from 'src/app/_common/models/resultado.model';
 import { UltimaConversa } from '../../_common/models/ultima-conversa.model';
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Contato } from 'src/app/_common/models/contato.model';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ConversaService {
-  conversaSelecionadaSubject = new Subject<UltimaConversa>();
-  pesquisaConversasSubject = new Subject<any>();
-  pesquisaContatosSubject = new Subject<any>();
-  esconderResultadosSubject = new Subject<boolean>();
-  atualizarResultadosSubject = new Subject<boolean>();
-  atualizarListaConversasSubject = new Subject<Resultado<UltimaConversa>>();
-  atualizarContatosParaFechadosSubject = new Subject<any>();
+  private ultimasConversas: Resultado<UltimaConversa>;
 
-  constructor() { }
-
-  public conversaSelecionada(): Observable<UltimaConversa> {
-    return this.conversaSelecionadaSubject.asObservable();
+  constructor() {
+    this.ultimasConversas = new Resultado<UltimaConversa>();
+    this.ultimasConversas.lista = [];
+    this.ultimasConversas.total = 0;
   }
 
-  public selecionarConversa(conversa: UltimaConversa) {
-    this.conversaSelecionadaSubject.next(conversa);
+  obterUltimasConversas(): Resultado<UltimaConversa> {
+    return this.ultimasConversas;
   }
 
-  public receberPesquisaConversas(): Observable<any> {
-    return this.pesquisaConversasSubject.asObservable();
+  obterUltimasConversasLista(): UltimaConversa[] {
+    return this.ultimasConversas.lista;
   }
 
-  public pesquisarConversas(conversa: any) {
-    this.pesquisaConversasSubject.next(conversa);
+  atualizarVariavelUltimasConversas(ultimasConversas: Resultado<UltimaConversa>) {
+    this.ultimasConversas = ultimasConversas;
+    this.fecharConversas();
   }
 
-  public receberPesquisaContatos(): Observable<any> {
-    return this.pesquisaContatosSubject.asObservable();
+  fecharConversas() {
+    this.ultimasConversas.lista.forEach(conversa => conversa.conversaAberta = false);
   }
 
-  public pesquisarContatos(conversa: any) {
-    this.pesquisaContatosSubject.next(conversa);
+  marcarMensagemComoLida(mensagem: Mensagem) {
+    const amigo = this.ultimasConversas.lista.find(x => x.conversaId === mensagem.conversaId);
+    if(!amigo) { return; }
+
+    amigo.statusUltimaMensagem = StatusMensagem.Lida;
+    amigo.qtdMensagensNovas = 0;
+    amigo.mostrarMensagensNovas = false;
   }
 
-  public receberEsconderResultados(): Observable<boolean> {
-    return this.esconderResultadosSubject.asObservable();
+  validarContatoQueEstaDigitando(res) {
+    const amigo = this.ultimasConversas.lista.find(x => x.contatoAmigoId === res.contatoQueEstaDigitandoId)
+    if(!amigo) { return; }
+
+    amigo.estaDigitando = res.estaDigitando;
   }
 
-  public esconderResultados(res) {
-    this.esconderResultadosSubject.next(res);
+  criarConversaPrimeiraMensagem(mensagem: Mensagem, contatoLogado: Contato) {
+    const souORemetente = contatoLogado.contatoId === mensagem.contatoRemetenteId;
+
+    const conversaNova = new UltimaConversa();
+    conversaNova.contatoAmigoId = souORemetente
+      ? mensagem.contatoDestinatarioId : mensagem.contatoRemetenteId;
+    conversaNova.conversaId = mensagem.conversaId;
+    conversaNova.contatoRemetenteId = mensagem.contatoRemetenteId;
+    conversaNova.contatoDestinatarioId = mensagem.contatoDestinatarioId;
+    conversaNova.nome = souORemetente ? mensagem.nomeDestinatario : mensagem.nomeRemetente;
+    conversaNova.email = souORemetente ? mensagem.emailDestinatario : mensagem.emailRemetente;
+    conversaNova.fotoUrl = souORemetente ? mensagem.fotoUrlDestinatario : mensagem.fotoUrlRemetente;
+    conversaNova.ultimaMensagem = mensagem.mensagemEnviada;
+    conversaNova.dataEnvio = mensagem.dataEnvio;
+    conversaNova.statusUltimaMensagem = mensagem.statusMensagem;
+
+    if(!souORemetente) {
+      conversaNova.qtdMensagensNovas = 1;
+      conversaNova.mostrarMensagensNovas = true;
+    }
+
+    return conversaNova;
   }
 
-  public receberAtualizarResultados(): Observable<any> {
-    return this.atualizarResultadosSubject.asObservable();
+  adicionarConversa(conversa: UltimaConversa) {
+    this.ultimasConversas.lista.push(conversa);
+    this.ultimasConversas.total++;
   }
 
-  public atualizarResultados() {
-    this.atualizarResultadosSubject.next();
+  ordenarConversas() {
+    this.ultimasConversas.lista.sort((n1,n2) =>
+      new Date(n2.dataEnvio).getTime() - new Date(n1.dataEnvio).getTime());
   }
 
-  public receberAtualizarListaConversas(): Observable<any> {
-    return this.atualizarListaConversasSubject.asObservable();
+  receberMensagem(mensagem: Mensagem, contatoLogado: Contato) {
+    const conversa = this.ultimasConversas.lista.find(x => x.conversaId === mensagem.conversaId);
+    if(!conversa) { return; }
+
+    this.atualizarUltimaConversa(conversa, mensagem, contatoLogado);
+    this.ordenarConversas();
   }
 
-  public atualizarListaConversas(res: Resultado<UltimaConversa>) {
-    this.atualizarListaConversasSubject.next(res);
-  }
-
-  public receberAtualizarContatosParaFechados(): Observable<any> {
-    return this.atualizarContatosParaFechadosSubject.asObservable();
-  }
-
-  public atualizarContatosParaFechados() {
-    this.atualizarContatosParaFechadosSubject.next();
+  atualizarUltimaConversa(conversa: UltimaConversa, mensagem: Mensagem, contatoLogado: Contato) {
+    conversa.ultimaMensagem = mensagem.mensagemEnviada;
+    conversa.dataEnvio = mensagem.dataEnvio;
+    conversa.statusUltimaMensagem = mensagem.statusMensagem;
+    conversa.contatoRemetenteId = mensagem.contatoRemetenteId;
+    conversa.contatoDestinatarioId = mensagem.contatoDestinatarioId;
+    if(!conversa.conversaAberta) {
+      conversa.qtdMensagensNovas++;
+      conversa.mostrarMensagensNovas = mensagem.contatoDestinatarioId === contatoLogado.contatoId;
+    }
   }
 }

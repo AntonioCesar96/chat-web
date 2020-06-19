@@ -1,9 +1,9 @@
+import { ContatoStatus } from './../../../_common/models/contato-status.model';
 import { SignalRService } from './../../../_common/services/signalr.service';
-import { OrigemConversa } from './../../../_common/models/ultima-conversa.model';
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
-import { ConversaService } from '../../services/conversa.service';
+import { ConversaSubjectsService } from '../../services/conversa-subjects.service';
 import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import * as moment from 'moment';
@@ -18,9 +18,10 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
 
   @Input() contatoLogado: Contato;
   ultimaConversa: UltimaConversa;
+  statusDoContato: ContatoStatus;
 
   constructor(
-    private conversaService: ConversaService,
+    private conversaService: ConversaSubjectsService,
     private signalRService: SignalRService) { }
 
   ngOnInit() {
@@ -28,71 +29,60 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
-    this.conversaSelecionadaSub = this.conversaService
-      .conversaSelecionada()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((conversa) => {
-        if(conversa.origemConversa === OrigemConversa.ReceberPrimeiraMensagem) {
-          if(this.ultimaConversa && this.ultimaConversa.conversaId === 0
-            && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId) {
+    this.conversaService
+    .receberConversaSelecionadaMensagem()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((conversa) => this.abrirConversaSelecionada(conversa));
 
-              this.ultimaConversa = conversa
-              this.signalRService.obterStatusDoContato(conversa.contatoAmigoId);
-            return;
-          }
-          return;
-        }
+  this.conversaService
+    .receberContatoSelecionadoMensagem()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((conversa) => this.abrirConversaSelecionada(conversa));
 
-        this.ultimaConversa = conversa
-        this.signalRService.obterStatusDoContato(conversa.contatoAmigoId);
-      });
+  this.conversaService
+    .receberPrimeiraConversaMensagem()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((conversa) => this.abrirPrimeiraConversaMensagem(conversa));
 
-    this.signalRService
-      .receberStatusContatoOnline()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((contatoId) => {
-        if(!this.ultimaConversa || this.ultimaConversa.contatoAmigoId !== contatoId) { return; }
-        this.ultimaConversa.online = true
-      });
+  this.signalRService
+    .receberStatusDoContato()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((status) => this.receberStatusDoContato(status));
 
-    this.signalRService
-      .receberStatusContatoOffline()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((status) => {
-        if(!this.ultimaConversa || this.ultimaConversa.contatoAmigoId !== status.contatoId) { return; }
-        this.ultimaConversa.online = true
-        this.ultimaConversa.online = status.online;
-        this.ultimaConversa.dataRegistroOnline = status.data;
-        this.ultimaConversa.estaDigitando = false;
-      });
-
-    this.signalRService
-      .receberStatusContato()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((res) => {
-        if(!res) { return; }
-        this.ultimaConversa.online = res.online;
-        this.ultimaConversa.dataRegistroOnline = res.data;
-      });
-
-    this.signalRService
-      .receberContatoDigitando()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((res) => {
-        if(!this.ultimaConversa || this.ultimaConversa.contatoAmigoId !== res.contatoQueEstaDigitandoId) { return; }
-        this.ultimaConversa.estaDigitando = res.estaDigitando;
-      });
+  this.signalRService
+    .receberContatoDigitando()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe((res) => this.receberContatoDigitando(res));
   }
 
-  ultimoStatus() {
-    if(this.ultimaConversa.online) {
-      return 'On-line';
-    }
+  abrirConversaSelecionada(conversa: UltimaConversa) {
+    this.ultimaConversa = conversa;
+    this.statusDoContato = null;
+    this.signalRService.obterStatusDoContato(conversa.contatoAmigoId);
+  }
 
-    if(this.ultimaConversa.dataRegistroOnline) {
-      return moment(this.ultimaConversa.dataRegistroOnline).calendar();
+  abrirPrimeiraConversaMensagem(conversa: UltimaConversa) {
+    if(this.ultimaConversa && this.ultimaConversa.conversaId === 0
+      && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId) {
+
+        this.ultimaConversa = conversa;
+        this.statusDoContato = null;
+        this.signalRService.obterStatusDoContato(conversa.contatoAmigoId);
+      return;
     }
-    return '';
+  }
+
+  receberStatusDoContato(status: ContatoStatus) {
+    if(!this.ultimaConversa || this.ultimaConversa.contatoAmigoId !== status.contatoId) { return; }
+    this.statusDoContato = status;
+
+    if(!status) { return; }
+    status.ultimoStatus = status.online ? 'On-line' : moment(status.data).calendar();
+  }
+
+  receberContatoDigitando(res) {
+    if(!this.ultimaConversa || this.ultimaConversa.contatoAmigoId !== res.contatoQueEstaDigitandoId) { return; }
+    this.statusDoContato.estaDigitando = res.estaDigitando;
   }
 
   ngOnDestroy() {

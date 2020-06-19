@@ -1,5 +1,5 @@
 import { Contato } from 'src/app/_common/models/contato.model';
-import { ConversaService } from './../../services/conversa.service';
+import { ConversaSubjectsService } from '../../services/conversa-subjects.service';
 import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -15,7 +15,7 @@ export class PesquisaComponent implements OnInit {
   textoPesquisa: string;
   esconderResultados = true;
 
-  constructor(private conversaService: ConversaService) { }
+  constructor(private conversaService: ConversaSubjectsService) { }
 
   ngOnInit() {
     this.conversaService

@@ -1,13 +1,12 @@
-import { ContatoStatus } from './../../../_common/models/contato-status.model';
+import { ConversaService } from './../../services/conversa.service';
 import { Mensagem } from 'src/app/_common/models/mensagem.model';
 import { StatusMensagem } from 'src/app/_common/models/status-mensagem.enum';
 import { Resultado } from 'src/app/_common/models/resultado.model';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { ConversaFiltro } from './../../../_common/models/conversa.filtro';
-import { UltimaConversa, OrigemConversa } from 'src/app/_common/models/ultima-conversa.model';
+import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
 import { SignalRService } from './../../../_common/services/signalr.service';
-import { ConversaService } from './../../services/conversa.service';
-import { AutenticacaoService } from './../../../_common/services/autenticacao.service';
+import { ConversaSubjectsService } from '../../services/conversa-subjects.service';
 import { Component, OnInit, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -21,10 +20,10 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   @Input() contatoLogado: Contato;
   @Output() criarComponente = new EventEmitter<UltimaConversa>();
   filtro: ConversaFiltro;
-  resultado: Resultado<UltimaConversa>;
 
   constructor(
-    private conversaService: ConversaService,
+    public conversaService: ConversaService,
+    private conversaSubjectsService: ConversaSubjectsService,
     private signalRService: SignalRService) { }
 
   ngOnInit() {
@@ -33,10 +32,6 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   inicializar() {
-    this.resultado = new Resultado<UltimaConversa>();
-    this.resultado.lista = [];
-    this.resultado.total = 0;
-
     this.signalRService
       .receberMensagem()
       .pipe(takeUntil(this.destroy$))
@@ -53,16 +48,6 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
       .subscribe((res) => this.validarContatoQueEstaDigitando(res));
 
     this.signalRService
-      .receberStatusContatoOnline()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((contatoId) => this.marcarStatusContatoOnline(contatoId));
-
-    this.signalRService
-      .receberStatusContatoOffline()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((status) => this.marcarStatusContatoOffline(status));
-
-    this.signalRService
       .receberMensagemLida()
       .pipe(takeUntil(this.destroy$))
       .subscribe((mensagem) => this.marcarMensagemComoLida(mensagem));
@@ -72,46 +57,22 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => this.receberConversasDoContato(res));
 
-    this.conversaService
+    this.conversaSubjectsService
       .receberAtualizarContatosParaFechados()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.resultado.lista.forEach(conversa => conversa.conversaAberta = false));
-  }
-
-  marcarStatusContatoOnline(contatoId: number) {
-    const amigo = this.resultado.lista.find(x => x.contatoAmigoId === contatoId);
-    if(!amigo) { return; }
-    amigo.online = true;
-  }
-
-  marcarStatusContatoOffline(contatoStatus: ContatoStatus) {
-    const amigo = this.resultado.lista.find(x => x.contatoAmigoId === contatoStatus.contatoId);
-    if(!amigo) { return; }
-    amigo.online = contatoStatus.online;
-    amigo.dataRegistroOnline = contatoStatus.data;
-    amigo.estaDigitando = false;
+      .subscribe(() => this.conversaService.fecharConversas());
   }
 
   marcarMensagemComoLida(mensagem: Mensagem) {
-    const amigo = this.resultado.lista.find(x => x.conversaId === mensagem.conversaId);
-    if(!amigo) { return; }
-
-    amigo.statusUltimaMensagem = StatusMensagem.Lida;
-    amigo.qtdMensagensNovas = 0;
-    amigo.mostrarMensagensNovas = false;
+    this.conversaService.marcarMensagemComoLida(mensagem);
   }
 
   validarContatoQueEstaDigitando(res) {
-    const amigo = this.resultado.lista.find(x => x.contatoAmigoId === res.contatoQueEstaDigitandoId)
-    if(!amigo) { return; }
-
-    amigo.estaDigitando = res.estaDigitando;
+    this.conversaService.validarContatoQueEstaDigitando(res);
   }
 
   receberConversasDoContato(res: Resultado<UltimaConversa>) {
-    this.conversaService.atualizarListaConversas(res);
-    this.resultado = res;
-    this.resultado.lista.forEach(conversa => conversa.conversaAberta = false);
+    this.conversaService.atualizarVariavelUltimasConversas(res);
   }
 
   obterConversasDoContato(contatoId: number) {
@@ -120,79 +81,34 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   existeConversas() {
-    return !!this.resultado && this.resultado.lista.length > 0;
+    return this.conversaService.obterUltimasConversas().total > 0;
   }
 
   public selecionarConversa(conversa: UltimaConversa) {
-    this.resultado.lista.forEach(x => {
-      x.conversaAberta = false;
-      delete x.origemConversa;
-    });
-
-    conversa.origemConversa = OrigemConversa.ListaConversas;
+    this.conversaService.fecharConversas();
     conversa.conversaAberta = true;
-    this.conversaService.selecionarConversa(conversa);
+    this.conversaSubjectsService.abrirConversaSelecionada(conversa);
   }
 
   receberPrimeiraMensagem(mensagem: Mensagem) {
-    const souORemetente = this.contatoLogado.contatoId === mensagem.contatoRemetenteId;
+    const conversaNova = this.conversaService.criarConversaPrimeiraMensagem(mensagem, this.contatoLogado);
 
-    const conversaNova = new UltimaConversa();
-    conversaNova.contatoAmigoId = souORemetente
-      ? mensagem.contatoDestinatarioId : mensagem.contatoRemetenteId;
-    conversaNova.conversaId = mensagem.conversaId;
-    conversaNova.contatoRemetenteId = mensagem.contatoRemetenteId;
-    conversaNova.contatoDestinatarioId = mensagem.contatoDestinatarioId;
-    conversaNova.nome = souORemetente ? mensagem.nomeDestinatario : mensagem.nomeRemetente;
-    conversaNova.email = souORemetente ? mensagem.emailDestinatario : mensagem.emailRemetente;
-    conversaNova.fotoUrl = souORemetente ? mensagem.fotoUrlDestinatario : mensagem.fotoUrlRemetente;
-    conversaNova.ultimaMensagem = mensagem.mensagemEnviada;
-    conversaNova.dataEnvio = mensagem.dataEnvio;
-    conversaNova.statusUltimaMensagem = mensagem.statusMensagem;
-    conversaNova.origemConversa = OrigemConversa.ReceberPrimeiraMensagem;
+    this.conversaService.adicionarConversa(conversaNova);
+    this.conversaService.ordenarConversas();
 
-    if(!souORemetente) {
-      conversaNova.qtdMensagensNovas = 1;
-      conversaNova.mostrarMensagensNovas = true;
-    }
-
-    this.resultado.lista.push(conversaNova);
-    this.resultado.total++;
-    this.ordenarConversas();
-    this.conversaService.selecionarConversa(conversaNova);
+    this.conversaSubjectsService.abrirPrimeiraConversa(conversaNova);
 
     if(this.contatoLogado.contatoId !== mensagem.contatoRemetenteId) {
-      this.conversaService.atualizarResultados();
+      this.conversaSubjectsService.atualizarResultados();
     }
   }
 
   receberMensagem(mensagem: Mensagem) {
-    const conversa = this.resultado.lista.find(x => x.conversaId === mensagem.conversaId);
-    if(!conversa) { return; }
-
-    this.atualizarUltimaConversa(conversa, mensagem);
-    this.ordenarConversas();
+    this.conversaService.receberMensagem(mensagem, this.contatoLogado);
 
     if(this.contatoLogado.contatoId !== mensagem.contatoRemetenteId) {
-      this.conversaService.atualizarResultados();
+      this.conversaSubjectsService.atualizarResultados();
     }
-  }
-
-  atualizarUltimaConversa(conversa: UltimaConversa, mensagem: Mensagem) {
-    conversa.ultimaMensagem = mensagem.mensagemEnviada;
-    conversa.dataEnvio = mensagem.dataEnvio;
-    conversa.statusUltimaMensagem = mensagem.statusMensagem;
-    conversa.contatoRemetenteId = mensagem.contatoRemetenteId;
-    conversa.contatoDestinatarioId = mensagem.contatoDestinatarioId;
-    if(!conversa.conversaAberta) {
-      conversa.qtdMensagensNovas++;
-      conversa.mostrarMensagensNovas = mensagem.contatoDestinatarioId === this.contatoLogado.contatoId;
-    }
-  }
-
-  ordenarConversas() {
-    this.resultado.lista.sort((n1,n2) =>
-      new Date(n2.dataEnvio).getTime() - new Date(n1.dataEnvio).getTime());
   }
 
   ngOnDestroy() {

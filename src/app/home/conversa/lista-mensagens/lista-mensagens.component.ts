@@ -6,8 +6,8 @@ import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';
 import { Mensagem } from 'src/app/_common/models/mensagem.model';
 import { Resultado } from 'src/app/_common/models/resultado.model';
 import { Contato } from 'src/app/_common/models/contato.model';
-import { UltimaConversa, OrigemConversa } from 'src/app/_common/models/ultima-conversa.model';
-import { ConversaService } from '../../services/conversa.service';
+import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
+import { ConversaSubjectsService } from '../../services/conversa-subjects.service';
 import * as moment from 'moment';
 import { StatusMensagem } from 'src/app/_common/models/status-mensagem.enum';
 import { Subject } from 'rxjs';
@@ -34,7 +34,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   scrollHeightOld = 0;
 
   constructor(
-    private conversaService: ConversaService,
+    private conversaService: ConversaSubjectsService,
     private signalRService: SignalRService) { }
 
   ngOnInit() {
@@ -48,9 +48,19 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
 
   inicializar() {
     this.conversaService
-      .conversaSelecionada()
+      .receberConversaSelecionadaMensagem()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((conversa) => this.selecionarConversa(conversa));
+      .subscribe((conversa) => this.abrirConversaSelecionadaMensagem(conversa));
+
+    this.conversaService
+      .receberContatoSelecionadoMensagem()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((conversa) => this.abrirContatoSelecionadoMensagem(conversa));
+
+    this.conversaService
+      .receberPrimeiraConversaMensagem()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((conversa) => this.abrirPrimeiraConversaMensagem(conversa));
 
     this.signalRService
       .receberMensagem()
@@ -68,35 +78,32 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
       .subscribe((res) => this.receberMensagens(res));
   }
 
-  selecionarConversa(conversa: UltimaConversa) {
-    if(conversa.origemConversa === OrigemConversa.ReceberPrimeiraMensagem) {
-
-      if(this.ultimaConversa && this.ultimaConversa.conversaId === 0
-        && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId) {
-
-          this.ultimaConversa = conversa;
-          conversa.conversaAberta = true;
-          this.inicializarVariaveis();
-          this.criarFiltro(conversa.conversaId);
-          this.criarListaInicial();
-          this.avisarQueAsMensagensForamLidas();
-        return;
-      }
-      return;
-    }
-
-    if(conversa.origemConversa === OrigemConversa.SelecionarContato) {
-      this.ultimaConversa = conversa;
-      this.inicializarVariaveis();
-      return;
-    }
-
+  abrirConversaSelecionadaMensagem(conversa: UltimaConversa) {
     this.ultimaConversa = conversa;
     conversa.conversaAberta = true;
     this.inicializarVariaveis();
     this.criarFiltro(conversa.conversaId);
     this.criarListaInicial();
     this.obterMensagens();
+  }
+
+  abrirContatoSelecionadoMensagem(conversa: UltimaConversa) {
+    this.ultimaConversa = conversa;
+    this.inicializarVariaveis();
+  }
+
+  abrirPrimeiraConversaMensagem(conversa: UltimaConversa) {
+    if(this.ultimaConversa && this.ultimaConversa.conversaId === 0
+      && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId) {
+
+        this.ultimaConversa = conversa;
+        conversa.conversaAberta = true;
+        this.inicializarVariaveis();
+        this.criarFiltro(conversa.conversaId);
+        this.criarListaInicial();
+        this.avisarQueAsMensagensForamLidas();
+      return;
+    }
   }
 
   viewsMensagemRenderizadas() {
@@ -125,7 +132,6 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
 
     this.buscandoMensagens = false;
     this.resultado.total = res.total;
-    this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
 
     if(this.manterScrollTop) {
       this.resultado.lista.push(...res.lista);
@@ -135,6 +141,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     this.resultado = res;
+    this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
     this.filtro.primeiraBusca = false;
     this.avisarQueAsMensagensForamLidas();
     this.ordenarMensagens();
@@ -271,8 +278,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
 
   onScroll(target) {
     this.scrollHeightOld = target.scrollHeight;
-    if (this.ultimaConversa && !this.ultimaConversa.origemConversa
-        && !this.ultimaPagina && !this.buscandoMensagens) {
+    if (this.ultimaConversa && !this.ultimaPagina && !this.buscandoMensagens) {
 
       if ((target.scrollTop - 100) <= 0) {
         this.obterMensagensPaginado();

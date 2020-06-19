@@ -1,5 +1,5 @@
-import { UltimaConversa, OrigemConversa } from './../../../../_common/models/ultima-conversa.model';
-import { ConversaService } from '../../../services/conversa.service';
+import { ListaAmigos } from './../../../../_common/models/lista-amigos.model';
+import { ConversaSubjectsService } from '../../../services/conversa-subjects.service';
 import { SignalRService } from '../../../../_common/services/signalr.service';
 import { Resultado } from 'src/app/_common/models/resultado.model';
 import { Contato } from 'src/app/_common/models/contato.model';
@@ -19,7 +19,7 @@ export class PesquisaContatosComponent implements OnInit, OnDestroy {
 
   constructor(
     private signalRService: SignalRService,
-    private conversaService: ConversaService) { }
+    private conversaService: ConversaSubjectsService) { }
 
   ngOnInit() {
     this.inicializar();
@@ -60,20 +60,9 @@ export class PesquisaContatosComponent implements OnInit, OnDestroy {
       new Date(n2.dataEnvio).getTime() - new Date(n1.dataEnvio).getTime());
   }
 
-  public selecionarContato(contato: any) {
-    const conversa = new UltimaConversa();
-    conversa.conversaId = 0;
-    conversa.qtdMensagensNovas = 0;
-    conversa.contatoRemetenteId = this.contatoLogado.contatoId;
-    conversa.contatoDestinatarioId = contato.contatoAmigoId;
-    conversa.contatoAmigoId = contato.contatoAmigoId;
-    conversa.nome = contato.nomeAmigo;
-    conversa.email = contato.emailAmigo;
-    conversa.fotoUrl = contato.fotoUrl;
-    conversa.origemConversa = OrigemConversa.SelecionarContato;
-    conversa.conversaAberta = true;
+  public selecionarContato(contatoAmigo: ListaAmigos) {
     this.conversaService.atualizarContatosParaFechados();
-    this.conversaService.selecionarConversa(conversa);
+    this.conversaService.abrirContatoSelecionado(contatoAmigo);
   }
 
   ngOnDestroy() {

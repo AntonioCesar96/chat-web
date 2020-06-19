@@ -12,16 +12,7 @@ export class UltimaConversa {
   statusUltimaMensagem: StatusMensagem;
 
   estaDigitando: boolean;
-  online: boolean;
-  dataRegistroOnline: string;
   qtdMensagensNovas: number;
   mostrarMensagensNovas: boolean;
   conversaAberta: boolean;
-  origemConversa: OrigemConversa;
-}
-
-export enum OrigemConversa {
-  ListaConversas,
-  SelecionarContato,
-  ReceberPrimeiraMensagem
 }
