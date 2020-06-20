@@ -1,7 +1,7 @@
 <div #mensagem 
   class="mensagens-wrapper" 
   (scroll)="onScroll($event.target)" 
-  *ngIf="ultimaConversa">
+  *ngIf="conversaAtual">
 
   <div class="msg-vazio"></div>  
 

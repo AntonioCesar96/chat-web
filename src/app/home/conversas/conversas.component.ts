@@ -14,7 +14,6 @@ export class ConversasComponent implements OnInit {
 
   ngOnInit() {
     if (!this.autenticacaoService.estaLogado()) { return; }
-
     this.contatoLogado = this.autenticacaoService.getContatoLogado();
   }
 }

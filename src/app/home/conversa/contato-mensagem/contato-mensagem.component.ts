@@ -62,27 +62,42 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   }
 
   abrirPrimeiraConversaMensagem(conversa: UltimaConversa) {
-    if(this.ultimaConversa && this.ultimaConversa.conversaId === 0
-      && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId) {
+    if(!this.ehElegivelParaAbrirPrimeiraConversaMensagem(conversa)) { return; }
 
-        this.ultimaConversa = conversa;
-        this.statusDoContato = null;
-        this.signalRService.obterStatusDoContato(conversa.contatoAmigoId);
-      return;
-    }
+    this.ultimaConversa = conversa;
+    this.statusDoContato = null;
+    this.signalRService.obterStatusDoContato(conversa.contatoAmigoId);
+  }
+
+  ehElegivelParaAbrirPrimeiraConversaMensagem(conversa: UltimaConversa) {
+    return this.ultimaConversa && this.ultimaConversa.conversaId === 0
+      && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId;
   }
 
   receberStatusDoContato(status: ContatoStatus) {
-    if(!this.ultimaConversa || this.ultimaConversa.contatoAmigoId !== status.contatoId) { return; }
-    this.statusDoContato = status;
+    if(!this.ehElegivelParaReceberStatusDoContato(status)) { return; }
 
-    if(!status) { return; }
-    status.ultimoStatus = status.online ? 'On-line' : moment(status.data).calendar();
+    this.statusDoContato = status;
+    this.atualizarUltimoStatus();
+  }
+
+  ehElegivelParaReceberStatusDoContato(status: ContatoStatus) {
+    return this.ultimaConversa && status && this.ultimaConversa.contatoAmigoId === status.contatoId;
+  }
+
+  atualizarUltimoStatus() {
+    if(!this.statusDoContato) { return; }
+    this.statusDoContato.ultimoStatus = this.statusDoContato.online
+      ? 'On-line' : moment(this.statusDoContato.data).calendar();
   }
 
   receberContatoDigitando(res) {
-    if(!this.ultimaConversa || this.ultimaConversa.contatoAmigoId !== res.contatoQueEstaDigitandoId) { return; }
+    if(!this.ehElegivelParaReceberContatoDigitando(res)) { return; }
     this.statusDoContato.estaDigitando = res.estaDigitando;
+  }
+
+  ehElegivelParaReceberContatoDigitando(res) {
+    return this.ultimaConversa && this.ultimaConversa.contatoAmigoId === res.contatoQueEstaDigitandoId;
   }
 
   ngOnDestroy() {

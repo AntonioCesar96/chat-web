@@ -12,14 +12,14 @@ import { Subject } from 'rxjs';
   templateUrl: './enviar-mensagem.component.html'
 })
 export class EnviarMensagemComponent implements OnInit, OnDestroy {
-  destroy$: Subject<boolean> = new Subject<boolean>();
-
   @ViewChild('mensagemEnviar') mensagem: ElementRef;
   @Input() contatoLogado: Contato;
   @Input() ultimaConversa: UltimaConversa;
-  ultimoTimer: any;
+
+  destroy$: Subject<boolean> = new Subject<boolean>();
   estaDigitando = false;
-  tempo = 0;
+  timerIdValidacaoDigitando: any;
+  horaQueEstavaDigitando = 0;
 
   constructor(
     private conversaService: ConversaSubjectsService,
@@ -52,12 +52,13 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   }
 
   abrirPrimeiraConversaMensagem(conversa: UltimaConversa) {
-    if(this.ultimaConversa && this.ultimaConversa.conversaId === 0
-      && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId) {
+    if(!this.ehElegivelParaAbrirPrimeiraConversaMensagem(conversa)) { return; }
+    this.ultimaConversa = conversa
+  }
 
-        this.ultimaConversa = conversa
-      return;
-    }
+  ehElegivelParaAbrirPrimeiraConversaMensagem(conversa: UltimaConversa) {
+    return this.ultimaConversa && this.ultimaConversa.conversaId === 0
+      && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId;
   }
 
   onEnviarMensagem(event: KeyboardEvent) {
@@ -68,17 +69,19 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
   }
 
   enviarMensagem() {
-    if(!this.mensagem.nativeElement.innerText ||
-      this.mensagem.nativeElement.innerText === '') {
-      return;
-    }
+    if(!this.ehElegivelParaEnviarMensagem()) { return; }
 
-    clearTimeout(this.ultimoTimer);
+    this.removerValidacaoTempoDigitando();
     this.enviarQueNaoEstaDigitando();
 
     this.signalRService.enviarMensagem(this.criarMensagem());
-    this.mensagem.nativeElement.innerText = '';
     this.conversaService.esconderResultados(true);
+    this.mensagem.nativeElement.innerText = '';
+  }
+
+  ehElegivelParaEnviarMensagem() {
+    return this.mensagem.nativeElement.innerText &&
+      this.mensagem.nativeElement.innerText.trim() !== '';
   }
 
   criarMensagem() {
@@ -86,32 +89,44 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     mensagem.conversaId = this.ultimaConversa.conversaId;
     mensagem.contatoRemetenteId = this.contatoLogado.contatoId;
     mensagem.contatoDestinatarioId = this.ultimaConversa.contatoAmigoId;
-    mensagem.mensagemEnviada = this.mensagem.nativeElement.innerText;
+    mensagem.mensagemEnviada = this.mensagem.nativeElement.innerText.trim();
     return mensagem;
   }
 
   avisarContatoDigitando() {
-    this.tempo =  new Date().getTime();
-    this.enviarQueEstaDigitando();
+    this.horaQueEstavaDigitando = this.obterHoraAtual();
 
-    clearTimeout(this.ultimoTimer);
-    this.validarTempo();
+    this.enviarQueEstaDigitando();
+    this.removerValidacaoTempoDigitando();
+    this.validarTempoParaAvisarQueParouDeDigitar();
   }
 
-  validarTempo() {
-    this.ultimoTimer = setTimeout(() => {
-      if((new Date().getTime() - this.tempo) <= 3000) {
-        this.validarTempo();
+  removerValidacaoTempoDigitando() {
+    clearTimeout(this.timerIdValidacaoDigitando);
+  }
+
+  validarTempoParaAvisarQueParouDeDigitar() {
+    this.timerIdValidacaoDigitando = setTimeout(() => {
+      if(this.ehElegivelParaAvisarQueParouDeDigitar()) {
+        this.validarTempoParaAvisarQueParouDeDigitar();
         return;
       }
       this.enviarQueNaoEstaDigitando();
     }, 1000);
   }
 
+  ehElegivelParaAvisarQueParouDeDigitar() {
+    return (this.obterHoraAtual() - this.horaQueEstavaDigitando) <= 3000;
+  }
+
+  obterHoraAtual() {
+    return new Date().getTime();
+  }
+
   enviarQueEstaDigitando() {
     if(this.estaDigitando) { return; }
-    this.estaDigitando = true;
 
+    this.estaDigitando = true;
     this.signalRService.enviarContatoDigitando(true,
       this.ultimaConversa.contatoAmigoId, this.contatoLogado.contatoId);
   }

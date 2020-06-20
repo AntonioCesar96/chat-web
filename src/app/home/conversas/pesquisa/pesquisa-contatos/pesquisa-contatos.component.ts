@@ -14,7 +14,6 @@ import { takeUntil } from 'rxjs/operators';
 export class PesquisaContatosComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
   @Input() contatoLogado: Contato;
-  filtro: any;
   resultado: Resultado<any>;
 
   constructor(
@@ -35,20 +34,19 @@ export class PesquisaContatosComponent implements OnInit, OnDestroy {
       .receberPesquisaContatos()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => this.receberPesquisa(res));
+
+    this.conversaService
+      .receberLimparPesquisa()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.resultado = null);
   }
 
-  receberPesquisa(res) {
-    this.filtro = {
-      contatoPrincipalId: res.contatoLogadoId,
-      nomeAmigo: res.textoPesquisa,
-      contatosIdsParaIgnorar: res.contatosIdsParaIgnorar
-    };
-    this.signalRService.obterContatosAmigosPesquisa(this.filtro);
+  receberPesquisa(filtro) {
+    this.signalRService.obterContatosAmigosPesquisa(filtro);
   }
 
   receberContatosAmigosPesquisa(res: Resultado<any>) {
     this.resultado = res;
-    this.resultado.lista.forEach(conversa => conversa.conversaAberta = false);
   }
 
   existeContatos() {

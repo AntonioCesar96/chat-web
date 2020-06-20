@@ -1,6 +1,6 @@
 import { SignalRService } from '../_common/services/signalr.service';
 import { AutenticacaoService } from './../_common/services/autenticacao.service';
-import { Component, OnInit, ViewContainerRef, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 
@@ -9,7 +9,6 @@ import { Location } from '@angular/common';
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
-  @ViewChild('dynamicComponent', { read: ViewContainerRef }) myRef
 
   constructor(
     private router: Router,
@@ -25,7 +24,10 @@ export class HomeComponent implements OnInit {
     }
 
     this.location.replaceState('/');
+    this.inicializar();
+  }
 
+  inicializar() {
     const contato = this.autenticacaoService.getContatoLogado();
     this.signalRService.inicializar(contato.contatoId);
   }

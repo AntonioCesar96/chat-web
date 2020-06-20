@@ -10,7 +10,6 @@ export class ConversaSubjectsService {
   private abrirConversaSelecionadaMensagemSubject = new Subject<UltimaConversa>();
   private abrirContatoSelecionadoSubject = new Subject<ListaAmigos>();
   private abrirContatoSelecionadoMensagemSubject = new Subject<UltimaConversa>();
-
   private abrirPrimeiraConversaSubject = new Subject<UltimaConversa>();
   private abrirPrimeiraConversaMensagemSubject = new Subject<UltimaConversa>();
 
@@ -19,6 +18,7 @@ export class ConversaSubjectsService {
   private esconderResultadosSubject = new Subject<boolean>();
   private atualizarResultadosSubject = new Subject<boolean>();
   private atualizarContatosParaFechadosSubject = new Subject<any>();
+  private limparPesquisaSubject = new Subject<any>();
 
   constructor() { }
 
@@ -95,6 +95,14 @@ export class ConversaSubjectsService {
 
   esconderResultados(res) {
     this.esconderResultadosSubject.next(res);
+  }
+
+  receberLimparPesquisa(): Observable<any> {
+    return this.limparPesquisaSubject.asObservable();
+  }
+
+  limparPesquisa() {
+    this.limparPesquisaSubject.next();
   }
 
   receberAtualizarResultados(): Observable<any> {

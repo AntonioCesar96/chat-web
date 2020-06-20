@@ -27,7 +27,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   filtro: MensagemFiltro;
   resultado: Resultado<Mensagem>;
   mensagensPorData: Map<any, Mensagem[]>;
-  ultimaConversa: UltimaConversa;
+  conversaAtual: UltimaConversa;
   manterScrollTop = false;
   buscandoMensagens = false;
   ultimaPagina = false;
@@ -42,8 +42,8 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   ngAfterViewInit() {
-    this.viewsMensagemData.changes.subscribe(t => this.viewsMensagemRenderizadas());
-    this.mensagemNova.changes.subscribe(t => this.mensagemNovaRenderizada());
+    this.viewsMensagemData.changes.subscribe(t => this.onMensagensRenderizadas());
+    this.mensagemNova.changes.subscribe(t => this.onMensagemNovaRenderizada());
   }
 
   inicializar() {
@@ -79,7 +79,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   abrirConversaSelecionadaMensagem(conversa: UltimaConversa) {
-    this.ultimaConversa = conversa;
+    this.conversaAtual = conversa;
     conversa.conversaAberta = true;
     this.inicializarVariaveis();
     this.criarFiltro(conversa.conversaId);
@@ -88,70 +88,90 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   abrirContatoSelecionadoMensagem(conversa: UltimaConversa) {
-    this.ultimaConversa = conversa;
+    this.conversaAtual = conversa;
     this.inicializarVariaveis();
   }
 
   abrirPrimeiraConversaMensagem(conversa: UltimaConversa) {
-    if(this.ultimaConversa && this.ultimaConversa.conversaId === 0
-      && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId) {
+    if(!this.ehElegivelParaPrimeiraConversa(conversa)) { return; }
 
-        this.ultimaConversa = conversa;
-        conversa.conversaAberta = true;
-        this.inicializarVariaveis();
-        this.criarFiltro(conversa.conversaId);
-        this.criarListaInicial();
-        this.avisarQueAsMensagensForamLidas();
-      return;
-    }
+    this.conversaAtual = conversa;
+    conversa.conversaAberta = true;
+    this.inicializarVariaveis();
+    this.criarFiltro(conversa.conversaId);
+    this.criarListaInicial();
+    this.avisarQueAsMensagensForamLidas();
   }
 
-  viewsMensagemRenderizadas() {
+  ehElegivelParaPrimeiraConversa(conversa: UltimaConversa) {
+    return this.conversaAtual && this.conversaAtual.conversaId === 0
+      && conversa.contatoAmigoId === this.conversaAtual.contatoAmigoId
+  }
+
+  onMensagensRenderizadas() {
     const elemento = this.mensagem.nativeElement;
     if(this.manterScrollTop) {
       elemento.scrollTop = elemento.scrollTop + (elemento.scrollHeight - this.scrollHeightOld);
       return;
     }
 
-    if(this.obterMensagemNova()) { return; }
+    if(this.obterMensagemQueEstaMarcadaComQtdDeMensagensNovas()) { return; }
     elemento.scrollTop = elemento.scrollHeight - elemento.offsetHeight;
   }
 
-  mensagemNovaRenderizada() {
-    if(!this.manterScrollTop && this.obterMensagemNova() && this.mensagemNova.first) {
-      const elemento = this.mensagemNova.first;
-      this.mensagem.nativeElement.scrollTop = elemento.nativeElement.offsetTop - 130;
-    }
+  onMensagemNovaRenderizada() {
+    if(!this.ehElegivelParaMensagemNovaRenderizada()) { return; }
+
+    const elemento = this.mensagemNova.first;
+    this.mensagem.nativeElement.scrollTop = elemento.nativeElement.offsetTop - 130;
+  }
+
+  ehElegivelParaMensagemNovaRenderizada() {
+    return !this.manterScrollTop && this.obterMensagemQueEstaMarcadaComQtdDeMensagensNovas()
+      && this.mensagemNova.first;
   }
 
   receberMensagens(res: Resultado<Mensagem>) {
-    if(!this.ultimaConversa || res.lista.length === 0
-        || this.ultimaConversa.conversaId !== res.lista[0].conversaId) {
-      return;
-    }
-
-    this.buscandoMensagens = false;
-    this.resultado.total = res.total;
+    if(!this.ehElegivelParaReceberMensagens(res)) { return; }
 
     if(this.manterScrollTop) {
-      this.resultado.lista.push(...res.lista);
-      this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
-      this.ordenarMensagens();
+      this.receberMensagensBuscaPaginada(res);
       return;
     }
 
+    this.receberMensagensPrimeiraBusca(res);
+  }
+
+  receberMensagensPrimeiraBusca(res: Resultado<Mensagem>) {
+    this.buscandoMensagens = false;
+    this.resultado.total = res.total;
     this.resultado = res;
     this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
     this.filtro.primeiraBusca = false;
     this.avisarQueAsMensagensForamLidas();
-    this.ordenarMensagens();
+    this.criarMapComMensagensOrdenadasPorData();
+  }
+
+  receberMensagensBuscaPaginada(res: Resultado<Mensagem>) {
+    this.buscandoMensagens = false;
+    this.resultado.total = res.total;
+    this.resultado.lista.push(...res.lista);
+    this.ultimaPagina = this.resultado.lista.length === this.resultado.total;
+    this.criarMapComMensagensOrdenadasPorData();
+  }
+
+  ehElegivelParaReceberMensagens(res: Resultado<Mensagem>) {
+    return this.conversaAtual && res.lista.length > 0
+      && this.conversaAtual.conversaId === res.lista[0].conversaId;
   }
 
   marcarMensagemComoLida(mensagem: Mensagem) {
-    if(!this.ultimaConversa || this.ultimaConversa.conversaId !== mensagem.conversaId) {
-      return;
-    }
+    if(!this.mensagemRecebidaEhDaConversaAtual(mensagem)) { return; }
 
+    this.marcarMensagensDaListaLidas(mensagem);
+  }
+
+  marcarMensagensDaListaLidas(mensagem: Mensagem) {
     this.resultado.lista
       .filter(x => (mensagem.mensagemId !== 0 && x.mensagemId === mensagem.mensagemId)
         || (mensagem.mensagemId === 0 && x.conversaId === mensagem.conversaId))
@@ -159,28 +179,36 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   receberMensagem(mensagem: Mensagem) {
-    if(!this.ultimaConversa ||
-        this.ultimaConversa.conversaId !== mensagem.conversaId) {
-      return;
-    }
+    if(!this.mensagemRecebidaEhDaConversaAtual(mensagem)) { return; }
 
-    this.resultado.lista.push(mensagem);
-    this.filtro.qtdMensagensPular++;
-    this.resultado.total++;
-    this.manterScrollTop = false;
-    this.ordenarMensagens();
-    this.desmarcarMensagemNova();
+    this.adicionarMensagemNovaNaLista(mensagem);
+    this.avisarQueMensagemFoiLida(mensagem);
+  }
 
+  mensagemRecebidaEhDaConversaAtual(mensagem: Mensagem) {
+    return this.conversaAtual && this.conversaAtual.conversaId === mensagem.conversaId;
+  }
+
+  avisarQueMensagemFoiLida(mensagem: Mensagem) {
     if(this.contatoLogado.contatoId === mensagem.contatoDestinatarioId) {
       this.signalRService.marcarMensagemComoLida(mensagem.mensagemId,
         mensagem.conversaId, mensagem.contatoRemetenteId);
     }
   }
 
+  adicionarMensagemNovaNaLista(mensagem: Mensagem) {
+    this.resultado.lista.push(mensagem);
+    this.filtro.qtdMensagensPular++;
+    this.resultado.total++;
+    this.manterScrollTop = false;
+    this.criarMapComMensagensOrdenadasPorData();
+    this.desmarcarMensagemQuePossuiQuantitativoDeMensagensNovas();
+  }
+
   inicializarVariaveis() {
     this.manterScrollTop = false;
     this.buscandoMensagens = false;
-    this.ultimaPagina = false;
+    this.ultimaPagina = true;
     this.resultado = null;
     this.mensagensPorData = null;
   }
@@ -190,77 +218,99 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
   }
 
   criarListaInicial() {
-    const mensagem = new Mensagem();
-    mensagem.conversaId = this.ultimaConversa.conversaId;
-    mensagem.contatoRemetenteId =  this.ultimaConversa.contatoRemetenteId;
-    mensagem.contatoDestinatarioId =  this.ultimaConversa.contatoDestinatarioId;
-    mensagem.dataEnvio =  this.ultimaConversa.dataEnvio;
-    mensagem.mensagemEnviada =  this.ultimaConversa.ultimaMensagem;
-    mensagem.statusMensagem =  this.ultimaConversa.statusUltimaMensagem;
+    const mensagem = this.criarPrimeiraMensagem();
 
     this.resultado = new Resultado<Mensagem>();
     this.resultado.lista = [ mensagem ];
 
-    this.ordenarMensagens();
+    this.criarMapComMensagensOrdenadasPorData();
+  }
+
+  criarPrimeiraMensagem() {
+    const mensagem = new Mensagem();
+    mensagem.conversaId = this.conversaAtual.conversaId;
+    mensagem.contatoRemetenteId =  this.conversaAtual.contatoRemetenteId;
+    mensagem.contatoDestinatarioId =  this.conversaAtual.contatoDestinatarioId;
+    mensagem.dataEnvio =  this.conversaAtual.dataEnvio;
+    mensagem.mensagemEnviada =  this.conversaAtual.ultimaMensagem;
+    mensagem.statusMensagem =  this.conversaAtual.statusUltimaMensagem;
+
+    return mensagem;
   }
 
   criarFiltro(conversaId: number) {
-    this.filtro = new MensagemFiltro(conversaId, this.ultimaConversa.qtdMensagensNovas);
-  }
-
-  obterMensagens() {
-    this.buscandoMensagens = true;
-    this.signalRService.obterMensagens(this.filtro);
+    this.filtro = new MensagemFiltro(conversaId, this.conversaAtual.qtdMensagensNovas);
   }
 
   avisarQueAsMensagensForamLidas() {
-    if(this.ultimaConversa.contatoRemetenteId === this.contatoLogado.contatoId
-        || this.ultimaConversa.qtdMensagensNovas === 0) {
-      return;
-    }
+    if(!this.ehElegivelParaAvisarQueAsMensagensForamLidas()) { return; }
 
-    const naoLidas = this.resultado.lista.filter(x => x.statusMensagem !== StatusMensagem.Lida);
-    naoLidas[0].qtdMensagensNovas = this.ultimaConversa.qtdMensagensNovas;
-    naoLidas[0].qtdMensagensNovasDescricao = this.ultimaConversa.qtdMensagensNovas === 1
-      ? StringResources.QTD_MSG_NOVA_SINGULAR
-      : `${this.ultimaConversa.qtdMensagensNovas} ${StringResources.QTD_MSG_NOVA_PLURAL}`;
+    this.indicarQualMensagemPossuiraQuantitativoDeMensagensNovas();
+    this.zerarQtdMensagensNovas();
 
-    this.ultimaConversa.qtdMensagensNovas = 0;
-    this.ultimaConversa.mostrarMensagensNovas = false;
-
-    this.signalRService.marcarMensagemComoLida(0, this.ultimaConversa.conversaId,
-      this.ultimaConversa.contatoAmigoId);
+    this.signalRService.marcarMensagemComoLida(0, this.conversaAtual.conversaId,
+      this.conversaAtual.contatoAmigoId);
   }
 
-  desmarcarMensagemNova() {
-    const mensagem = this.obterMensagemNova();
+  ehElegivelParaAvisarQueAsMensagensForamLidas() {
+    return this.conversaAtual.qtdMensagensNovas > 0
+      && this.conversaAtual.contatoDestinatarioId === this.contatoLogado.contatoId;
+  }
+
+  indicarQualMensagemPossuiraQuantitativoDeMensagensNovas() {
+    const naoLidas = this.resultado.lista.filter(x => x.statusMensagem !== StatusMensagem.Lida);
+    naoLidas[0].qtdMensagensNovas = this.conversaAtual.qtdMensagensNovas;
+    naoLidas[0].qtdMensagensNovasDescricao = this.obterDescricaoQtdMensagensNovas();
+  }
+
+  obterDescricaoQtdMensagensNovas() {
+    return this.conversaAtual.qtdMensagensNovas === 1
+      ? StringResources.QTD_MSG_NOVA_SINGULAR
+      : `${this.conversaAtual.qtdMensagensNovas} ${StringResources.QTD_MSG_NOVA_PLURAL}`;
+  }
+
+  zerarQtdMensagensNovas() {
+    this.conversaAtual.qtdMensagensNovas = 0;
+    this.conversaAtual.mostrarMensagensNovas = false;
+  }
+
+  desmarcarMensagemQuePossuiQuantitativoDeMensagensNovas() {
+    const mensagem = this.obterMensagemQueEstaMarcadaComQtdDeMensagensNovas();
     if(!mensagem) { return; }
 
     mensagem.qtdMensagensNovas = 0;
+    delete mensagem.qtdMensagensNovasDescricao;
   }
 
-  obterMensagemNova() {
+  obterMensagemQueEstaMarcadaComQtdDeMensagensNovas() {
     return this.resultado && this.resultado.lista
       && this.resultado.lista.find(x => x.qtdMensagensNovas > 0);
   }
 
-  ordenarMensagens() {
-    const lista = this.resultado.lista;
-    const datas = lista.map(x => new Date(x.dataEnvio).toDateString())
-    .filter((item, i, ar) => ar.indexOf(item) === i)
-    .sort((d1,d2) => new Date(d1).getTime() - new Date(d2).getTime());
-
+  criarMapComMensagensOrdenadasPorData() {
     this.mensagensPorData = new Map<string, Mensagem[]>();
-    datas.forEach(data => {
-      const mensagens = lista.filter(x => new Date(x.dataEnvio).toDateString() === data)
-        .sort((m1,m2) => new Date(m1.dataEnvio).getTime() - new Date(m2.dataEnvio).getTime());
+    const datas = this.obterDatasDasMensagens();
 
-      const dataKey = this.obterDataKey(new Date(data));
-      this.mensagensPorData.set(dataKey, mensagens);
+    datas.forEach(data => {
+      const mensagens = this.obterMensagensPorData(data);
+      const key = this.criarKeyParaMapMensagensPorData(new Date(data));
+
+      this.mensagensPorData.set(key, mensagens);
     });
   }
 
-  obterDataKey(data: Date) {
+  obterDatasDasMensagens() {
+    return this.resultado.lista.map(x => new Date(x.dataEnvio).toDateString())
+      .filter((item, i, ar) => ar.indexOf(item) === i)
+      .sort((d1,d2) => new Date(d1).getTime() - new Date(d2).getTime());
+  }
+
+  obterMensagensPorData(data: string) {
+    return this.resultado.lista.filter(x => new Date(x.dataEnvio).toDateString() === data)
+      .sort((m1,m2) => new Date(m1.dataEnvio).getTime() - new Date(m2.dataEnvio).getTime());;
+  }
+
+  criarKeyParaMapMensagensPorData(data: Date) {
     const diferencaEmDias = moment().diff(moment(data), 'days');
     let dataDescricao = moment(data).format('L');
 
@@ -278,12 +328,16 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
 
   onScroll(target) {
     this.scrollHeightOld = target.scrollHeight;
-    if (this.ultimaConversa && !this.ultimaPagina && !this.buscandoMensagens) {
+    if (this.conversaAtual && !this.ultimaPagina
+      && !this.buscandoMensagens && ((target.scrollTop - 100) <= 0)) {
 
-      if ((target.scrollTop - 100) <= 0) {
-        this.obterMensagensPaginado();
-      }
+      this.obterMensagensPaginado();
     }
+  }
+
+  obterMensagens() {
+    this.buscandoMensagens = true;
+    this.signalRService.obterMensagens(this.filtro);
   }
 
   obterMensagensPaginado() {

@@ -1,7 +1,6 @@
 import { ConversaService } from './../../../services/conversa.service';
 import { ConversaSubjectsService } from '../../../services/conversa-subjects.service';
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
-import { ConversaFiltro } from './../../../../_common/models/conversa.filtro';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Subject } from 'rxjs';
@@ -14,7 +13,6 @@ import { takeUntil } from 'rxjs/operators';
 export class PesquisaConversasComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
   @Input() contatoLogado: Contato;
-  filtro: ConversaFiltro;
   resultadoPesquisa: UltimaConversa[];
 
   constructor(
@@ -30,23 +28,28 @@ export class PesquisaConversasComponent implements OnInit, OnDestroy {
       .receberPesquisaConversas()
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => this.receberPesquisa(res));
+
+    this.conversaSubjectsService
+      .receberLimparPesquisa()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res) => this.resultadoPesquisa = null);
   }
 
-  receberPesquisa(res) {
-    this.filtro = new ConversaFiltro(res.contatoLogadoId, res.textoPesquisa);
+  receberPesquisa(filtro) {
+    this.filtrarConversas(filtro.textoPesquisa);
+    this.conversaSubjectsService.pesquisarContatos(this.criarFiltroParaBuscarContatos(filtro));
+  }
 
+  filtrarConversas(nomeContato: string) {
     this.resultadoPesquisa = this.conversaService.obterUltimasConversasLista()
-      .filter(x => x.nome.toLocaleLowerCase().includes(res.textoPesquisa))
-
-    this.conversaSubjectsService.pesquisarContatos(this.obterFiltroDaPesquisa());
+      .filter(x => x.nome.toLowerCase().includes(nomeContato));
   }
 
-  obterFiltroDaPesquisa() {
+  criarFiltroParaBuscarContatos(filtro) {
     return {
-      contatoLogadoId: this.contatoLogado.contatoId,
-      textoPesquisa: this.filtro.nomeContato,
-      contatosIdsParaIgnorar: this.conversaService.obterUltimasConversasLista()
-        .map(x => x.contatoAmigoId)
+      contatoPrincipalId: this.contatoLogado.contatoId,
+      nomeAmigo: filtro.textoPesquisa,
+      contatosIdsParaIgnorar: this.resultadoPesquisa.map(x => x.contatoAmigoId)
     };
   }
 
@@ -55,7 +58,7 @@ export class PesquisaConversasComponent implements OnInit, OnDestroy {
   }
 
   ordenarConversas() {
-    this.conversaService.obterUltimasConversasLista().sort((n1,n2) =>
+    this.resultadoPesquisa.sort((n1,n2) =>
       new Date(n2.dataEnvio).getTime() - new Date(n1.dataEnvio).getTime());
   }
 

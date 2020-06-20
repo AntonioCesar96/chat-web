@@ -64,11 +64,19 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   marcarMensagemComoLida(mensagem: Mensagem) {
-    this.conversaService.marcarMensagemComoLida(mensagem);
+    const amigo = this.conversaService.obterConversaPorId(mensagem.conversaId);
+    if(!amigo) { return; }
+
+    amigo.statusUltimaMensagem = StatusMensagem.Lida;
+    amigo.qtdMensagensNovas = 0;
+    amigo.mostrarMensagensNovas = false;
   }
 
   validarContatoQueEstaDigitando(res) {
-    this.conversaService.validarContatoQueEstaDigitando(res);
+    const amigo = this.conversaService.obterConversaPorContatoAmigoId(res.contatoQueEstaDigitandoId);
+    if(!amigo) { return; }
+
+    amigo.estaDigitando = res.estaDigitando;
   }
 
   receberConversasDoContato(res: Resultado<UltimaConversa>) {
@@ -81,7 +89,7 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   existeConversas() {
-    return this.conversaService.obterUltimasConversas().total > 0;
+    return this.conversaService.existeConversas();
   }
 
   public selecionarConversa(conversa: UltimaConversa) {
@@ -91,24 +99,62 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
   }
 
   receberPrimeiraMensagem(mensagem: Mensagem) {
-    const conversaNova = this.conversaService.criarConversaPrimeiraMensagem(mensagem, this.contatoLogado);
-
+    const conversaNova = this.criarConversaPrimeiraMensagem(mensagem);
     this.conversaService.adicionarConversa(conversaNova);
-    this.conversaService.ordenarConversas();
 
     this.conversaSubjectsService.abrirPrimeiraConversa(conversaNova);
-
     if(this.contatoLogado.contatoId !== mensagem.contatoRemetenteId) {
       this.conversaSubjectsService.atualizarResultados();
     }
   }
 
   receberMensagem(mensagem: Mensagem) {
-    this.conversaService.receberMensagem(mensagem, this.contatoLogado);
+    const conversa = this.conversaService.obterConversaPorId(mensagem.conversaId);
+    if(!conversa) { return; }
+
+    this.atualizarUltimaConversa(conversa, mensagem);
+    this.conversaService.ordenarConversas();
 
     if(this.contatoLogado.contatoId !== mensagem.contatoRemetenteId) {
       this.conversaSubjectsService.atualizarResultados();
     }
+  }
+
+  atualizarUltimaConversa(conversa: UltimaConversa, mensagem: Mensagem) {
+    conversa.ultimaMensagem = mensagem.mensagemEnviada;
+    conversa.dataEnvio = mensagem.dataEnvio;
+    conversa.statusUltimaMensagem = mensagem.statusMensagem;
+    conversa.contatoRemetenteId = mensagem.contatoRemetenteId;
+    conversa.contatoDestinatarioId = mensagem.contatoDestinatarioId;
+
+    if(mensagem.contatoDestinatarioId === this.contatoLogado.contatoId && !conversa.conversaAberta) {
+      conversa.qtdMensagensNovas++;
+      conversa.mostrarMensagensNovas = true;
+    }
+  }
+
+  criarConversaPrimeiraMensagem(mensagem: Mensagem) {
+    const souORemetente = this.contatoLogado.contatoId === mensagem.contatoRemetenteId;
+
+    const conversaNova = new UltimaConversa();
+    conversaNova.contatoAmigoId = souORemetente
+      ? mensagem.contatoDestinatarioId : mensagem.contatoRemetenteId;
+    conversaNova.conversaId = mensagem.conversaId;
+    conversaNova.contatoRemetenteId = mensagem.contatoRemetenteId;
+    conversaNova.contatoDestinatarioId = mensagem.contatoDestinatarioId;
+    conversaNova.nome = souORemetente ? mensagem.nomeDestinatario : mensagem.nomeRemetente;
+    conversaNova.email = souORemetente ? mensagem.emailDestinatario : mensagem.emailRemetente;
+    conversaNova.fotoUrl = souORemetente ? mensagem.fotoUrlDestinatario : mensagem.fotoUrlRemetente;
+    conversaNova.ultimaMensagem = mensagem.mensagemEnviada;
+    conversaNova.dataEnvio = mensagem.dataEnvio;
+    conversaNova.statusUltimaMensagem = mensagem.statusMensagem;
+
+    if(!souORemetente) {
+      conversaNova.qtdMensagensNovas = 1;
+      conversaNova.mostrarMensagensNovas = true;
+    }
+
+    return conversaNova;
   }
 
   ngOnDestroy() {

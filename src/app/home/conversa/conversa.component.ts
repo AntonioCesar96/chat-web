@@ -23,6 +23,10 @@ export class ConversaComponent implements OnInit, OnDestroy {
     if (!this.autenticacaoService.estaLogado()) { return; }
     this.contatoLogado = this.autenticacaoService.getContatoLogado();
 
+    this.inicializar();
+  }
+
+  inicializar() {
     this.conversaService
       .receberConversaSelecionada()
       .pipe(takeUntil(this.destroy$))
@@ -43,7 +47,16 @@ export class ConversaComponent implements OnInit, OnDestroy {
     this.conversaService.abrirConversaSelecionadaMensagem(conversa);
   }
 
+  abrirPrimeiraConversa(conversa: UltimaConversa) {
+    this.conversaService.abrirPrimeiraConversaMensagem(conversa);
+  }
+
   abrirContatoSelecionado(contatoAmigo: ListaAmigos) {
+    const conversa = this.criarConversa(contatoAmigo);
+    this.conversaService.abrirContatoSelecionadoMensagem(conversa);
+  }
+
+  criarConversa(contatoAmigo: ListaAmigos) {
     const conversa = new UltimaConversa();
     conversa.conversaId = 0;
     conversa.qtdMensagensNovas = 0;
@@ -55,11 +68,7 @@ export class ConversaComponent implements OnInit, OnDestroy {
     conversa.fotoUrl = contatoAmigo.fotoUrl;
     conversa.conversaAberta = true;
 
-    this.conversaService.abrirContatoSelecionadoMensagem(conversa);
-  }
-
-  abrirPrimeiraConversa(conversa: UltimaConversa) {
-    this.conversaService.abrirPrimeiraConversaMensagem(conversa);
+    return conversa;
   }
 
   ngOnDestroy() {

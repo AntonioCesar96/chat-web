@@ -12,7 +12,6 @@ export class PesquisaComponent implements OnInit {
   destroy$: Subject<boolean> = new Subject<boolean>();
   @ViewChild('pesquisa') pesquisa: ElementRef;
   @Input() contatoLogado: Contato;
-  textoPesquisa: string;
   esconderResultados = true;
 
   constructor(private conversaService: ConversaSubjectsService) { }
@@ -21,34 +20,40 @@ export class PesquisaComponent implements OnInit {
     this.conversaService
       .receberEsconderResultados()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((res) => {
-        this.pesquisa.nativeElement.innerText = '';
-        this.esconderResultados = res;
-      });
+      .subscribe((res) => this.receberEsconderResultados(res));
 
     this.conversaService
       .receberAtualizarResultados()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.pesquisar();
-      });
+      .subscribe(() => this.pesquisar());
   }
 
   pesquisar() {
-    this.textoPesquisa = this.pesquisa.nativeElement.innerText.trim();
-    if(!this.textoPesquisa) {
+    if(!this.ehElegivelParaPesquisar()) {
       this.esconderResultados = true;
+      this.conversaService.limparPesquisa();
       return;
     }
 
     this.esconderResultados = false;
-    this.conversaService.pesquisarConversas(this.obterFiltroDaPesquisa());
+    this.conversaService.pesquisarConversas(this.criarFiltroDaPesquisa());
   }
 
-  obterFiltroDaPesquisa() {
+  ehElegivelParaPesquisar() {
+    return this.pesquisa.nativeElement.innerText &&
+      this.pesquisa.nativeElement.innerText.trim() !== '';
+  }
+
+  receberEsconderResultados(res) {
+    this.pesquisa.nativeElement.innerText = '';
+    this.esconderResultados = res;
+    this.conversaService.limparPesquisa();
+  }
+
+  criarFiltroDaPesquisa() {
     return {
       contatoLogadoId: this.contatoLogado.contatoId,
-      textoPesquisa: this.textoPesquisa
+      textoPesquisa: this.pesquisa.nativeElement.innerText.trim().toLowerCase()
     };
   }
 }
