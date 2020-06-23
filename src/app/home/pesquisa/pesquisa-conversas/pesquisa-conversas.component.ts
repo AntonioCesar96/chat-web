@@ -1,5 +1,5 @@
-import { ConversaService } from './../../../services/conversa.service';
-import { ConversaSubjectsService } from '../../../services/conversa-subjects.service';
+import { ConversaService } from './../../services/conversa.service';
+import { ConversaSubjectsService } from '../../services/conversa-subjects.service';
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';

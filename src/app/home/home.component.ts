@@ -1,6 +1,6 @@
 import { ConversaSubjectsService } from './services/conversa-subjects.service';
 import { SignalRService } from '../_common/services/signalr.service';
-import { AutenticacaoService } from './../_common/services/autenticacao.service';
+import { AutenticacaoService } from '../autenticacao/services/autenticacao.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';

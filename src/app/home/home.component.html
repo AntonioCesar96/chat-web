@@ -1,11 +1,15 @@
 
-<div class="home-box-wrapper" [class.detalhes-aberto]="mostrarDetalhes">
-  <div class="conversas-wrapper">
+<div class="home-wrapper" [class.detalhes-aberto]="mostrarDetalhes">
+  <div class="side-wrapper">
+    <app-opcoes></app-opcoes>
+    
+    <app-pesquisa></app-pesquisa>
+    
     <app-conversas></app-conversas>
   </div>
   
-  <div class="conversa-wrapper">
-    <app-conversa></app-conversa>
+  <div class="center-wrapper">
+    <app-mensagens></app-mensagens>
   </div>
 
   <div class="detalhes-wrapper">

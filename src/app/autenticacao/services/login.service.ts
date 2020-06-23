@@ -1,5 +1,5 @@
-import { Contato } from '../_common/models/contato.model';
-import { UrlService } from '../_common/services/url.service';
+import { Contato } from '../../_common/models/contato.model';
+import { UrlService } from '../../_common/services/url.service';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';

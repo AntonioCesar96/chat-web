@@ -1,5 +1,5 @@
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
-import { AutenticacaoService } from './../../_common/services/autenticacao.service';
+import { AutenticacaoService } from '../../autenticacao/services/autenticacao.service';
 import { ConversaSubjectsService } from './../services/conversa-subjects.service';
 import { Component, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { Subject } from 'rxjs';

@@ -326,7 +326,7 @@ export class ListaMensagensComponent implements OnInit, OnDestroy, AfterViewInit
     return { dataDescricao, data: moment(data).format('L') };
   }
 
-  onScroll(target) {
+  scrollMensagens(target) {
     this.scrollHeightOld = target.scrollHeight;
     if (this.conversaAtual && !this.ultimaPagina
       && !this.buscandoMensagens && ((target.scrollTop - 100) <= 0)) {

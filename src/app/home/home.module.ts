@@ -1,25 +1,25 @@
-import { PesquisaContatosComponent } from './conversas/pesquisa/pesquisa-contatos/pesquisa-contatos.component';
+import { PesquisaContatosComponent } from './pesquisa/pesquisa-contatos/pesquisa-contatos.component';
 import { ConversaSubjectsService } from './services/conversa-subjects.service';
 import { HomeRouting } from './home.routing';
 import { ChatCommonModule } from './../_common/common.module';
 import { NgModule } from '@angular/core';
 import { HomeComponent } from './home.component';
 import { ConversasComponent } from './conversas/conversas.component';
-import { ConversaComponent } from './conversa/conversa.component';
-import { EnviarMensagemComponent } from './conversa/enviar-mensagem/enviar-mensagem.component';
-import { ListaMensagensComponent } from './conversa/lista-mensagens/lista-mensagens.component';
-import { ContatoMensagemComponent } from './conversa/contato-mensagem/contato-mensagem.component';
+import { MensagensComponent } from './mensagens/mensagens.component';
+import { EnviarMensagemComponent } from './mensagens/enviar-mensagem/enviar-mensagem.component';
+import { ListaMensagensComponent } from './mensagens/lista-mensagens/lista-mensagens.component';
+import { ContatoMensagemComponent } from './mensagens/contato-mensagem/contato-mensagem.component';
 import { ListaConversasComponent } from './conversas/lista-conversas/lista-conversas.component';
-import { PesquisaComponent } from './conversas/pesquisa/pesquisa.component';
-import { PesquisaConversasComponent } from './conversas/pesquisa/pesquisa-conversas/pesquisa-conversas.component';
+import { PesquisaComponent } from './pesquisa/pesquisa.component';
+import { PesquisaConversasComponent } from './pesquisa/pesquisa-conversas/pesquisa-conversas.component';
 import { DetalhesComponent } from './detalhes/detalhes.component';
-import { OpcoesComponent } from './conversas/opcoes/opcoes.component';
+import { OpcoesComponent } from './opcoes/opcoes.component';
 
 @NgModule({
   declarations: [
     HomeComponent,
     ConversasComponent,
-    ConversaComponent,
+    MensagensComponent,
     EnviarMensagemComponent,
     ListaMensagensComponent,
     ContatoMensagemComponent,

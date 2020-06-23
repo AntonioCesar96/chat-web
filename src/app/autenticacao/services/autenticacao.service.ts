@@ -1,7 +1,7 @@
-import { Contato } from '../models/contato.model';
+import { Contato } from '../../_common/models/contato.model';
 import { Injectable } from '@angular/core';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AutenticacaoService {
   private contatoLogado: Contato;
   private contatoCriado: Contato;

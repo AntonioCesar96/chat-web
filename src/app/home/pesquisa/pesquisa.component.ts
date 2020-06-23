@@ -1,5 +1,6 @@
+import { AutenticacaoService } from './../../autenticacao/services/autenticacao.service';
 import { Contato } from 'src/app/_common/models/contato.model';
-import { ConversaSubjectsService } from '../../services/conversa-subjects.service';
+import { ConversaSubjectsService } from '../services/conversa-subjects.service';
 import { Component, OnInit, ViewChild, ElementRef, Input } from '@angular/core';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -11,12 +12,17 @@ import { Subject } from 'rxjs';
 export class PesquisaComponent implements OnInit {
   destroy$: Subject<boolean> = new Subject<boolean>();
   @ViewChild('pesquisa') pesquisa: ElementRef;
-  @Input() contatoLogado: Contato;
+  contatoLogado: Contato;
   esconderResultados = true;
 
-  constructor(private conversaService: ConversaSubjectsService) { }
+  constructor(
+    private conversaService: ConversaSubjectsService,
+    private autenticacaoService: AutenticacaoService) { }
 
   ngOnInit() {
+    if (!this.autenticacaoService.estaLogado()) { return; }
+    this.contatoLogado = this.autenticacaoService.getContatoLogado();
+
     this.conversaService
       .receberEsconderResultados()
       .pipe(takeUntil(this.destroy$))

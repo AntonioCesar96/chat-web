@@ -1,5 +1,5 @@
 import { CookieService } from './services/cookie.service';
-import { AutenticacaoService } from './services/autenticacao.service';
+import { AutenticacaoService } from '../autenticacao/services/autenticacao.service';
 import { AlertaService } from './services/alerta.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -31,7 +31,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   ],
   providers: [
     AlertaService,
-    AutenticacaoService,
     CookieService
   ]
 })

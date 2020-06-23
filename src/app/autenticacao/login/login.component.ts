@@ -1,9 +1,9 @@
 import { CookieService } from './../../_common/services/cookie.service';
-import { AutenticacaoService } from '../../_common/services/autenticacao.service';
+import { AutenticacaoService } from '../services/autenticacao.service';
 import { StringResources } from './../../string-resources';
 import { Erro } from '../../_common/models/erro.model';
 import { Contato } from '../../_common/models/contato.model';
-import { LoginService } from '../login.service';
+import { LoginService } from '../services/login.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';

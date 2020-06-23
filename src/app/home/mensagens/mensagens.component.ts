@@ -1,17 +1,17 @@
-import { ListaAmigos } from './../../_common/models/lista-amigos.model';
+import { ListaAmigos } from '../../_common/models/lista-amigos.model';
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
 import { ConversaSubjectsService } from '../services/conversa-subjects.service';
-import { Contato } from './../../_common/models/contato.model';
-import { AutenticacaoService } from './../../_common/services/autenticacao.service';
+import { Contato } from '../../_common/models/contato.model';
+import { AutenticacaoService } from '../../autenticacao/services/autenticacao.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
-  selector: 'app-conversa',
-  templateUrl: './conversa.component.html'
+  selector: 'app-mensagens',
+  templateUrl: './mensagens.component.html'
 })
-export class ConversaComponent implements OnInit, OnDestroy {
+export class MensagensComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
   contatoLogado: Contato;
 

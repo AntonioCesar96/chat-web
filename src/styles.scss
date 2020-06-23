@@ -176,7 +176,7 @@ body {
   }
 }
 
-.home-box-wrapper {
+.home-wrapper {
   display: flex;
   align-items: stretch;
   height: calc(100% - 38px);
@@ -186,7 +186,7 @@ body {
   top: 19px;
 
   &.detalhes-aberto {
-    .conversa-wrapper {
+    .center-wrapper {
       flex: 40%;
     }
     .detalhes-wrapper {
@@ -194,14 +194,14 @@ body {
     }
   }
 
-  .conversas-wrapper {
+  .side-wrapper {
     overflow: hidden;
     position: relative;
     z-index: 2;
     flex: 30%;    
   }
   
-  .conversa-wrapper {
+  .center-wrapper {
     overflow: hidden;
     position: relative;
     z-index: 2;
@@ -553,7 +553,7 @@ body {
     background-color: #101d24;
     position: absolute;
     left: 0;
-    top: 54px;
+    top: 113px;
     width: 100%;
     z-index: 3;
     overflow-x: hidden;

@@ -1,5 +1,5 @@
 import { Contato } from '../../_common/models/contato.model';
-import { AutenticacaoService } from '../../_common/services/autenticacao.service';
+import { AutenticacaoService } from '../../autenticacao/services/autenticacao.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({

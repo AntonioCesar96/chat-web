@@ -1,11 +1,11 @@
 import { AlertaService } from '../../_common/services/alerta.service';
-import { AutenticacaoService } from '../../_common/services/autenticacao.service';
+import { AutenticacaoService } from '../services/autenticacao.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Erro } from 'src/app/_common/models/erro.model';
 import { Contato } from 'src/app/_common/models/contato.model';
-import { LoginService } from '../login.service';
+import { LoginService } from '../services/login.service';
 import { StringResources } from 'src/app/string-resources';
 
 @Component({

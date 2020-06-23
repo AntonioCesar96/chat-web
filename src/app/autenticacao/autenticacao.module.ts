@@ -1,5 +1,5 @@
-import { AutenticacaoService } from '../_common/services/autenticacao.service';
-import { LoginService } from './login.service';
+import { AutenticacaoService } from './services/autenticacao.service';
+import { LoginService } from './services/login.service';
 import { AutenticacaoRouting } from './autenticacao.routing';
 import { ChatCommonModule } from './../_common/common.module';
 import { NgModule } from '@angular/core';
@@ -16,8 +16,6 @@ import { CriarLoginComponent } from './criar-login/criar-login.component';
     AutenticacaoRouting
   ],
   exports: [],
-  providers: [
-    LoginService
-  ]
+  providers: [ LoginService ]
 })
 export class AutenticacaoModule { }
