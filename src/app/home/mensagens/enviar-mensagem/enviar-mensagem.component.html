@@ -1,7 +1,9 @@
 <div class="enviar-mensagem-wrapper" *ngIf="ultimaConversa">
   <div class="enviar-mensagem-input-wrapper">
+    <div class="enviar-mensagem-label" *ngIf="mostrarLabel">Digite uma mensagem</div>
     <div #mensagemEnviar
       contenteditable="true" 
+      class="enviar-mensagem-contenteditable"
       (input)="avisarContatoDigitando()"
       (keypress)="onEnviarMensagem($event)"></div>
   </div>
@@ -11,5 +13,4 @@
       <i class="material-icons">send</i>
     </a>
   </div>
-
 </div>

@@ -3,7 +3,7 @@ import { ConversaSubjectsService } from '../../services/conversa-subjects.servic
 import { SignalRService } from '../../../_common/services/signalr.service';
 import { Resultado } from 'src/app/_common/models/resultado.model';
 import { Contato } from 'src/app/_common/models/contato.model';
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -13,6 +13,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class PesquisaContatosComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
+  @Output() avisarSeEncontrouAlgumContato = new EventEmitter<boolean>();
   @Input() contatoLogado: Contato;
   resultado: Resultado<any>;
 
@@ -47,6 +48,7 @@ export class PesquisaContatosComponent implements OnInit, OnDestroy {
 
   receberContatosAmigosPesquisa(res: Resultado<any>) {
     this.resultado = res;
+    this.avisarSeEncontrouAlgumContato.emit(res.lista.length > 0);
   }
 
   existeContatos() {

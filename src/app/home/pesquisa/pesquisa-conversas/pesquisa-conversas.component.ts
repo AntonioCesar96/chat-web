@@ -2,7 +2,7 @@ import { ConversaService } from './../../services/conversa.service';
 import { ConversaSubjectsService } from '../../services/conversa-subjects.service';
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
 import { Contato } from 'src/app/_common/models/contato.model';
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, EventEmitter, Output } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -12,6 +12,7 @@ import { takeUntil } from 'rxjs/operators';
 })
 export class PesquisaConversasComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
+  @Output() avisarSeEncontrouAlgumaConversa = new EventEmitter<boolean>();
   @Input() contatoLogado: Contato;
   resultadoPesquisa: UltimaConversa[];
 
@@ -43,6 +44,8 @@ export class PesquisaConversasComponent implements OnInit, OnDestroy {
   filtrarConversas(nomeContato: string) {
     this.resultadoPesquisa = this.conversaService.obterUltimasConversasLista()
       .filter(x => x.nome.toLowerCase().includes(nomeContato));
+
+    this.avisarSeEncontrouAlgumaConversa.emit(this.resultadoPesquisa.length > 0);
   }
 
   criarFiltroParaBuscarContatos(filtro) {

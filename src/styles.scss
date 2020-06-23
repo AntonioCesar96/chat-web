@@ -166,7 +166,7 @@ body {
         background-color: #101d24;
         border: 1px solid #101d24;
     
-        div {
+        .enviar-mensagem-contenteditable {
           color: #a5aaad;
         }
       }
@@ -249,7 +249,7 @@ body {
   .opcoes-img-wrapper {
     flex-grow: 1;
 
-    .img,
+    img,
     i {
       width: 40px;
       height: 40px;
@@ -527,6 +527,7 @@ body {
     max-width: 100%;
     min-height: 62px;
     padding: 5px 10px;
+    position: relative;
 
     .enviar-mensagem-input-wrapper {
       box-sizing: border-box;
@@ -543,7 +544,7 @@ body {
       padding: 9px 12px 11px;
       margin: 5px 10px;
   
-      div {
+      .enviar-mensagem-contenteditable {
         font-size: 15px;
         font-weight: 400;
         max-height: 100px;
@@ -554,6 +555,21 @@ body {
         position: relative;
         white-space: pre-wrap;
         word-wrap: break-word;
+      }
+
+      .enviar-mensagem-label {
+        color: #6c7175;
+        font-size: 14px;
+        height: 20px;
+        line-height: 20px;
+        overflow: hidden;
+        pointer-events: none;
+        position: absolute;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        z-index: 100;
+        top: 19px;
+        left: 33px;
       }
     }
   }
@@ -587,12 +603,32 @@ body {
     height: calc(100% - 54px);
   }
 
+  .pesquisa-nenhum-resultado {
+    font-size: 14px;
+    color: #f1f1f273;
+    line-height: 20px;
+    padding: 46px 20px;
+    text-align: center;
+  }
+
   .pesquisa-wrapper {
     display: flex;
     align-items: flex-end;
     flex-direction: row;
     max-width: 100%;
-    padding: 5px 10px;
+    padding: 0px 10px;
+
+    &.pesquisando {
+      .pesquisa-input-wrapper {
+        .pesquisa-label {
+          opacity: 0;
+        }
+        .pesquisa-close {
+          opacity: 1;
+          pointer-events: auto;
+        }
+      }
+    }
 
     .pesquisa-input-wrapper {
       box-sizing: border-box;
@@ -605,23 +641,53 @@ body {
       width: inherit;
       will-change: width;
       border-radius: 21px;
-      padding: 7px 12px;
-      margin: 5px 10px;
+      padding: 7px 25px 7px 12px;
+      margin: 6px 10px;
+      position: relative;
 
       background-color: #101d24;
       color: #a5aaad;
   
-      div {
+      .pesquisa-contenteditable {
         font-size: 15px;
         font-weight: 400;
-        max-height: 100px;
-        min-height: 20px;
+        height: 20px;
         outline: none;
         overflow-x: hidden;
         overflow-y: auto;
         position: relative;
         white-space: pre-wrap;
         word-wrap: break-word;
+      }
+
+      .pesquisa-label {
+        color: #6c7175;
+        font-size: 14px;
+        height: 20px;
+        line-height: 20px;
+        overflow: hidden;
+        pointer-events: none;
+        position: absolute;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        z-index: 100;
+        top: 6px;
+        left: 13px;
+        opacity: 1;
+        transition: opacity .14s linear;
+      }
+
+      .pesquisa-close {
+        display: block;
+        width: 24px;
+        height: 24px;
+        position: absolute;
+        top: 5px;
+        right: 2px;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity .14s linear;
+        pointer-events: none;
       }
     }
   }

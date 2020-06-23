@@ -18,6 +18,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
 
   destroy$: Subject<boolean> = new Subject<boolean>();
   estaDigitando = false;
+  mostrarLabel = true;
   timerIdValidacaoDigitando: any;
   horaQueEstavaDigitando = 0;
 
@@ -77,6 +78,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     this.signalRService.enviarMensagem(this.criarMensagem());
     this.conversaService.esconderResultados(true);
     this.mensagem.nativeElement.innerText = '';
+    this.validarMostrarLabel();
   }
 
   ehElegivelParaEnviarMensagem() {
@@ -93,7 +95,12 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
     return mensagem;
   }
 
+  validarMostrarLabel() {
+    this.mostrarLabel = !this.ehElegivelParaEnviarMensagem();
+  }
+
   avisarContatoDigitando() {
+    this.validarMostrarLabel();
     this.horaQueEstavaDigitando = this.obterHoraAtual();
 
     this.enviarQueEstaDigitando();

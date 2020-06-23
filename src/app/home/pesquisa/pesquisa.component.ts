@@ -14,6 +14,9 @@ export class PesquisaComponent implements OnInit {
   @ViewChild('pesquisa') pesquisa: ElementRef;
   contatoLogado: Contato;
   esconderResultados = true;
+  pesquisando = false;
+  encontrouAlgumaConversa = true;
+  encontrouAlgumContato = true;
 
   constructor(
     private conversaService: ConversaSubjectsService,
@@ -37,10 +40,12 @@ export class PesquisaComponent implements OnInit {
   pesquisar() {
     if(!this.ehElegivelParaPesquisar()) {
       this.esconderResultados = true;
+      this.pesquisando = false;
       this.conversaService.limparPesquisa();
       return;
     }
 
+    this.pesquisando = true;
     this.esconderResultados = false;
     this.conversaService.pesquisarConversas(this.criarFiltroDaPesquisa());
   }
@@ -61,5 +66,18 @@ export class PesquisaComponent implements OnInit {
       contatoLogadoId: this.contatoLogado.contatoId,
       textoPesquisa: this.pesquisa.nativeElement.innerText.trim().toLowerCase()
     };
+  }
+
+  limparPesquisa() {
+    this.pesquisa.nativeElement.innerText = '';
+    this.pesquisar();
+  }
+
+  avisarSeEncontrouAlgumaConversa($event) {
+    this.encontrouAlgumaConversa = $event;
+  }
+
+  avisarSeEncontrouAlgumContato($event) {
+    this.encontrouAlgumContato = $event;
   }
 }
