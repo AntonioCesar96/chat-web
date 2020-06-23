@@ -2,7 +2,8 @@
     <div class="contato"       
       *ngFor="let item of conversaService.obterUltimasConversas()?.lista" 
       (click)="selecionarConversa(item)"
-      [class.nova]="item.mostrarMensagensNovas">
+      [class.nova]="item.mostrarMensagensNovas"
+      [class.active]="item.conversaAberta">
   
       <div class="img-wrapper">
         <div class="crop">

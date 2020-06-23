@@ -6,7 +6,8 @@
   <div>
     <div class="contato"       
       *ngFor="let item of resultadoPesquisa" 
-      (click)="selecionarConversa(item)">
+      (click)="selecionarConversa(item)"
+      [class.active]="item.conversaAberta">
 
       <div class="img-wrapper">
         <div class="crop">
