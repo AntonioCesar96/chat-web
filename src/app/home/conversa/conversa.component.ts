@@ -45,15 +45,18 @@ export class ConversaComponent implements OnInit, OnDestroy {
 
   abrirConversaSelecionada(conversa: UltimaConversa) {
     this.conversaService.abrirConversaSelecionadaMensagem(conversa);
+    this.conversaService.mostrarDetalhes(false);
   }
 
   abrirPrimeiraConversa(conversa: UltimaConversa) {
     this.conversaService.abrirPrimeiraConversaMensagem(conversa);
+    this.conversaService.mostrarDetalhes(false);
   }
 
   abrirContatoSelecionado(contatoAmigo: ListaAmigos) {
     const conversa = this.criarConversa(contatoAmigo);
     this.conversaService.abrirContatoSelecionadoMensagem(conversa);
+    this.conversaService.mostrarDetalhes(false);
   }
 
   criarConversa(contatoAmigo: ListaAmigos) {

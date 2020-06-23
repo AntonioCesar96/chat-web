@@ -19,6 +19,8 @@ export class ConversaSubjectsService {
   private atualizarResultadosSubject = new Subject<boolean>();
   private atualizarContatosParaFechadosSubject = new Subject<any>();
   private limparPesquisaSubject = new Subject<any>();
+  private abrirDetalhesSubject = new Subject<UltimaConversa>();
+  private mostrarDetalhesSubject = new Subject<boolean>();
 
   constructor() { }
 
@@ -119,5 +121,21 @@ export class ConversaSubjectsService {
 
   atualizarContatosParaFechados() {
     this.atualizarContatosParaFechadosSubject.next();
+  }
+
+  receberAbrirDetalhes(): Observable<UltimaConversa> {
+    return this.abrirDetalhesSubject.asObservable();
+  }
+
+  abrirDetalhes(conversa: UltimaConversa) {
+    this.abrirDetalhesSubject.next(conversa);
+  }
+
+  receberMostrarDetalhes(): Observable<boolean> {
+    return this.mostrarDetalhesSubject.asObservable();
+  }
+
+  mostrarDetalhes(mostrar: boolean) {
+    this.mostrarDetalhesSubject.next(mostrar);
   }
 }

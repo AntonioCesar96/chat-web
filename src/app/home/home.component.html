@@ -1,9 +1,14 @@
 
-<div class="home-box-wrapper">
-  <div class="home-box">
+<div class="home-box-wrapper" [class.detalhes-aberto]="mostrarDetalhes">
+  <div class="conversas-wrapper">
     <app-conversas></app-conversas>
   </div>
-  <div class="home-box">
+  
+  <div class="conversa-wrapper">
     <app-conversa></app-conversa>
+  </div>
+
+  <div class="detalhes-wrapper">
+    <app-detalhes (abrirDetalhes)="abrirDetalhes($event)"></app-detalhes>
   </div>
 </div>

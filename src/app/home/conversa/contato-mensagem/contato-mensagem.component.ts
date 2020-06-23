@@ -100,6 +100,10 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
     return this.ultimaConversa && this.ultimaConversa.contatoAmigoId === res.contatoQueEstaDigitandoId;
   }
 
+  abrirDetalhes() {
+    this.conversaService.abrirDetalhes(this.ultimaConversa);
+  }
+
   ngOnDestroy() {
     this.destroy$.next(true);
     this.destroy$.unsubscribe();

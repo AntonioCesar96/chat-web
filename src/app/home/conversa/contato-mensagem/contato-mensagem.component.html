@@ -1,4 +1,4 @@
-<div class="contato" *ngIf="ultimaConversa">
+<div class="contato" (click)="abrirDetalhes()" *ngIf="ultimaConversa">
   <div class="img-wrapper">
     <div class="crop">
       <img [src]="ultimaConversa?.fotoUrl" *ngIf="ultimaConversa?.fotoUrl">

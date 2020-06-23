@@ -12,6 +12,8 @@ import { ContatoMensagemComponent } from './conversa/contato-mensagem/contato-me
 import { ListaConversasComponent } from './conversas/lista-conversas/lista-conversas.component';
 import { PesquisaComponent } from './conversas/pesquisa/pesquisa.component';
 import { PesquisaConversasComponent } from './conversas/pesquisa/pesquisa-conversas/pesquisa-conversas.component';
+import { DetalhesComponent } from './detalhes/detalhes.component';
+import { OpcoesComponent } from './conversas/opcoes/opcoes.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +26,9 @@ import { PesquisaConversasComponent } from './conversas/pesquisa/pesquisa-conver
     ListaConversasComponent,
     PesquisaComponent,
     PesquisaConversasComponent,
-    PesquisaContatosComponent
+    PesquisaContatosComponent,
+    DetalhesComponent,
+    OpcoesComponent
   ],
   imports: [
     ChatCommonModule,
