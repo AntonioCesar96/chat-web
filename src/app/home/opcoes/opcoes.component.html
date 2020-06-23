@@ -1,6 +1,6 @@
 <div class="opcoes-wrapper">
    <div class="opcoes-img-wrapper">
-      <div class="opcoes-crop">
+      <div class="opcoes-crop" (click)="abrirPerfil()">
         <img [src]="contatoLogado?.fotoUrl" *ngIf="contatoLogado?.fotoUrl">
         <i class="material-icons circle" *ngIf="!contatoLogado?.fotoUrl"></i>
       </div>

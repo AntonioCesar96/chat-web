@@ -1,11 +1,15 @@
 
-<div class="home-wrapper" [class.detalhes-aberto]="mostrarDetalhes">
+<div class="home-wrapper" 
+    [class.detalhes-aberto]="mostrarDetalhes" 
+    [class.perfil-aberto]="mostrarPerfil">
   <div class="side-wrapper">
-    <app-opcoes></app-opcoes>
+    <app-opcoes (mostrarSessaoPerfil)="mostrarSessaoPerfil($event)"></app-opcoes>
     
     <app-pesquisa></app-pesquisa>
     
     <app-conversas></app-conversas>
+
+    <app-perfil (mostrarSessaoPerfil)="mostrarSessaoPerfil($event)"></app-perfil>
   </div>
   
   <div class="center-wrapper">
@@ -13,6 +17,6 @@
   </div>
 
   <div class="detalhes-wrapper">
-    <app-detalhes></app-detalhes>
+    <app-detalhes></app-detalhes>    
   </div>
 </div>

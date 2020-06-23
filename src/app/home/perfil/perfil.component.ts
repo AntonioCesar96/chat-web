@@ -3,10 +3,10 @@ import { Contato } from 'src/app/_common/models/contato.model';
 import { AutenticacaoService } from 'src/app/autenticacao/services/autenticacao.service';
 
 @Component({
-  selector: 'app-opcoes',
-  templateUrl: './opcoes.component.html'
+  selector: 'app-perfil',
+  templateUrl: './perfil.component.html'
 })
-export class OpcoesComponent implements OnInit {
+export class PerfilComponent implements OnInit {
   @Output() mostrarSessaoPerfil = new EventEmitter<boolean>();
   contatoLogado: Contato;
 
@@ -18,7 +18,8 @@ export class OpcoesComponent implements OnInit {
     this.contatoLogado = this.autenticacaoService.getContatoLogado();
   }
 
-  abrirPerfil() {
-    this.mostrarSessaoPerfil.emit(true);
+  fecharPerfil() {
+    this.mostrarSessaoPerfil.emit(false);
   }
+
 }

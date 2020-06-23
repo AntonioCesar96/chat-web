@@ -34,8 +34,13 @@ export class DetalhesComponent implements OnInit, OnDestroy {
   }
 
   receberAbrirDetalhes(conversa) {
-    this.ultimaConversa = conversa
+    this.ultimaConversa = conversa;
     this.conversaService.mostrarDetalhes(true);
+  }
+
+  fecharDetalhes() {
+    this.ultimaConversa = null;
+    this.conversaService.mostrarDetalhes(false);
   }
 
   ngOnDestroy() {

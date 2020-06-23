@@ -14,6 +14,7 @@ import { PesquisaComponent } from './pesquisa/pesquisa.component';
 import { PesquisaConversasComponent } from './pesquisa/pesquisa-conversas/pesquisa-conversas.component';
 import { DetalhesComponent } from './detalhes/detalhes.component';
 import { OpcoesComponent } from './opcoes/opcoes.component';
+import { PerfilComponent } from './perfil/perfil.component';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import { OpcoesComponent } from './opcoes/opcoes.component';
     PesquisaConversasComponent,
     PesquisaContatosComponent,
     DetalhesComponent,
-    OpcoesComponent
+    OpcoesComponent,
+    PerfilComponent
   ],
   imports: [
     ChatCommonModule,

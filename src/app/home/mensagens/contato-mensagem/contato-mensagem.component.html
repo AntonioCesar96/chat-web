@@ -14,8 +14,8 @@
     <div class="ultima-mensagem-wrapper">
       <div class="ultima-mensagem">
         <div class="ultima-mensagem-texto">
-          <span *ngIf="!statusDoContato?.estaDigitando">{{ statusDoContato?.ultimoStatus }}</span>
-          <span *ngIf="statusDoContato?.estaDigitando">Está digitando...</span>
+          <span *ngIf="!ultimaConversa?.estaDigitando">{{ ultimaConversa?.ultimoStatus }}</span>
+          <span *ngIf="ultimaConversa?.estaDigitando">Está digitando...</span>
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+import { ContatoStatus } from './contato-status.model';
 import { StatusMensagem } from './status-mensagem.enum';
 export class UltimaConversa {
   conversaId: number;
@@ -15,4 +16,5 @@ export class UltimaConversa {
   qtdMensagensNovas: number;
   mostrarMensagensNovas: boolean;
   conversaAberta: boolean;
+  ultimoStatus: string;
 }

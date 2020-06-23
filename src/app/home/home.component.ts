@@ -14,6 +14,7 @@ import { takeUntil } from 'rxjs/operators';
 export class HomeComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
   mostrarDetalhes = false;
+  mostrarPerfil = false;
 
   constructor(
     private router: Router,
@@ -45,6 +46,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   receberMostrarDetalhes(mostrar) {
     this.mostrarDetalhes = mostrar;
+  }
+
+  mostrarSessaoPerfil($event) {
+    this.mostrarPerfil = $event;
   }
 
   ngOnDestroy() {

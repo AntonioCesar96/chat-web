@@ -18,7 +18,6 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
 
   @Input() contatoLogado: Contato;
   ultimaConversa: UltimaConversa;
-  statusDoContato: ContatoStatus;
 
   constructor(
     private conversaService: ConversaSubjectsService,
@@ -57,7 +56,7 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
 
   abrirConversaSelecionada(conversa: UltimaConversa) {
     this.ultimaConversa = conversa;
-    this.statusDoContato = null;
+    this.ultimaConversa.ultimoStatus = null;
     this.signalRService.obterStatusDoContato(conversa.contatoAmigoId);
   }
 
@@ -65,7 +64,7 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
     if(!this.ehElegivelParaAbrirPrimeiraConversaMensagem(conversa)) { return; }
 
     this.ultimaConversa = conversa;
-    this.statusDoContato = null;
+    this.ultimaConversa.ultimoStatus = null;
     this.signalRService.obterStatusDoContato(conversa.contatoAmigoId);
   }
 
@@ -77,23 +76,23 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   receberStatusDoContato(status: ContatoStatus) {
     if(!this.ehElegivelParaReceberStatusDoContato(status)) { return; }
 
-    this.statusDoContato = status;
-    this.atualizarUltimoStatus();
+    this.atualizarUltimoStatus(status);
   }
 
   ehElegivelParaReceberStatusDoContato(status: ContatoStatus) {
     return this.ultimaConversa && status && this.ultimaConversa.contatoAmigoId === status.contatoId;
   }
 
-  atualizarUltimoStatus() {
-    if(!this.statusDoContato) { return; }
-    this.statusDoContato.ultimoStatus = this.statusDoContato.online
-      ? 'On-line' : moment(this.statusDoContato.data).calendar();
+  atualizarUltimoStatus(statusDoContato: ContatoStatus) {
+    if(!statusDoContato) { return; }
+
+    this.ultimaConversa.ultimoStatus = statusDoContato.online
+      ? 'On-line' : moment(statusDoContato.data).calendar();
   }
 
   receberContatoDigitando(res) {
     if(!this.ehElegivelParaReceberContatoDigitando(res)) { return; }
-    this.statusDoContato.estaDigitando = res.estaDigitando;
+    this.ultimaConversa.estaDigitando = res.estaDigitando;
   }
 
   ehElegivelParaReceberContatoDigitando(res) {
