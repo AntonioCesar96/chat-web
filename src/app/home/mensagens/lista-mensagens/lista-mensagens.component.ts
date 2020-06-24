@@ -1,5 +1,5 @@
 import { StringResources } from 'src/app/string-resources';
-import { SignalRService } from './../../../_common/services/signalr.service';
+import { SignalRService } from '../../services/signalr.service';
 import { Component, OnInit, OnDestroy, Input, ViewChild,
   ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
 import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';

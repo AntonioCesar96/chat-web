@@ -1,53 +1,33 @@
-<div class="criar-login row">
-  <div class="col s4"></div>
-  <div class="col s4">
-    <div class="card horizontal">
-      <div class="card-stacked">
-        <div class="card-content">
-          <div class="row mb-0">
-            <form class="col s12" [formGroup]="form" novalidate>
-              <div class="row mb-0" *ngIf="existeErros()">
-                <div class="input-field col s12">
-                  <div class="erros">
-                    <span *ngFor="let e of erro?.erros">{{ e }}</span>
-                  </div>
-                </div>
-              </div>
+<div class="form-wrapper">
 
-              <div class="row mb-0">
-                <div class="input-field col s12">
-                  <input id="nome" type="text" formControlName="nome">
-                  <label for="nome">Nome</label>
-                </div>
-              </div>
-
-              <div class="row mb-0">
-                <div class="input-field col s12">
-                  <input id="email" type="email" formControlName="email">
-                  <label for="email">Email</label>
-                </div>
-              </div>
-
-              <div class="row mb-0">
-                <div class="input-field col s12">
-                  <input id="senha" type="password" maxlength="10" formControlName="senha">
-                  <label for="senha">Senha</label>
-                </div>
-              </div>
-
-              <div class="row mb-0">
-                <div class="input-field col s12">
-                  <a class="waves-effect waves-light btn" (click)="criarConta()">Criar Conta</a>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-        <div class="card-action">
-          <a routerLink="/entrar">Entrar</a>
-        </div>
+  <form class="form" [formGroup]="form" novalidate>
+    <div class="erros-wrapper" *ngIf="existeErros()">
+      <div class="erros">
+        <span *ngFor="let e of erro?.erros">{{ e }}</span>
       </div>
     </div>
-  </div>
-  <div class="col s4"></div>
+
+    <div class="input-wrapper">
+      <label>Nome</label>
+      <input type="text" formControlName="nome">
+    </div>
+
+    <div class="input-wrapper">
+      <label>E-mail</label>
+      <input type="email" formControlName="email">
+    </div>
+
+    <div class="input-wrapper">
+      <label>Senha</label>
+      <input type="password" formControlName="senha">
+    </div>
+
+    <div class="btn-wrapper">
+      <a class="btn azul" (click)="criarConta()">Criar Conta</a>
+    </div>
+
+    <div class="btn-wrapper">
+      <a class="btn vermelho" routerLink="/entrar">Entrar</a>
+    </div>
+  </form>
 </div>

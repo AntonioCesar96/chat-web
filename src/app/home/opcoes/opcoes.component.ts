@@ -1,3 +1,6 @@
+import { SignalRService } from '../services/signalr.service';
+import { Router } from '@angular/router';
+import { CookieService } from './../../_common/services/cookie.service';
 import { ConversaSubjectsService } from './../services/conversa-subjects.service';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Contato } from 'src/app/_common/models/contato.model';
@@ -9,9 +12,13 @@ import { AutenticacaoService } from 'src/app/autenticacao/services/autenticacao.
 })
 export class OpcoesComponent implements OnInit {
   contatoLogado: Contato;
+  mostrarMaisOpcoes = false;
 
   constructor(
+    private router: Router,
     private conversaSubjectsService: ConversaSubjectsService,
+    private cookieService: CookieService,
+    private signalRService: SignalRService,
     private autenticacaoService: AutenticacaoService) { }
 
   ngOnInit() {
@@ -20,6 +27,19 @@ export class OpcoesComponent implements OnInit {
   }
 
   abrirPerfil() {
+    this.mostrarMaisOpcoes = false;
     this.conversaSubjectsService.mostrarPerfil(true);
+  }
+
+  abrirMaisOpcoes() {
+    this.mostrarMaisOpcoes = !this.mostrarMaisOpcoes;
+  }
+
+  sair() {
+    this.mostrarMaisOpcoes = false;
+    this.signalRService.desconectar();
+    this.cookieService.setCookie('email', '');
+    this.cookieService.setCookie('senha', '');
+    this.router.navigate([`/login`]);
   }
 }

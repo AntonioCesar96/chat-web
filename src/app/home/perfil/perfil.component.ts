@@ -1,4 +1,4 @@
-import { SignalRService } from './../../_common/services/signalr.service';
+import { SignalRService } from '../services/signalr.service';
 import { ConversaService } from './../services/conversa.service';
 import { ConversaSubjectsService } from './../services/conversa-subjects.service';
 import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef, OnDestroy } from '@angular/core';

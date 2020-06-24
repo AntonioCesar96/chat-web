@@ -1,46 +1,27 @@
-<div class="login row">
-  <div class="col s4"></div>
-  <div class="col s4">
-    <div class="card horizontal">
-      <div class="card-stacked">
-        <div class="card-content">
-          <div class="row mb-0">
-            <form class="col s12" [formGroup]="form" novalidate>
-              <div class="row mb-0" *ngIf="existeErros()">
-                <div class="input-field col s12">
-                  <div class="erros">
-                    <span *ngFor="let e of erro?.erros">{{ e }}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row mb-0">
-                <div class="input-field col s12">
-                  <input id="email" type="email" formControlName="email">
-                  <label for="email" [ngClass]="{active: criouContaAgora}">E-mail</label>
-                </div>
-              </div>
-
-              <div class="row mb-0">
-                <div class="input-field col s12">
-                  <input id="senha" type="password" maxlength="10" formControlName="senha">
-                  <label for="senha" [ngClass]="{active: criouContaAgora}">Senha</label>
-                </div>
-              </div>
-              
-              <div class="row mb-0">
-                <div class="input-field col s12">
-                  <a class="waves-effect waves-light btn" (click)="entrar()">Entrar</a>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-        <div class="card-action">
-          <a routerLink="/criar-conta">Criar Conta</a>
-        </div>
+<div class="form-wrapper">
+  <form class="form" [formGroup]="form" novalidate>
+    <div class="erros-wrapper" *ngIf="existeErros()">
+      <div class="erros">
+        <span *ngFor="let e of erro?.erros">{{ e }}</span>
       </div>
     </div>
-  </div>
-  <div class="col s4"></div>
+
+    <div class="input-wrapper">
+      <label for="email">E-mail</label>
+      <input id="email" type="email" formControlName="email">
+    </div>
+
+    <div class="input-wrapper">
+      <label for="senha">Senha</label>
+      <input id="senha" type="password" maxlength="10" formControlName="senha">
+    </div>
+    
+    <div class="btn-wrapper">
+      <a class="btn azul" (click)="entrar()">Entrar</a>
+    </div>
+
+    <div class="btn-wrapper">
+      <a class="btn vermelho" routerLink="/criar-conta">Criar Conta</a>
+    </div>
+  </form>
 </div>

@@ -1,4 +1,4 @@
-<div class="opcoes-wrapper">
+<div class="opcoes-wrapper" >
    <div class="opcoes-img-wrapper">
       <div class="opcoes-crop" (click)="abrirPerfil()">
         <img [src]="contatoLogado?.fotoUrl" *ngIf="contatoLogado?.fotoUrl">
@@ -8,6 +8,13 @@
 
   <div class="opcoes-icons">
     <a><i class="material-icons">chat</i></a>
-    <a><i class="material-icons">more_vert</i></a>
-</div>
+    <a (click)="abrirMaisOpcoes()"><i class="material-icons">more_vert</i></a>
+  </div>
+
+  <div class="mais-opcoes" [class.aberto]="mostrarMaisOpcoes">
+    <div class="opcao">Novo contato</div>
+    <div class="opcao">Novo grupo - Em breve</div>
+    <div class="opcao" (click)="abrirPerfil()">Perfil</div>
+    <div class="opcao" (click)="sair()">Sair</div>
+  </div>
 </div>

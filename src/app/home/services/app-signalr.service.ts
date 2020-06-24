@@ -3,13 +3,14 @@ import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subscription } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class AppSignalRService implements OnDestroy {
   private _connectionEstablished = new EventEmitter<boolean>();
   private _iniciarConexaoTimeoutDelay = 3000;
   private _contatoId = 0;
   private _hubConnection: HubConnection;
   private _connectedSubscription: Subscription;
+  public reconectar = true;
 
   constructor() { }
 
@@ -29,6 +30,7 @@ export class AppSignalRService implements OnDestroy {
         .build();
 
       this._hubConnection.onclose((msg) => {
+        if(!this.reconectar) { return; }
         this.iniciarConexao();
       });
 
@@ -46,6 +48,7 @@ export class AppSignalRService implements OnDestroy {
           console.log('Conectado ao Hub');
           this._hubConnection.invoke('RegistrarConexao', this._contatoId);
           this._connectionEstablished.emit();
+          this.reconectar = true
         })
         .catch(err => {
           console.log('Erro ao tentar conectar, tentando novamente...');

@@ -1,4 +1,4 @@
-import { SignalRService } from './_common/services/signalr.service';
+import { SignalRService } from './home/services/signalr.service';
 import { Subject } from 'rxjs';
 import { Location } from '@angular/common';
 import { CookieService } from './_common/services/cookie.service';
@@ -35,18 +35,13 @@ export class AppComponent implements OnInit, OnDestroy {
   inicializar() {
     moment.locale('pt-br');
     this.addEventoReload();
-
-    this.signalRService
-      .receberDeslogar()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.usuarioLogouEmOutroLugar = true);
   }
 
   addEventoReload() {
     this.router.events.subscribe(event => {
       if(event instanceof NavigationEnd) {
-        if(event.url === '/home' || event.url === '/') { return; }
-        this.recarregar();
+        // if(event.url === '/home' || event.url === '/') { return; }
+        // this.recarregar();
       }
     });
   }
@@ -67,6 +62,11 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   async tratarRetornoAutenticao(res) {
+    this.signalRService
+      .receberDeslogar()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.usuarioLogouEmOutroLugar = true);
+
     this.autenticacaoService.setContatoLogado(res as Contato);
     this.router.navigate([`/home`]);
   }

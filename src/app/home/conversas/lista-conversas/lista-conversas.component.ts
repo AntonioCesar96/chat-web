@@ -5,7 +5,7 @@ import { Resultado } from 'src/app/_common/models/resultado.model';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { ConversaFiltro } from './../../../_common/models/conversa.filtro';
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';
-import { SignalRService } from './../../../_common/services/signalr.service';
+import { SignalRService } from '../../services/signalr.service';
 import { ConversaSubjectsService } from '../../services/conversa-subjects.service';
 import { Component, OnInit, OnDestroy, Output, EventEmitter, Input } from '@angular/core';
 import { Subject } from 'rxjs';
@@ -27,6 +27,8 @@ export class ListaConversasComponent implements OnInit, OnDestroy {
     private signalRService: SignalRService) { }
 
   ngOnInit() {
+    if (!this.contatoLogado) { return; }
+
     this.inicializar();
     this.obterConversasDoContato(this.contatoLogado.contatoId);
   }

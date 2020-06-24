@@ -1,15 +1,15 @@
-import { ConversaFiltro } from '../models/conversa.filtro';
+import { ConversaFiltro } from '../../_common/models/conversa.filtro';
 import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';
-import { ContatoStatus } from '../models/contato-status.model';
-import { Mensagem } from '../models/mensagem.model';
+import { ContatoStatus } from '../../_common/models/contato-status.model';
+import { Mensagem } from '../../_common/models/mensagem.model';
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
-import { Resultado } from '../models/resultado.model';
-import { UltimaConversa } from '../models/ultima-conversa.model';
+import { Resultado } from '../../_common/models/resultado.model';
+import { UltimaConversa } from '../../_common/models/ultima-conversa.model';
 import { AppSignalRService } from './app-signalr.service';
-import { Contato } from '../models/contato.model';
+import { Contato } from '../../_common/models/contato.model';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class SignalRService {
   private _receberMensagemSubject = new Subject<Mensagem>();
   private _receberPrimeiraMensagemSubject = new Subject<Mensagem>();
@@ -28,6 +28,11 @@ export class SignalRService {
     this.appSignalRService.criarConexao('/chatHub', contatoId);
     this.appSignalRService.iniciarConexao();
     this.configurarMetodos();
+  }
+
+  desconectar() {
+    this.appSignalRService.reconectar = false;
+    this.appSignalRService.hubConnection.stop();
   }
 
   configurarMetodos() {

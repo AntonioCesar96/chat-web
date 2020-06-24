@@ -1,3 +1,6 @@
+import { SignalRService } from './services/signalr.service';
+import { ConversaService } from './services/conversa.service';
+import { AppSignalRService } from './services/app-signalr.service';
 import { PesquisaContatosComponent } from './pesquisa/pesquisa-contatos/pesquisa-contatos.component';
 import { ConversaSubjectsService } from './services/conversa-subjects.service';
 import { HomeRouting } from './home.routing';
@@ -38,7 +41,10 @@ import { PerfilComponent } from './perfil/perfil.component';
   ],
   exports: [],
   providers: [
-    ConversaSubjectsService
+    AppSignalRService,
+    ConversaSubjectsService,
+    ConversaService,
+    SignalRService
   ]
 })
 export class HomeModule { }

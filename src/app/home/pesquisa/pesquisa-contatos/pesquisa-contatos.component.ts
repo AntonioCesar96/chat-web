@@ -1,6 +1,6 @@
 import { ListaAmigos } from './../../../_common/models/lista-amigos.model';
 import { ConversaSubjectsService } from '../../services/conversa-subjects.service';
-import { SignalRService } from '../../../_common/services/signalr.service';
+import { SignalRService } from '../../services/signalr.service';
 import { Resultado } from 'src/app/_common/models/resultado.model';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';

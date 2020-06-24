@@ -1,5 +1,5 @@
 import { ContatoStatus } from './../../../_common/models/contato-status.model';
-import { SignalRService } from './../../../_common/services/signalr.service';
+import { SignalRService } from '../../services/signalr.service';
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { UltimaConversa } from 'src/app/_common/models/ultima-conversa.model';

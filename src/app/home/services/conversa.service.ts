@@ -5,7 +5,7 @@ import { UltimaConversa } from '../../_common/models/ultima-conversa.model';
 import { Injectable } from '@angular/core';
 import { Contato } from 'src/app/_common/models/contato.model';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class ConversaService {
   private ultimasConversas: Resultado<UltimaConversa>;
 
