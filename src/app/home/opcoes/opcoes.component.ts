@@ -1,3 +1,4 @@
+import { ConversaSubjectsService } from './../services/conversa-subjects.service';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { AutenticacaoService } from 'src/app/autenticacao/services/autenticacao.service';
@@ -7,10 +8,10 @@ import { AutenticacaoService } from 'src/app/autenticacao/services/autenticacao.
   templateUrl: './opcoes.component.html'
 })
 export class OpcoesComponent implements OnInit {
-  @Output() mostrarSessaoPerfil = new EventEmitter<boolean>();
   contatoLogado: Contato;
 
   constructor(
+    private conversaSubjectsService: ConversaSubjectsService,
     private autenticacaoService: AutenticacaoService) { }
 
   ngOnInit() {
@@ -19,6 +20,6 @@ export class OpcoesComponent implements OnInit {
   }
 
   abrirPerfil() {
-    this.mostrarSessaoPerfil.emit(true);
+    this.conversaSubjectsService.mostrarPerfil(true);
   }
 }

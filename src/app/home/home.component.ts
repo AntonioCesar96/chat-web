@@ -42,14 +42,19 @@ export class HomeComponent implements OnInit, OnDestroy {
       .receberMostrarDetalhes()
       .pipe(takeUntil(this.destroy$))
       .subscribe((mostrar) => this.receberMostrarDetalhes(mostrar));
+
+    this.conversaSubjectsService
+      .receberMostrarPerfil()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((mostrar) => this.receberMostrarPerfil(mostrar));
   }
 
   receberMostrarDetalhes(mostrar) {
     this.mostrarDetalhes = mostrar;
   }
 
-  mostrarSessaoPerfil($event) {
-    this.mostrarPerfil = $event;
+  receberMostrarPerfil(mostrar) {
+    this.mostrarPerfil = mostrar;
   }
 
   ngOnDestroy() {

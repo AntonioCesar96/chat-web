@@ -17,4 +17,5 @@ export class UltimaConversa {
   mostrarMensagensNovas: boolean;
   conversaAberta: boolean;
   ultimoStatus: string;
+  descricao: string;
 }

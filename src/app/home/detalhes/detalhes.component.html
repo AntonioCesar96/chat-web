@@ -13,7 +13,7 @@
     <div class="detalhes-contato-imagem">
       <div class="crop">
         <img [src]="ultimaConversa?.fotoUrl" *ngIf="ultimaConversa?.fotoUrl">
-        <i class="material-icons circle" *ngIf="!ultimaConversa?.fotoUrl"></i>
+        <img src="./../../../assets/images/foto-perfil-default.svg" *ngIf="!ultimaConversa?.fotoUrl">
       </div>
     </div>
 
@@ -30,6 +30,10 @@
   <div class="detalhes-recado">
     <div class="detalhes-recado-email-titulo">
       <span>Recado e e-mail</span>
+    </div>
+
+    <div class="detalhes-recado-email" *ngIf="ultimaConversa?.descricao">
+      <span>{{ ultimaConversa?.descricao }}</span>
     </div>
 
     <div class="detalhes-recado-email">

@@ -62,7 +62,7 @@ export class EnviarMensagemComponent implements OnInit, OnDestroy {
       && conversa.contatoAmigoId === this.ultimaConversa.contatoAmigoId;
   }
 
-  onEnviarMensagem(event: KeyboardEvent) {
+  enterEnviarMensagem(event: KeyboardEvent) {
     if (event.code === 'Enter' || event.code === 'NumpadEnter') {
       this.enviarMensagem();
       return false;

@@ -2,7 +2,7 @@
   <div class="img-wrapper">
     <div class="crop">
       <img [src]="ultimaConversa?.fotoUrl" *ngIf="ultimaConversa?.fotoUrl">
-      <i class="material-icons circle" *ngIf="!ultimaConversa?.fotoUrl"></i>
+      <img src="./../../../../assets/images/foto-perfil-default.svg" *ngIf="!ultimaConversa?.fotoUrl">
     </div>
   </div>
 

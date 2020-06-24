@@ -21,6 +21,7 @@ export class ConversaSubjectsService {
   private limparPesquisaSubject = new Subject<any>();
   private abrirDetalhesSubject = new Subject<UltimaConversa>();
   private mostrarDetalhesSubject = new Subject<boolean>();
+  private mostrarPerfilSubject = new Subject<boolean>();
 
   constructor() { }
 
@@ -137,5 +138,13 @@ export class ConversaSubjectsService {
 
   mostrarDetalhes(mostrar: boolean) {
     this.mostrarDetalhesSubject.next(mostrar);
+  }
+
+  receberMostrarPerfil(): Observable<boolean> {
+    return this.mostrarPerfilSubject.asObservable();
+  }
+
+  mostrarPerfil(mostrar: boolean) {
+    this.mostrarPerfilSubject.next(mostrar);
   }
 }

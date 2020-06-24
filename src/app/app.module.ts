@@ -14,7 +14,7 @@ import { AppComponent } from './app.component';
     ChatCommonModule,
     AutenticacaoModule,
     HomeModule,
-    AppRouting
+    AppRouting,
   ],
   exports: [
     ChatCommonModule

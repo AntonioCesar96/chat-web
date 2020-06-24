@@ -7,6 +7,7 @@ import { Subject, Observable } from 'rxjs';
 import { Resultado } from '../models/resultado.model';
 import { UltimaConversa } from '../models/ultima-conversa.model';
 import { AppSignalRService } from './app-signalr.service';
+import { Contato } from '../models/contato.model';
 
 @Injectable({ providedIn: 'root' })
 export class SignalRService {
@@ -145,5 +146,9 @@ export class SignalRService {
 
   obterStatusDoContato(contatoId: number) {
     this.appSignalRService.run('ObterStatusDoContato', contatoId);
+  }
+
+  atualizarDadosContato(contato: Contato) {
+    this.appSignalRService.run('AtualizarDadosContato', contato);
   }
 }
