@@ -24,8 +24,8 @@ export class SignalRService {
 
   constructor(private appSignalRService: AppSignalRService) { }
 
-  inicializar(contatoId: number) {
-    this.appSignalRService.criarConexao('/chatHub', contatoId);
+  inicializar(contatoId: number, token: string) {
+    this.appSignalRService.criarConexao('/chatHub', contatoId, token);
     this.appSignalRService.iniciarConexao();
     this.configurarMetodos();
   }

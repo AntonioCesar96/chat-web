@@ -36,12 +36,9 @@ export class OpcoesComponent implements OnInit {
   }
 
   sair() {
-    this.loginService.desconectar(localStorage.getItem('access_token'))
-      .subscribe(res => {
-        this.mostrarMaisOpcoes = false;
-        this.signalRService.desconectar();
-        localStorage.removeItem('access_token');
-        this.router.navigate([`/entrar`]);
-      })
+    this.mostrarMaisOpcoes = false;
+    this.signalRService.desconectar();
+    localStorage.removeItem('access_token');
+    this.router.navigate([`/entrar`]);
   }
 }

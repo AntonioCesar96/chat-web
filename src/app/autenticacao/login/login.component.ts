@@ -6,7 +6,6 @@ import { LoginService } from '../services/login.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-login',

@@ -1,9 +1,8 @@
 import { SignalRService } from './home/services/signalr.service';
 import { Subject } from 'rxjs';
-import { Location } from '@angular/common';
 import { Contato } from './_common/models/contato.model';
 import { AutenticacaoService } from './autenticacao/services/autenticacao.service';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router } from '@angular/router';
 import { LoginService } from './autenticacao/services/login.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import * as moment from 'moment';
@@ -21,7 +20,6 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private loginService: LoginService,
     private router: Router,
-    private location: Location,
     private autenticacaoService: AutenticacaoService,
     private signalRService: SignalRService,
     private jwtHelperService: JwtHelperService

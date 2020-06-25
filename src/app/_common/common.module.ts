@@ -1,4 +1,3 @@
-import { CookieService } from 'ngx-cookie-service';
 import { AlertaService } from './services/alerta.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -43,8 +42,7 @@ import { JwtModule } from '@auth0/angular-jwt';
     RouterModule
   ],
   providers: [
-    AlertaService,
-    CookieService
+    AlertaService
   ]
 })
 export class ChatCommonModule { }

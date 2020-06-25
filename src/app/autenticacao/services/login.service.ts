@@ -29,11 +29,6 @@ export class LoginService {
     return this.http.get<any>(`${this.URL_BASE}/${this.API}/${email}`, { headers } );
   }
 
-  desconectar(token: string): Observable<any> {
-    const headers = this.getHeaders(token);
-    return this.http.post<any>(`${this.URL_BASE}/${this.API}/desconectar`,{}, { headers } );
-  }
-
   getHeaders(token: string) {
     let headers = new HttpHeaders();
     headers = headers.set('Authorization', `Bearer ${token}`);
