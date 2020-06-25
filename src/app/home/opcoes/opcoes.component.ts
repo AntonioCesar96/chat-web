@@ -1,6 +1,6 @@
+import { LoginService } from './../../autenticacao/services/login.service';
 import { SignalRService } from '../services/signalr.service';
 import { Router } from '@angular/router';
-import { CookieService } from './../../_common/services/cookie.service';
 import { ConversaSubjectsService } from './../services/conversa-subjects.service';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Contato } from 'src/app/_common/models/contato.model';
@@ -17,9 +17,9 @@ export class OpcoesComponent implements OnInit {
   constructor(
     private router: Router,
     private conversaSubjectsService: ConversaSubjectsService,
-    private cookieService: CookieService,
     private signalRService: SignalRService,
-    private autenticacaoService: AutenticacaoService) { }
+    private autenticacaoService: AutenticacaoService,
+    private loginService: LoginService) { }
 
   ngOnInit() {
     if (!this.autenticacaoService.estaLogado()) { return; }
@@ -36,10 +36,12 @@ export class OpcoesComponent implements OnInit {
   }
 
   sair() {
-    this.mostrarMaisOpcoes = false;
-    this.signalRService.desconectar();
-    this.cookieService.setCookie('email', '');
-    this.cookieService.setCookie('senha', '');
-    this.router.navigate([`/login`]);
+    this.loginService.desconectar(localStorage.getItem('access_token'))
+      .subscribe(res => {
+        this.mostrarMaisOpcoes = false;
+        this.signalRService.desconectar();
+        localStorage.removeItem('access_token');
+        this.router.navigate([`/entrar`]);
+      })
   }
 }

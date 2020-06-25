@@ -32,7 +32,9 @@ export class SignalRService {
 
   desconectar() {
     this.appSignalRService.reconectar = false;
-    this.appSignalRService.hubConnection.stop();
+    if(this.appSignalRService.hubConnection) {
+      this.appSignalRService.hubConnection.stop();
+    }
   }
 
   configurarMetodos() {

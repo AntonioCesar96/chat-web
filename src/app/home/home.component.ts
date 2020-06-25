@@ -1,3 +1,4 @@
+import { JwtHelperService } from '@auth0/angular-jwt';
 import { ConversaSubjectsService } from './services/conversa-subjects.service';
 import { SignalRService } from './services/signalr.service';
 import { AutenticacaoService } from '../autenticacao/services/autenticacao.service';
@@ -22,6 +23,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private autenticacaoService: AutenticacaoService,
     private signalRService: SignalRService,
     private conversaSubjectsService: ConversaSubjectsService,
+    private jwtHelperService: JwtHelperService
   ) { }
 
   ngOnInit() {
@@ -32,6 +34,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.location.replaceState('/');
     this.inicializar();
+
+    this.setTimeout();
   }
 
   inicializar() {
@@ -60,5 +64,20 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.destroy$.next(true);
     this.destroy$.unsubscribe();
+  }
+
+  // TODO: utilizar refresh token
+  setTimeout() {
+    setTimeout(() => {
+      const token = localStorage.getItem('access_token');
+      const expirou = this.jwtHelperService.isTokenExpired(token);
+      if(expirou) {
+        this.signalRService.desconectar();
+        localStorage.removeItem('access_token');
+        this.router.navigate([`/entrar`]);
+        return;
+      }
+      this.setTimeout();
+    }, 1000)
   }
 }

@@ -1,4 +1,3 @@
-import { CookieService } from './../../_common/services/cookie.service';
 import { AutenticacaoService } from '../services/autenticacao.service';
 import { StringResources } from './../../string-resources';
 import { Erro } from '../../_common/models/erro.model';
@@ -7,6 +6,7 @@ import { LoginService } from '../services/login.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +22,6 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private loginService: LoginService,
     private autenticacaoService: AutenticacaoService,
-    private cookieService: CookieService,
   ) { }
 
   ngOnInit() {
@@ -67,14 +66,9 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.salvarCookies();
-    this.autenticacaoService.setContatoLogado(res as Contato);
+    localStorage.setItem('access_token', res.token);
+    this.autenticacaoService.setContatoLogado(res.contato as Contato);
     this.router.navigate([`/home`]);
-  }
-
-  salvarCookies() {
-    this.cookieService.setCookie('email', this.form.value.email);
-    this.cookieService.setCookie('senha', this.form.value.senha);
   }
 
   validarSeExisteErroNosCampos() {

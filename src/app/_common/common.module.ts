@@ -1,4 +1,4 @@
-import { CookieService } from './services/cookie.service';
+import { CookieService } from 'ngx-cookie-service';
 import { AlertaService } from './services/alerta.service';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -8,6 +8,7 @@ import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ToastrModule } from 'ngx-toastr';
+import { JwtModule } from '@auth0/angular-jwt';
 
 @NgModule({
   declarations: [ ],
@@ -23,6 +24,13 @@ import { ToastrModule } from 'ngx-toastr';
       timeOut: 3000,
       positionClass: 'toast-bottom-left',
       preventDuplicates: true,
+    }),
+    JwtModule.forRoot({
+      config: {
+        tokenGetter: () => {
+          return localStorage.getItem('access_token');
+        },
+      },
     }),
   ],
   exports: [

@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 @Injectable()
 export class AppSignalRService implements OnDestroy {
   private _connectionEstablished = new EventEmitter<boolean>();
-  private _iniciarConexaoTimeoutDelay = 3000;
+  private _iniciarConexaoTimeoutDelay = 100000;
   private _contatoId = 0;
   private _hubConnection: HubConnection;
   private _connectedSubscription: Subscription;
@@ -23,14 +23,18 @@ export class AppSignalRService implements OnDestroy {
 
     if (!this._hubConnection && this._contatoId > 0)
     {
+      const token = localStorage.getItem('access_token');
       this._hubConnection = new HubConnectionBuilder()
-        .withUrl(StringResources.URL_SERVIDOR + hubUrl)
+        .withUrl(StringResources.URL_SERVIDOR + hubUrl, { accessTokenFactory: () => token })
         .configureLogging(LogLevel.Information)
         // .withAutomaticReconnect([0, 1000, 10000])
         .build();
 
       this._hubConnection.onclose((msg) => {
-        if(!this.reconectar) { return; }
+        if(!this.reconectar) {
+          this._hubConnection = null;
+          return;
+        }
         this.iniciarConexao();
       });
 
