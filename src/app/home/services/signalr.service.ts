@@ -21,6 +21,7 @@ export class SignalRService {
   private _conversasDoContatoPesquisaSubject = new Subject<Resultado<UltimaConversa>>();
   private _mensagensSubject = new Subject<Resultado<Mensagem>>();
   private _contatosAmigosPesquisaSubject = new Subject<Resultado<any>>();
+  private _todosOsContatosAmigosSubject = new Subject<Resultado<any>>();
 
   constructor(private appSignalRService: AppSignalRService) { }
 
@@ -81,6 +82,10 @@ export class SignalRService {
     hubConnection.on('ReceberContatosAmigosPesquisa', (res: Resultado<any>) => {
       this._contatosAmigosPesquisaSubject.next(res);
     });
+
+    hubConnection.on('ReceberTodosOsContatosAmigos', (res: Resultado<any>) => {
+      this._todosOsContatosAmigosSubject.next(res);
+    });
   }
 
   receberMensagem(): Observable<Mensagem> {
@@ -123,6 +128,10 @@ export class SignalRService {
     return this._contatosAmigosPesquisaSubject.asObservable();
   }
 
+  receberTodosOsContatosAmigos(): Observable<Resultado<any>> {
+    return this._todosOsContatosAmigosSubject.asObservable();
+  }
+
   marcarMensagemComoLida(mensagemId: number, conversaId: number, contatoRemetenteId: number) {
     this.appSignalRService.run('MarcarMensagemComoLida', mensagemId, conversaId, contatoRemetenteId);
   }
@@ -149,6 +158,10 @@ export class SignalRService {
 
   obterContatosAmigosPesquisa(filtro: any) {
     this.appSignalRService.run('ObterContatosAmigosPesquisa', filtro);
+  }
+
+  obterTodosOsContatosAmigos(filtro: any) {
+    this.appSignalRService.run('ObterTodosOsContatosAmigos', filtro);
   }
 
   obterStatusDoContato(contatoId: number) {

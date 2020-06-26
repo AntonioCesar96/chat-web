@@ -18,4 +18,5 @@ export class UltimaConversa {
   conversaAberta: boolean;
   ultimoStatus: string;
   descricao: string;
+  ehAmigo: boolean;
 }

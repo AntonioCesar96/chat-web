@@ -18,6 +18,7 @@ import { PesquisaConversasComponent } from './pesquisa/pesquisa-conversas/pesqui
 import { DetalhesComponent } from './detalhes/detalhes.component';
 import { OpcoesComponent } from './opcoes/opcoes.component';
 import { PerfilComponent } from './perfil/perfil.component';
+import { ContatosComponent } from './contatos/contatos.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { PerfilComponent } from './perfil/perfil.component';
     PesquisaContatosComponent,
     DetalhesComponent,
     OpcoesComponent,
-    PerfilComponent
+    PerfilComponent,
+    ContatosComponent
   ],
   imports: [
     ChatCommonModule,
