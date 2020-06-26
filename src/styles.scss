@@ -265,7 +265,17 @@ body {
       transition: opacity .2s;
       transition-delay: .2s;
     }
+  }
 
+  &.nova-conversa-aberto {
+    .nova-conversa-wrapper {
+      width: 100%;
+    }
+    .nova-conversa-content {
+      opacity: 1;
+      transition: opacity .2s;
+      transition-delay: .2s;
+    }
   }
 }
 
@@ -714,86 +724,86 @@ body {
 
     background-color: #101d24;
   }
+}
 
-  .pesquisa-wrapper {
-    display: flex;
-    align-items: flex-end;
-    flex-direction: row;
-    max-width: 100%;
-    padding: 0px 10px;
+.pesquisa-wrapper {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: row;
+  max-width: 100%;
+  padding: 0px 10px;
 
-    &.pesquisando {
-      .pesquisa-input-wrapper {
-        .pesquisa-label {
-          opacity: 0;
-        }
-        .pesquisa-close {
-          opacity: 1;
-          pointer-events: auto;
-        }
+  &.pesquisando {
+    .pesquisa-input-wrapper {
+      .pesquisa-label {
+        opacity: 0;
+      }
+      .pesquisa-close {
+        opacity: 1;
+        pointer-events: auto;
       }
     }
+  }
 
-    .pesquisa-input-wrapper {
-      box-sizing: border-box;
-      flex: 1 1 auto;
+  .pesquisa-input-wrapper {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 20px;
+    min-height: 20px;
+    outline: none;
+    width: inherit;
+    will-change: width;
+    border-radius: 21px;
+    padding: 7px 25px 7px 12px;
+    margin: 6px 10px;
+    position: relative;
+
+    background-color: #101d24;
+    color: #a5aaad;
+
+    .pesquisa-contenteditable {
       font-size: 15px;
       font-weight: 400;
-      line-height: 20px;
-      min-height: 20px;
+      height: 20px;
       outline: none;
-      width: inherit;
-      will-change: width;
-      border-radius: 21px;
-      padding: 7px 25px 7px 12px;
-      margin: 6px 10px;
+      overflow-x: hidden;
+      overflow-y: auto;
       position: relative;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
 
-      background-color: #101d24;
-      color: #a5aaad;
-  
-      .pesquisa-contenteditable {
-        font-size: 15px;
-        font-weight: 400;
-        height: 20px;
-        outline: none;
-        overflow-x: hidden;
-        overflow-y: auto;
-        position: relative;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-      }
+    .pesquisa-label {
+      font-size: 14px;
+      height: 20px;
+      line-height: 20px;
+      overflow: hidden;
+      pointer-events: none;
+      position: absolute;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      z-index: 2;
+      top: 6px;
+      left: 13px;
+      opacity: 1;
+      transition: opacity .14s linear;
 
-      .pesquisa-label {
-        font-size: 14px;
-        height: 20px;
-        line-height: 20px;
-        overflow: hidden;
-        pointer-events: none;
-        position: absolute;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        z-index: 2;
-        top: 6px;
-        left: 13px;
-        opacity: 1;
-        transition: opacity .14s linear;
+      color: #6c7175;
+    }
 
-        color: #6c7175;
-      }
-
-      .pesquisa-close {
-        display: block;
-        width: 24px;
-        height: 24px;
-        position: absolute;
-        top: 5px;
-        right: 2px;
-        cursor: pointer;
-        opacity: 0;
-        transition: opacity .14s linear;
-        pointer-events: none;
-      }
+    .pesquisa-close {
+      display: block;
+      width: 24px;
+      height: 24px;
+      position: absolute;
+      top: 5px;
+      right: 2px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity .14s linear;
+      pointer-events: none;
     }
   }
 }
@@ -835,6 +845,8 @@ body {
 .perfil {
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 
   .perfil-header {
     display: flex;
@@ -862,6 +874,10 @@ body {
   }
 
   .perfil-contato-wrapper {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    flex-grow: 1;
+    padding-bottom: 20px;
     opacity: 0;
     transition: opacity .2s;
   }
@@ -950,8 +966,74 @@ body {
   }
 }
 
+.nova-conversa-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 0%;
+  height: 100%;
+  z-index: 3;
+  background-color: #101d24;
+  overflow: hidden;
+  transition: width .1s;
+}
+
+.nova-conversa {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .nova-conversa-header {
+    display: flex;
+    flex-direction: row;
+    padding-left: 25px;
+    align-items: center;
+    padding-top: 55px;
+    padding-bottom: 25px;
+    font-size: 19px;
+
+    color: #f1f1f2de;
+    background-color: #222e35;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+
+    .nova-conversa-header-icone-voltar {
+      cursor: pointer;
+    }
+
+    .nova-conversa-header-texto {
+      font-size: 19px;
+      height: 22px;
+      margin-left: 30px;
+      font-weight: 600;
+    }
+  }
+
+  .nova-conversa-content {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    flex-grow: 1;
+    padding-bottom: 20px;
+    opacity: 0;
+    transition: opacity .2s;
+    border-top: 1px solid #1b282e;
+  }
+
+  .pesquisa-input-wrapper {
+    background-color: #222e35;
+  }
+
+  .contato:first-child .titulo {
+    border-top: none;
+  }
+}
+
 
 .detalhes {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
   .detalhes-header {
     height: 59px;
@@ -979,6 +1061,13 @@ body {
       font-size: 16px;
       height: 20px;
     }
+  }
+
+  .detalhes-content {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    flex-grow: 1;
+    padding-bottom: 20px;
   }
 
   .detalhes-contato {

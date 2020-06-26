@@ -9,46 +9,47 @@
     <div class="detalhes-header-texto">Dados do contato</div>
   </div>
 
-  <div class="detalhes-contato">
-    <div class="detalhes-contato-imagem">
-      <div class="crop">
-        <img [src]="ultimaConversa?.fotoUrl" *ngIf="ultimaConversa?.fotoUrl">
-        <img src="./../../../assets/images/foto-perfil-default.svg" *ngIf="!ultimaConversa?.fotoUrl">
+  <div class="detalhes-content">
+    <div class="detalhes-contato">
+      <div class="detalhes-contato-imagem">
+        <div class="crop">
+          <img [src]="ultimaConversa?.fotoUrl" *ngIf="ultimaConversa?.fotoUrl">
+          <img src="./../../../assets/images/foto-perfil-default.svg" *ngIf="!ultimaConversa?.fotoUrl">
+        </div>
+      </div>
+
+      <div class="detalhes-contato-nome">
+        <span>{{ ultimaConversa?.nome }}</span>
+      </div>
+
+      <div class="detalhes-contato-status">
+        <span *ngIf="!ultimaConversa?.estaDigitando">{{ ultimaConversa?.ultimoStatus }}</span>
+        <span *ngIf="ultimaConversa?.estaDigitando">Está digitando...</span>
       </div>
     </div>
 
-    <div class="detalhes-contato-nome">
-      <span>{{ ultimaConversa?.nome }}</span>
-    </div>
+    <div class="detalhes-recado">
+      <div class="detalhes-recado-email-titulo">
+        <span>Recado e e-mail</span>
+      </div>
 
-    <div class="detalhes-contato-status">
-      <span *ngIf="!ultimaConversa?.estaDigitando">{{ ultimaConversa?.ultimoStatus }}</span>
-      <span *ngIf="ultimaConversa?.estaDigitando">Está digitando...</span>
-    </div>
-  </div>
+      <div class="detalhes-recado-email" *ngIf="ultimaConversa?.descricao">
+        <span>{{ ultimaConversa?.descricao }}</span>
+      </div>
 
-  <div class="detalhes-recado">
-    <div class="detalhes-recado-email-titulo">
-      <span>Recado e e-mail</span>
-    </div>
-
-    <div class="detalhes-recado-email" *ngIf="ultimaConversa?.descricao">
-      <span>{{ ultimaConversa?.descricao }}</span>
-    </div>
-
-    <div class="detalhes-recado-email">
-      <span>{{ ultimaConversa?.email }}</span>
-    </div>
-  </div>
-
-  <div class="detalhes-opcao">
-    <div class="detalhes-opcao-icone">
-      <div>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M6 18c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V6H6v12zM19 3h-3.5l-1-1h-5l-1 1H5v2h14V3z"></path></svg>
+      <div class="detalhes-recado-email">
+        <span>{{ ultimaConversa?.email }}</span>
       </div>
     </div>
 
-    <div class="detalhes-opcao-texto">Apagar conversa</div>
-  </div>
+    <div class="detalhes-opcao">
+      <div class="detalhes-opcao-icone">
+        <div>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M6 18c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V6H6v12zM19 3h-3.5l-1-1h-5l-1 1H5v2h14V3z"></path></svg>
+        </div>
+      </div>
 
+      <div class="detalhes-opcao-texto">Apagar conversa</div>
+    </div>
+  </div>
 </div>

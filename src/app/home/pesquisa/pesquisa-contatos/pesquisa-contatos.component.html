@@ -11,7 +11,7 @@
       <div class="img-wrapper">
         <div class="crop">
           <img [src]="item.fotoUrl" *ngIf="item.fotoUrl">
-          <i class="material-icons circle" *ngIf="!item.fotoUrl"></i>
+          <img src="./../../../../assets/images/foto-perfil-default.svg" *ngIf="!item.fotoUrl">
         </div>
       </div>
 

@@ -15,7 +15,7 @@ export class PesquisaContatosComponent implements OnInit, OnDestroy {
   destroy$: Subject<boolean> = new Subject<boolean>();
   @Output() avisarSeEncontrouAlgumContato = new EventEmitter<boolean>();
   @Input() contatoLogado: Contato;
-  resultado: Resultado<any>;
+  resultado: Resultado<ListaAmigos>;
 
   constructor(
     private signalRService: SignalRService,
@@ -46,18 +46,13 @@ export class PesquisaContatosComponent implements OnInit, OnDestroy {
     this.signalRService.obterContatosAmigosPesquisa(filtro);
   }
 
-  receberContatosAmigosPesquisa(res: Resultado<any>) {
+  receberContatosAmigosPesquisa(res: Resultado<ListaAmigos>) {
     this.resultado = res;
     this.avisarSeEncontrouAlgumContato.emit(res.lista.length > 0);
   }
 
   existeContatos() {
     return !!this.resultado && this.resultado.lista.length > 0;
-  }
-
-  ordenarConversas() {
-    this.resultado.lista.sort((n1,n2) =>
-      new Date(n2.dataEnvio).getTime() - new Date(n1.dataEnvio).getTime());
   }
 
   public selecionarContato(contatoAmigo: ListaAmigos) {

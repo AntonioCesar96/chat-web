@@ -86,7 +86,8 @@ export class ContatoMensagemComponent implements OnInit, OnDestroy {
   atualizarUltimoStatus(statusDoContato: ContatoStatus) {
     if(!statusDoContato) { return; }
 
-    this.ultimaConversa.nome = statusDoContato.nome;
+    this.ultimaConversa.nome = this.ultimaConversa.ehAmigo
+      ? statusDoContato.nome : this.ultimaConversa.nome;
     this.ultimaConversa.descricao = statusDoContato.descricao;
     this.ultimaConversa.ultimoStatus = statusDoContato.online
       ? 'On-line' : moment(statusDoContato.data).calendar();
