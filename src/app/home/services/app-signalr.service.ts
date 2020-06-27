@@ -1,4 +1,4 @@
-import { StringResources } from 'src/app/string-resources';
+import { UrlService } from './../../_common/services/url.service';
 import { EventEmitter, Injectable, OnDestroy } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { Subscription } from 'rxjs';
@@ -12,7 +12,7 @@ export class AppSignalRService implements OnDestroy {
   private _connectedSubscription: Subscription;
   public reconectar = true;
 
-  constructor() { }
+  constructor(private urlService: UrlService) { }
 
   get hubConnection() {
     return this._hubConnection;
@@ -24,7 +24,7 @@ export class AppSignalRService implements OnDestroy {
     if (!this._hubConnection && this._contatoId > 0)
     {
       this._hubConnection = new HubConnectionBuilder()
-        .withUrl(StringResources.URL_SERVIDOR + hubUrl, { accessTokenFactory: () => token })
+        .withUrl(this.urlService.URL + hubUrl, { accessTokenFactory: () => token })
         .configureLogging(LogLevel.Information)
         // .withAutomaticReconnect([0, 1000, 10000])
         .build();

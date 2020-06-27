@@ -23,20 +23,24 @@
     </div>
 
     <div class="nova-conversa-content">
-      <div class="contato"       
-        *ngFor="let item of contatos" 
-        (click)="selecionarContato(item)">
 
-        <div class="img-wrapper">
-          <div class="crop">
-            <img [src]="item.fotoUrl" *ngIf="item.fotoUrl">
-            <img src="./../../../../assets/images/foto-perfil-default.svg" *ngIf="!item.fotoUrl">
-          </div>
+      <div *ngFor="let item of contatos" >
+        <div class="titulo-contexo" *ngIf="item.primeiraLetra">
+          <div>{{item.primeiraLetra}}</div>
         </div>
 
-        <div class="titulo">
-          <div class="nome-wrapper">
-            <div class="nome"><span>{{ item.nomeAmigo }}</span></div>
+        <div class="contato" (click)="selecionarContato(item)">
+          <div class="img-wrapper">
+            <div class="crop">
+              <img [src]="item.fotoUrl" *ngIf="item.fotoUrl">
+              <img src="./../../../../assets/images/foto-perfil-default.svg" *ngIf="!item.fotoUrl">
+            </div>
+          </div>
+
+          <div class="titulo">
+            <div class="nome-wrapper">
+              <div class="nome"><span>{{ item.nomeAmigo }}</span></div>
+            </div>
           </div>
         </div>
       </div>

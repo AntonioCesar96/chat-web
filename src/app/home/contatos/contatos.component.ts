@@ -62,11 +62,12 @@ export class ContatosComponent implements OnInit, OnDestroy {
   pesquisar() {
     this.nomeContatoPesquisado = this.obterTextoPesquisado();
     if(!this.ehElegivelParaPesquisar()) {
-      this.pesquisando = false;
+      this.limparPesquisa();
       return;
     }
 
     this.filtrarContatos(this.obterTextoPesquisado().trim());
+    this.agruparContatosPorPrimeiraLetra();
     this.pesquisando = true;
   }
 
@@ -83,7 +84,24 @@ export class ContatosComponent implements OnInit, OnDestroy {
     this.pesquisa.nativeElement.innerText = '';
     this.pesquisando = false;
     this.contatos = this.resultado.lista;
+    this.agruparContatosPorPrimeiraLetra();
     this.definirSeEncontrouAlgumResultado();
+  }
+
+  agruparContatosPorPrimeiraLetra() {
+    this.contatos.forEach(x => delete x.primeiraLetra);
+    this.contatos.sort((c1,c2) => c1.nomeAmigo.localeCompare(c2.nomeAmigo));
+    this.definirContatosComPrimeiraLetra();
+  }
+
+  definirContatosComPrimeiraLetra() {
+    this.contatos.map(x => x.nomeAmigo.charAt(0))
+      .filter((item, i, ar) => ar.indexOf(item) === i)
+      .sort((c1,c2) => c1.localeCompare(c2))
+      .forEach(primeiraLetra => {
+        const contatosComEssaLetra = this.contatos.filter(c => c.nomeAmigo.charAt(0) === primeiraLetra)
+        contatosComEssaLetra[0].primeiraLetra = primeiraLetra;
+      });
   }
 
   definirSeEncontrouAlgumResultado() {

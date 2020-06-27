@@ -1,8 +1,7 @@
-import { LoginService } from './../../autenticacao/services/login.service';
 import { SignalRService } from '../services/signalr.service';
 import { Router } from '@angular/router';
 import { ConversaSubjectsService } from './../services/conversa-subjects.service';
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { Contato } from 'src/app/_common/models/contato.model';
 import { AutenticacaoService } from 'src/app/autenticacao/services/autenticacao.service';
 
@@ -11,6 +10,8 @@ import { AutenticacaoService } from 'src/app/autenticacao/services/autenticacao.
   templateUrl: './opcoes.component.html'
 })
 export class OpcoesComponent implements OnInit {
+  @ViewChild('maisOpcoes') maisOpcoes: ElementRef;
+  @ViewChild('botaoMaisOpcoes') botaoMaisOpcoes: ElementRef;
   contatoLogado: Contato;
   mostrarMaisOpcoes = false;
 
@@ -18,8 +19,7 @@ export class OpcoesComponent implements OnInit {
     private router: Router,
     private conversaSubjectsService: ConversaSubjectsService,
     private signalRService: SignalRService,
-    private autenticacaoService: AutenticacaoService,
-    private loginService: LoginService) { }
+    private autenticacaoService: AutenticacaoService) { }
 
   ngOnInit() {
     if (!this.autenticacaoService.estaLogado()) { return; }
@@ -37,6 +37,15 @@ export class OpcoesComponent implements OnInit {
 
   abrirMaisOpcoes() {
     this.mostrarMaisOpcoes = !this.mostrarMaisOpcoes;
+  }
+
+  @HostListener('document:click', ['$event.path'])
+  public onGlobalClick(targetElementPath: Array<any>) {
+    const list = [ this.maisOpcoes.nativeElement, this.botaoMaisOpcoes.nativeElement ];
+    const elementRefInPath = targetElementPath.find(e => list.includes(e));
+    if (!elementRefInPath) {
+      this.mostrarMaisOpcoes = false;
+    }
   }
 
   sair() {

@@ -5,4 +5,6 @@ export class ListaAmigos {
   emailAmigo: string;
   fotoUrl: string;
   contatoAmigoId: number;
+
+  primeiraLetra: string;
 }

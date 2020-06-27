@@ -7,11 +7,11 @@
   </div>
 
   <div class="opcoes-icons">
-    <a (click)="abrirContatos()" title="Nova conevrsa"><i class="material-icons">chat</i></a>
-    <a (click)="abrirMaisOpcoes()" title="Mais opções"><i class="material-icons">more_vert</i></a>
+    <a (click)="abrirContatos()" title="Nova conversa"><i class="material-icons">chat</i></a>
+    <a #botaoMaisOpcoes (click)="abrirMaisOpcoes()" title="Mais opções"><i class="material-icons">more_vert</i></a>
   </div>
 
-  <div class="mais-opcoes" [class.aberto]="mostrarMaisOpcoes">
+  <div #maisOpcoes class="mais-opcoes" [class.aberto]="mostrarMaisOpcoes">
     <div class="opcao">Novo contato</div>
     <div class="opcao">Novo grupo - Em breve</div>
     <div class="opcao" (click)="abrirPerfil()">Perfil</div>
