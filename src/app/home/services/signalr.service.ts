@@ -1,3 +1,4 @@
+import { ListaAmigos } from './../../_common/models/lista-amigos.model';
 import { ConversaFiltro } from '../../_common/models/conversa.filtro';
 import { MensagemFiltro } from 'src/app/_common/models/mensagem.filtro';
 import { ContatoStatus } from '../../_common/models/contato-status.model';
@@ -21,7 +22,8 @@ export class SignalRService {
   private _conversasDoContatoPesquisaSubject = new Subject<Resultado<UltimaConversa>>();
   private _mensagensSubject = new Subject<Resultado<Mensagem>>();
   private _contatosAmigosPesquisaSubject = new Subject<Resultado<any>>();
-  private _todosOsContatosAmigosSubject = new Subject<Resultado<any>>();
+  private _todosOsContatosAmigosSubject = new Subject<Resultado<ListaAmigos>>();
+  private _receberAdicionarContatoAmigoSubject = new Subject<any>();
 
   constructor(private appSignalRService: AppSignalRService) { }
 
@@ -83,8 +85,12 @@ export class SignalRService {
       this._contatosAmigosPesquisaSubject.next(res);
     });
 
-    hubConnection.on('ReceberTodosOsContatosAmigos', (res: Resultado<any>) => {
+    hubConnection.on('ReceberTodosOsContatosAmigos', (res: Resultado<ListaAmigos>) => {
       this._todosOsContatosAmigosSubject.next(res);
+    });
+
+    hubConnection.on('ReceberAdicionarContatoAmigo', (res: any) => {
+      this._receberAdicionarContatoAmigoSubject.next(res);
     });
   }
 
@@ -128,8 +134,12 @@ export class SignalRService {
     return this._contatosAmigosPesquisaSubject.asObservable();
   }
 
-  receberTodosOsContatosAmigos(): Observable<Resultado<any>> {
+  receberTodosOsContatosAmigos(): Observable<Resultado<ListaAmigos>> {
     return this._todosOsContatosAmigosSubject.asObservable();
+  }
+
+  receberAdicionarContatoAmigo(): Observable<any> {
+    return this._receberAdicionarContatoAmigoSubject.asObservable();
   }
 
   marcarMensagemComoLida(mensagemId: number, conversaId: number, contatoRemetenteId: number) {
@@ -170,5 +180,9 @@ export class SignalRService {
 
   atualizarDadosContato(contato: Contato) {
     this.appSignalRService.run('AtualizarDadosContato', contato);
+  }
+
+  adicionarContatoAmigo(contatoAmigoCriacao: any) {
+    this.appSignalRService.run('AdicionarContatoAmigo', contatoAmigoCriacao);
   }
 }

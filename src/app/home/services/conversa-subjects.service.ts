@@ -23,6 +23,7 @@ export class ConversaSubjectsService {
   private mostrarDetalhesSubject = new Subject<boolean>();
   private mostrarPerfilSubject = new Subject<boolean>();
   private mostrarNovaConversaSubject = new Subject<boolean>();
+  private mostrarNovoContatoSubject = new Subject<boolean>();
 
   constructor() { }
 
@@ -155,5 +156,13 @@ export class ConversaSubjectsService {
 
   mostrarNovaConversa(mostrar: boolean) {
     this.mostrarNovaConversaSubject.next(mostrar);
+  }
+
+  receberMostrarNovoContato(): Observable<boolean> {
+    return this.mostrarNovoContatoSubject.asObservable();
+  }
+
+  mostrarNovoContato(mostrar: boolean) {
+    this.mostrarNovoContatoSubject.next(mostrar);
   }
 }

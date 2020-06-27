@@ -19,6 +19,7 @@ import { DetalhesComponent } from './detalhes/detalhes.component';
 import { OpcoesComponent } from './opcoes/opcoes.component';
 import { PerfilComponent } from './perfil/perfil.component';
 import { ContatosComponent } from './contatos/contatos.component';
+import { NovoContatoComponent } from './novo-contato/novo-contato.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +36,8 @@ import { ContatosComponent } from './contatos/contatos.component';
     DetalhesComponent,
     OpcoesComponent,
     PerfilComponent,
-    ContatosComponent
+    ContatosComponent,
+    NovoContatoComponent
   ],
   imports: [
     ChatCommonModule,

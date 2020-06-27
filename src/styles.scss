@@ -257,7 +257,7 @@ body {
   }
 
   &.perfil-aberto {
-    .perfil-wrapper {
+    .perfil {
       width: 100%;
     }
     .perfil-contato-wrapper {
@@ -268,10 +268,21 @@ body {
   }
 
   &.nova-conversa-aberto {
-    .nova-conversa-wrapper {
+    .nova-conversa {
       width: 100%;
     }
     .nova-conversa-content {
+      opacity: 1;
+      transition: opacity .2s;
+      transition-delay: .2s;
+    }
+  }
+
+  &.novo-contato-aberto {
+    .novo-contato {
+      width: 100%;
+    }
+    .novo-contato-content {
       opacity: 1;
       transition: opacity .2s;
       transition-delay: .2s;
@@ -829,7 +840,14 @@ body {
   }
 }
 
-.perfil-wrapper {
+.side {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.side-content {
   position: absolute;
   top: 0;
   left: 0;
@@ -842,37 +860,32 @@ body {
   transition: width .1s;
 }
 
-.perfil {
-  width: 100%;
-  height: 100%;
+.side-header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  padding-left: 25px;
+  align-items: center;
+  padding-top: 55px;
+  padding-bottom: 25px;
+  font-size: 19px;
 
-  .perfil-header {
-    display: flex;
-    flex-direction: row;
-    padding-left: 25px;
-    align-items: center;
-    padding-top: 55px;
-    padding-bottom: 25px;
-    font-size: 19px;
+  color: #f1f1f2de;
+  background-color: #222e35;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 
-    color: #f1f1f2de;
-    background-color: #222e35;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-
-    .perfil-header-icone-voltar {
-      cursor: pointer;
-    }
-
-    .perfil-header-texto {
-      font-size: 19px;
-      height: 22px;
-      margin-left: 30px;
-      font-weight: 600;
-    }
+  .side-header-icone-voltar {
+    cursor: pointer;
   }
 
+  .side-header-texto {
+    font-size: 19px;
+    height: 22px;
+    margin-left: 30px;
+    font-weight: 600;
+  }
+}
+
+.perfil {
   .perfil-contato-wrapper {
     overflow-x: hidden;
     overflow-y: scroll;
@@ -908,108 +921,66 @@ body {
     }
   }
 
-  .perfil-dados {
-    margin-bottom: 10px;
-
-    color: #d4d5d7;
-
-    .perfil-dados-titulo {
-      padding: 14px 30px 4px;
-
-      span {
-        font-size: 15px;
-        line-height: normal;
-
-        color: #009688;
-      }
-    }
-
-    .perfil-dados-campo-wrapper {
-      padding: 0 30px;
-      height: 60px;
-      align-items: center;
-      display: flex;
-
-      div {
-        font-size: 18px;
-        line-height: 21px;
-      }
-    }
-
-    .perfil-dados-campo-borda {
-      align-items: center;
-      display: flex;
-      flex-grow: 1;
-      padding-bottom: 5px;
-
-      &.editando {
-        border-bottom: 2px solid #00af9c;
-      }
-    }
-
-    .perfil-dados-campo {
-      flex-grow: 1;
-
-      div {
-        outline: none;
-      }
-    }
-
-    .perfil-dados-icone {
-      color: #828689;
-
-      div {
-        display: inline-block;
-        cursor: pointer;        
-      }
-    }
-  }
 }
 
-.nova-conversa-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-  width: 0%;
-  height: 100%;
-  z-index: 3;
-  background-color: #101d24;
-  overflow: hidden;
-  transition: width .1s;
+.contenteditable-dados {
+  margin-bottom: 10px;
+
+  color: #d4d5d7;
+
+  .contenteditable-dados-titulo {
+    padding: 14px 30px 4px;
+
+    span {
+      font-size: 15px;
+      line-height: normal;
+
+      color: #009688;
+    }
+  }
+
+  .contenteditable-dados-campo-wrapper {
+    padding: 0 30px;
+    height: 60px;
+    align-items: center;
+    display: flex;
+
+    div {
+      font-size: 18px;
+      line-height: 21px;
+    }
+  }
+
+  .contenteditable-dados-campo-borda {
+    align-items: center;
+    display: flex;
+    flex-grow: 1;
+    padding-bottom: 5px;
+
+    &.editando {
+      border-bottom: 2px solid #00af9c;
+    }
+  }
+
+  .contenteditable-dados-campo {
+    flex-grow: 1;
+
+    div {
+      outline: none;
+    }
+  }
+
+  .contenteditable-dados-icone {
+    color: #828689;
+
+    div {
+      display: inline-block;
+      cursor: pointer;        
+    }
+  }
 }
 
 .nova-conversa {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-
-  .nova-conversa-header {
-    display: flex;
-    flex-direction: row;
-    padding-left: 25px;
-    align-items: center;
-    padding-top: 55px;
-    padding-bottom: 25px;
-    font-size: 19px;
-
-    color: #f1f1f2de;
-    background-color: #222e35;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-
-    .nova-conversa-header-icone-voltar {
-      cursor: pointer;
-    }
-
-    .nova-conversa-header-texto {
-      font-size: 19px;
-      height: 22px;
-      margin-left: 30px;
-      font-weight: 600;
-    }
-  }
-
   .nova-conversa-content {
     overflow-x: hidden;
     overflow-y: scroll;
@@ -1025,6 +996,16 @@ body {
   }
 }
 
+.novo-contato {
+  .novo-contato-content {
+    overflow-x: hidden;
+    overflow-y: scroll;
+    flex-grow: 1;
+    padding-bottom: 20px;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+}
 
 .detalhes {
   display: flex;

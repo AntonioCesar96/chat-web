@@ -1,13 +1,13 @@
 
-<div class="perfil-wrapper">
-  <div class="perfil">
-    <div class="perfil-header">
-      <div class="perfil-header-icone-voltar">
+<div class="side-content perfil">
+  <div class="side">
+    <div class="side-header">
+      <div class="side-header-icone-voltar">
         <div (click)="fecharPerfil()">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path></svg>
         </div>
       </div>
-      <div class="perfil-header-texto">Perfil</div>
+      <div class="side-header-texto">Perfil</div>
     </div>
 
     <div class="perfil-contato-wrapper">
@@ -20,20 +20,20 @@
         </div>
       </div>
 
-      <div class="perfil-dados">
-        <div class="perfil-dados-titulo">
+      <div class="contenteditable-dados">
+        <div class="contenteditable-dados-titulo">
           <span>Nome</span>
         </div>
     
-        <div class="perfil-dados-campo-wrapper">
-          <div class="perfil-dados-campo-borda editando" [class.editando]="editandoCampoNome">
-            <div class="perfil-dados-campo">
+        <div class="contenteditable-dados-campo-wrapper">
+          <div class="contenteditable-dados-campo-borda editando" [class.editando]="editandoCampoNome">
+            <div class="contenteditable-dados-campo">
               <div #campoNome 
                 (keypress)="enterSalvarCampoNome($event)"  
                 [contentEditable]="editandoCampoNome"></div>
             </div>
 
-            <div class="perfil-dados-icone">
+            <div class="contenteditable-dados-icone">
               <div (click)="editarCampoNome()" *ngIf="!editandoCampoNome" title="Editar">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M3.95 16.7v3.4h3.4l9.8-9.9-3.4-3.4-9.8 9.9zm15.8-9.1c.4-.4.4-.9 0-1.3l-2.1-2.1c-.4-.4-.9-.4-1.3 0l-1.6 1.6 3.4 3.4 1.6-1.6z"></path></svg>
               </div>
@@ -45,21 +45,20 @@
         </div>
       </div>
 
-
-      <div class="perfil-dados">
-        <div class="perfil-dados-titulo">
+      <div class="contenteditable-dados">
+        <div class="contenteditable-dados-titulo">
           <span>Recado</span>
         </div>
     
-        <div class="perfil-dados-campo-wrapper">
-          <div class="perfil-dados-campo-borda editando" [class.editando]="editandoCampoRecado">
-            <div class="perfil-dados-campo">
+        <div class="contenteditable-dados-campo-wrapper">
+          <div class="contenteditable-dados-campo-borda editando" [class.editando]="editandoCampoRecado">
+            <div class="contenteditable-dados-campo">
               <div #campoRecado 
                 (keypress)="enterSalvarCampoRecado($event)"
                 [contentEditable]="editandoCampoRecado"></div>
             </div>
 
-            <div class="perfil-dados-icone">
+            <div class="contenteditable-dados-icone">
               <div (click)="editarCampoRecado()" *ngIf="!editandoCampoRecado" title="Editar">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M3.95 16.7v3.4h3.4l9.8-9.9-3.4-3.4-9.8 9.9zm15.8-9.1c.4-.4.4-.9 0-1.3l-2.1-2.1c-.4-.4-.9-.4-1.3 0l-1.6 1.6 3.4 3.4 1.6-1.6z"></path></svg>
               </div>

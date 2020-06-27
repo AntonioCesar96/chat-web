@@ -12,7 +12,7 @@
   </div>
 
   <div #maisOpcoes class="mais-opcoes" [class.aberto]="mostrarMaisOpcoes">
-    <div class="opcao">Novo contato</div>
+    <div class="opcao" (click)="abrirNovoContato()">Novo contato</div>
     <div class="opcao">Novo grupo - Em breve</div>
     <div class="opcao" (click)="abrirPerfil()">Perfil</div>
     <div class="opcao" (click)="sair()">Sair</div>

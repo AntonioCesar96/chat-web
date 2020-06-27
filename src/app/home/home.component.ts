@@ -16,6 +16,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   mostrarDetalhes = false;
   mostrarPerfil = false;
   mostrarNovaConversa = false;
+  mostrarNovoContato = false;
 
   constructor(
     private router: Router,
@@ -42,29 +43,22 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.conversaSubjectsService
       .receberMostrarDetalhes()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((mostrar) => this.receberMostrarDetalhes(mostrar));
+      .subscribe((mostrar) => this.mostrarDetalhes = mostrar);
 
     this.conversaSubjectsService
       .receberMostrarPerfil()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((mostrar) => this.receberMostrarPerfil(mostrar));
+      .subscribe((mostrar) => this.mostrarPerfil = mostrar);
 
     this.conversaSubjectsService
       .receberMostrarNovaConversa()
       .pipe(takeUntil(this.destroy$))
-      .subscribe((mostrar) => this.receberMostrarNovaConversa(mostrar));
-  }
+      .subscribe((mostrar) => this.mostrarNovaConversa = mostrar);
 
-  receberMostrarDetalhes(mostrar) {
-    this.mostrarDetalhes = mostrar;
-  }
-
-  receberMostrarPerfil(mostrar) {
-    this.mostrarPerfil = mostrar;
-  }
-
-  receberMostrarNovaConversa(mostrar) {
-    this.mostrarNovaConversa = mostrar;
+    this.conversaSubjectsService
+      .receberMostrarNovoContato()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((mostrar) => this.mostrarNovoContato = mostrar);
   }
 
   ngOnDestroy() {

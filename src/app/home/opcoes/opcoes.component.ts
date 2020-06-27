@@ -35,6 +35,11 @@ export class OpcoesComponent implements OnInit {
     this.conversaSubjectsService.mostrarNovaConversa(true);
   }
 
+  abrirNovoContato() {
+    this.mostrarMaisOpcoes = false;
+    this.conversaSubjectsService.mostrarNovoContato(true);
+  }
+
   abrirMaisOpcoes() {
     this.mostrarMaisOpcoes = !this.mostrarMaisOpcoes;
   }
